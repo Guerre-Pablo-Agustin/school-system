@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  nombre    String
+  email     String    @unique
+  password  String
+  rol       UserRole
+  materias  Materia[] @relation("DocenteMaterias")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Student {
+  id        String   @id @default(uuid())
+  nombre    String
+  apellido  String
+  dni       String   @unique
+  grado     String
+  notas     Nota[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Materia {
+  id        String   @id @default(uuid())
+  nombre    String
+  ciclo     Ciclo
+  docente   User     @relation("DocenteMaterias", fields: [docenteId], references: [id])
+  docenteId String
+  notas     Nota[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Nota {
+  id        String   @id @default(uuid())
+  valor     Float
+  bimestre  Int
+  alumno    Student  @relation(fields: [alumnoId], references: [id])
+  alumnoId  String
+  materia   Materia  @relation(fields: [materiaId], references: [id])
+  materiaId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Ponderacion {
+  id        String   @id @default(uuid())
+  ciclo     Ciclo
+  bimestre  Int
+  peso      Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum UserRole {
+  ADMIN
+  DOCENTE
+}
+
+enum Ciclo {
+  PRIMARIA
+  SECUNDARIA
+}
