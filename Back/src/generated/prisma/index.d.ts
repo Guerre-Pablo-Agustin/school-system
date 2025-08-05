@@ -3573,6 +3573,7 @@ export namespace Prisma {
     id: string | null
     nombre: string | null
     ciclo: $Enums.Ciclo | null
+    codigo: string | null
     docenteId: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -3582,6 +3583,7 @@ export namespace Prisma {
     id: string | null
     nombre: string | null
     ciclo: $Enums.Ciclo | null
+    codigo: string | null
     docenteId: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -3591,6 +3593,7 @@ export namespace Prisma {
     id: number
     nombre: number
     ciclo: number
+    codigo: number
     docenteId: number
     createdAt: number
     updatedAt: number
@@ -3602,6 +3605,7 @@ export namespace Prisma {
     id?: true
     nombre?: true
     ciclo?: true
+    codigo?: true
     docenteId?: true
     createdAt?: true
     updatedAt?: true
@@ -3611,6 +3615,7 @@ export namespace Prisma {
     id?: true
     nombre?: true
     ciclo?: true
+    codigo?: true
     docenteId?: true
     createdAt?: true
     updatedAt?: true
@@ -3620,6 +3625,7 @@ export namespace Prisma {
     id?: true
     nombre?: true
     ciclo?: true
+    codigo?: true
     docenteId?: true
     createdAt?: true
     updatedAt?: true
@@ -3702,6 +3708,7 @@ export namespace Prisma {
     id: string
     nombre: string
     ciclo: $Enums.Ciclo
+    codigo: string
     docenteId: string
     createdAt: Date
     updatedAt: Date
@@ -3728,6 +3735,7 @@ export namespace Prisma {
     id?: boolean
     nombre?: boolean
     ciclo?: boolean
+    codigo?: boolean
     docenteId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -3740,6 +3748,7 @@ export namespace Prisma {
     id?: boolean
     nombre?: boolean
     ciclo?: boolean
+    codigo?: boolean
     docenteId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -3750,6 +3759,7 @@ export namespace Prisma {
     id?: boolean
     nombre?: boolean
     ciclo?: boolean
+    codigo?: boolean
     docenteId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -3760,12 +3770,13 @@ export namespace Prisma {
     id?: boolean
     nombre?: boolean
     ciclo?: boolean
+    codigo?: boolean
     docenteId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type MateriaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "nombre" | "ciclo" | "docenteId" | "createdAt" | "updatedAt", ExtArgs["result"]["materia"]>
+  export type MateriaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "nombre" | "ciclo" | "codigo" | "docenteId" | "createdAt" | "updatedAt", ExtArgs["result"]["materia"]>
   export type MateriaInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     docente?: boolean | UserDefaultArgs<ExtArgs>
     notas?: boolean | Materia$notasArgs<ExtArgs>
@@ -3788,6 +3799,7 @@ export namespace Prisma {
       id: string
       nombre: string
       ciclo: $Enums.Ciclo
+      codigo: string
       docenteId: string
       createdAt: Date
       updatedAt: Date
@@ -4219,6 +4231,7 @@ export namespace Prisma {
     readonly id: FieldRef<"Materia", 'String'>
     readonly nombre: FieldRef<"Materia", 'String'>
     readonly ciclo: FieldRef<"Materia", 'Ciclo'>
+    readonly codigo: FieldRef<"Materia", 'String'>
     readonly docenteId: FieldRef<"Materia", 'String'>
     readonly createdAt: FieldRef<"Materia", 'DateTime'>
     readonly updatedAt: FieldRef<"Materia", 'DateTime'>
@@ -6880,6 +6893,7 @@ export namespace Prisma {
     id: 'id',
     nombre: 'nombre',
     ciclo: 'ciclo',
+    codigo: 'codigo',
     docenteId: 'docenteId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -7158,6 +7172,7 @@ export namespace Prisma {
     id?: StringFilter<"Materia"> | string
     nombre?: StringFilter<"Materia"> | string
     ciclo?: EnumCicloFilter<"Materia"> | $Enums.Ciclo
+    codigo?: StringFilter<"Materia"> | string
     docenteId?: StringFilter<"Materia"> | string
     createdAt?: DateTimeFilter<"Materia"> | Date | string
     updatedAt?: DateTimeFilter<"Materia"> | Date | string
@@ -7169,6 +7184,7 @@ export namespace Prisma {
     id?: SortOrder
     nombre?: SortOrder
     ciclo?: SortOrder
+    codigo?: SortOrder
     docenteId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -7178,6 +7194,7 @@ export namespace Prisma {
 
   export type MateriaWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    codigo?: string
     AND?: MateriaWhereInput | MateriaWhereInput[]
     OR?: MateriaWhereInput[]
     NOT?: MateriaWhereInput | MateriaWhereInput[]
@@ -7188,12 +7205,13 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Materia"> | Date | string
     docente?: XOR<UserScalarRelationFilter, UserWhereInput>
     notas?: NotaListRelationFilter
-  }, "id">
+  }, "id" | "codigo">
 
   export type MateriaOrderByWithAggregationInput = {
     id?: SortOrder
     nombre?: SortOrder
     ciclo?: SortOrder
+    codigo?: SortOrder
     docenteId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -7209,6 +7227,7 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"Materia"> | string
     nombre?: StringWithAggregatesFilter<"Materia"> | string
     ciclo?: EnumCicloWithAggregatesFilter<"Materia"> | $Enums.Ciclo
+    codigo?: StringWithAggregatesFilter<"Materia"> | string
     docenteId?: StringWithAggregatesFilter<"Materia"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Materia"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Materia"> | Date | string
@@ -7495,6 +7514,7 @@ export namespace Prisma {
     id?: string
     nombre: string
     ciclo: $Enums.Ciclo
+    codigo: string
     createdAt?: Date | string
     updatedAt?: Date | string
     docente: UserCreateNestedOneWithoutMateriasInput
@@ -7505,6 +7525,7 @@ export namespace Prisma {
     id?: string
     nombre: string
     ciclo: $Enums.Ciclo
+    codigo: string
     docenteId: string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -7515,6 +7536,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     nombre?: StringFieldUpdateOperationsInput | string
     ciclo?: EnumCicloFieldUpdateOperationsInput | $Enums.Ciclo
+    codigo?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     docente?: UserUpdateOneRequiredWithoutMateriasNestedInput
@@ -7525,6 +7547,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     nombre?: StringFieldUpdateOperationsInput | string
     ciclo?: EnumCicloFieldUpdateOperationsInput | $Enums.Ciclo
+    codigo?: StringFieldUpdateOperationsInput | string
     docenteId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -7535,6 +7558,7 @@ export namespace Prisma {
     id?: string
     nombre: string
     ciclo: $Enums.Ciclo
+    codigo: string
     docenteId: string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -7544,6 +7568,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     nombre?: StringFieldUpdateOperationsInput | string
     ciclo?: EnumCicloFieldUpdateOperationsInput | $Enums.Ciclo
+    codigo?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -7552,6 +7577,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     nombre?: StringFieldUpdateOperationsInput | string
     ciclo?: EnumCicloFieldUpdateOperationsInput | $Enums.Ciclo
+    codigo?: StringFieldUpdateOperationsInput | string
     docenteId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -7859,6 +7885,7 @@ export namespace Prisma {
     id?: SortOrder
     nombre?: SortOrder
     ciclo?: SortOrder
+    codigo?: SortOrder
     docenteId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -7868,6 +7895,7 @@ export namespace Prisma {
     id?: SortOrder
     nombre?: SortOrder
     ciclo?: SortOrder
+    codigo?: SortOrder
     docenteId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -7877,6 +7905,7 @@ export namespace Prisma {
     id?: SortOrder
     nombre?: SortOrder
     ciclo?: SortOrder
+    codigo?: SortOrder
     docenteId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -8381,6 +8410,7 @@ export namespace Prisma {
     id?: string
     nombre: string
     ciclo: $Enums.Ciclo
+    codigo: string
     createdAt?: Date | string
     updatedAt?: Date | string
     notas?: NotaCreateNestedManyWithoutMateriaInput
@@ -8390,6 +8420,7 @@ export namespace Prisma {
     id?: string
     nombre: string
     ciclo: $Enums.Ciclo
+    codigo: string
     createdAt?: Date | string
     updatedAt?: Date | string
     notas?: NotaUncheckedCreateNestedManyWithoutMateriaInput
@@ -8428,6 +8459,7 @@ export namespace Prisma {
     id?: StringFilter<"Materia"> | string
     nombre?: StringFilter<"Materia"> | string
     ciclo?: EnumCicloFilter<"Materia"> | $Enums.Ciclo
+    codigo?: StringFilter<"Materia"> | string
     docenteId?: StringFilter<"Materia"> | string
     createdAt?: DateTimeFilter<"Materia"> | Date | string
     updatedAt?: DateTimeFilter<"Materia"> | Date | string
@@ -8619,6 +8651,7 @@ export namespace Prisma {
     id?: string
     nombre: string
     ciclo: $Enums.Ciclo
+    codigo: string
     createdAt?: Date | string
     updatedAt?: Date | string
     docente: UserCreateNestedOneWithoutMateriasInput
@@ -8628,6 +8661,7 @@ export namespace Prisma {
     id?: string
     nombre: string
     ciclo: $Enums.Ciclo
+    codigo: string
     docenteId: string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -8684,6 +8718,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     nombre?: StringFieldUpdateOperationsInput | string
     ciclo?: EnumCicloFieldUpdateOperationsInput | $Enums.Ciclo
+    codigo?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     docente?: UserUpdateOneRequiredWithoutMateriasNestedInput
@@ -8693,6 +8728,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     nombre?: StringFieldUpdateOperationsInput | string
     ciclo?: EnumCicloFieldUpdateOperationsInput | $Enums.Ciclo
+    codigo?: StringFieldUpdateOperationsInput | string
     docenteId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -8702,6 +8738,7 @@ export namespace Prisma {
     id?: string
     nombre: string
     ciclo: $Enums.Ciclo
+    codigo: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -8710,6 +8747,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     nombre?: StringFieldUpdateOperationsInput | string
     ciclo?: EnumCicloFieldUpdateOperationsInput | $Enums.Ciclo
+    codigo?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     notas?: NotaUpdateManyWithoutMateriaNestedInput
@@ -8719,6 +8757,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     nombre?: StringFieldUpdateOperationsInput | string
     ciclo?: EnumCicloFieldUpdateOperationsInput | $Enums.Ciclo
+    codigo?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     notas?: NotaUncheckedUpdateManyWithoutMateriaNestedInput
@@ -8728,6 +8767,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     nombre?: StringFieldUpdateOperationsInput | string
     ciclo?: EnumCicloFieldUpdateOperationsInput | $Enums.Ciclo
+    codigo?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

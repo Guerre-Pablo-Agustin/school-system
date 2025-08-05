@@ -6,13 +6,14 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 
 model User {
   id        String   @id @default(uuid())
@@ -40,6 +41,7 @@ model Materia {
   id         String   @id @default(uuid())
   nombre     String
   ciclo      Ciclo
+  codigo     String   @unique // Ejemplo: "M1SEC" o "MAT1S"
   docente    User     @relation("DocenteMaterias", fields: [docenteId], references: [id])
   docenteId  String
   notas      Nota[]

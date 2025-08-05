@@ -144,6 +144,7 @@ exports.Prisma.MateriaScalarFieldEnum = {
   id: 'id',
   nombre: 'nombre',
   ciclo: 'ciclo',
+  codigo: 'codigo',
   docenteId: 'docenteId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

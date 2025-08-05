@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { FilterUser, User } from "../types/Usuario.type";
+import { User } from "../types/Usuario.type";
 import bcrypt from "bcryptjs";
-import prisma from "../lib/prisma";
+import { prisma } from "../lib/prisma";
 
 export const getUsers = async (req: Request, res: Response) => {
   try {
@@ -42,7 +42,7 @@ export const getUser = async (req: Request, res: Response) => {
         email: true,
         rol: true,
         materias: true,
-      }
+      },
     });
 
     res.status(200).json({
@@ -58,33 +58,62 @@ export const getUser = async (req: Request, res: Response) => {
 };
 
 export const createUser = async (req: Request, res: Response) => {
-  const { nombre, email, password, rol, materias } = req.body;
-
   try {
-     const user: User = await prisma.user.create({
-    data: {
+    const { nombre, email, password, rol, materias } = req.body;
+
+    console.log("Creating user with data:", { nombre, email, password, rol, materias });
+
+    // Validaciones básicas
+    if (!nombre || !email || !password || !rol) {
+      return res.status(400).json({ error: "Todos los campos son requeridos (excepto materias)" });
+    }
+
+    //verificar si el email ya existe
+    const user = await prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (user) {
+      return res.status(400).json({ error: "El email ya existe" });
+    }
+
+    // Encriptar password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Preparar objeto de creación
+    const data: any = {
       nombre,
       email,
-      password: await bcrypt.hash(password, 10),
+      password: hashedPassword,
       rol,
-      materias,
-    },
-    include: {
-      materias: true,
-    },
-  });
+    };
 
-  res.status(201).json({
-    mensaje: "Usuario creado exitosamente",
-    data: user,
-  });
-  } catch (error) {
-    res.status(500).json({
-      mensaje: "Error al crear usuario",
-      error: error,
+    // Si vienen materias, mapearlas al formato correcto
+    if (materias && Array.isArray(materias) && materias.length > 0) {
+      // Si usas codigo:
+      data.materias = {
+        connect: materias.map((codigo: string) => ({
+          codigo,
+        })),
+      };
+    }
+
+    console.log("Data to be saved -🚀:", data);
+
+    const newUser = await prisma.user.create({
+      data,
     });
-  }
 
+    return res.status(201).json({
+      mensaje: "Usuario creado exitosamente",
+      data: newUser,
+    });
+  } catch (error: any) {
+    console.error(error);
+    return res.status(500).json({ error: "Error al crear el usuario" });
+  }
 };
 
 export const updateUser = async (req: Request, res: Response) => {
@@ -93,29 +122,29 @@ export const updateUser = async (req: Request, res: Response) => {
 
   try {
     const user: User = await prisma.user.update({
-    where: {
-      id,
-    },
-    data: {
-      nombre,
-      email,
-      password: await bcrypt.hash(password, 10),
-      rol,
-      materias,
-    },
-    include: {
-      materias: true,
-    },
-  });
+      where: {
+        id,
+      },
+      data: {
+        nombre,
+        email,
+        password: await bcrypt.hash(password, 10),
+        rol,
+        materias,
+      },
+      include: {
+        materias: true,
+      },
+    });
 
-  res.status(200).json({
-    mensaje: "Usuario actualizado exitosamente",
-    data: user,
-  });
+    res.status(200).json({
+      mensaje: "Usuario actualizado exitosamente",
+      data: user,
+    });
   } catch (error) {
     res.status(500).json({
-        mensaje: "Error al actualizar usuario",
-        error: error,
+      mensaje: "Error al actualizar usuario",
+      error: error,
     });
   }
 };
