@@ -1,4 +1,4 @@
-type Bimestre = 1 | 2 | 3 | 4;
+export type Bimestre = 1 | 2 | 3 | 4;
 
 export interface Nota {
   id: string;

@@ -1,6 +1,6 @@
 import { Materia } from "./materia.types";
 
-type UserRole = 'ADMIN' | 'DOCENTE';
+type UserRole = 'ADMIN' | 'DOCENTE' | 'SUPER_ADMIN';
 
 export interface User {
   id: string;

@@ -5,6 +5,7 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import userRouter from "./routes/userRoutes";
 import authRouter from "./routes/authRoutes";
+import materiaRouter from "./routes/materiasRoutes";
 import path from "path";
 
 const app = express();
@@ -38,6 +39,7 @@ app.use(morgan("dev"));
 // Rutas
 app.use("/api/auth", authRouter);
 app.use("/api/users", userRouter);
+app.use("/api/materias", materiaRouter);
 
 
 // 👉 Servir archivos estáticos desde la carpeta 'uploads'

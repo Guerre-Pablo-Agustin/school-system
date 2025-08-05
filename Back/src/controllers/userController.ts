@@ -138,7 +138,7 @@ export const updateUser = async (req: Request, res: Response) => {
   const { nombre, email, password, rol, materias } = req.body;
 
   try {
-    const user: User = await prisma.user.update({
+    const user = await prisma.user.update({
       where: {
         id,
       },
