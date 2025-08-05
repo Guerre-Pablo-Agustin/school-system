@@ -1,19 +1,70 @@
+"use client"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Image from "next/image"
+import { useDispatch } from "react-redux"
+import { useRouter } from "next/navigation"
+import { useLoginMutation } from "@/redux/services/authApi"
+import { useState } from "react"
+import { toast } from "sonner"
+import { loginSlice } from "@/redux/features/userSlice"
+import { ApiError } from "../../types/RootState"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+
+    const router = useRouter();
+  const dispatch = useDispatch();
+  const [login, { isLoading }] = useLoginMutation();
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const [loginData, setLoginData] = useState({
+    email: "",
+    password: "",
+  });
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const { email, password } = loginData;
+    console.log("Login data:", email, password);
+    try {
+      if (email && password) {
+        const response = await login({ email, password }).unwrap(); // <-- importante
+
+        const { accessToken, user } = response;
+        dispatch(loginSlice({ userLogin: user, accessToken }));
+      toast("Bienvenido " + user.nombre, {
+        position: "top-center",
+          action: {
+            label: "Ir al dashboard",
+            onClick: () => router.push("/dashboard"),
+          },
+        })
+        setErrorMessage("");
+      } else {
+        setErrorMessage("Por favor, rellene todos los campos");
+      }
+    } catch (err) {
+      // el catch ahora sí se ejecutará
+      const errorMsg =
+        (err as ApiError)?.data?.message ||
+        (err instanceof Error ? err.message : "Error inesperado");
+      setErrorMessage(errorMsg);
+    }
+  };
+
+
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8">
+          <form className="p-6 md:p-8" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>
@@ -28,6 +79,10 @@ export function LoginForm({
                   type="email"
                   placeholder="m@example.com"
                   required
+                  value={loginData.email}
+                  onChange={(e) =>
+                      setLoginData({ ...loginData, email: e.target.value })
+                    }
                 />
               </div>
               <div className="grid gap-3">
@@ -40,12 +95,25 @@ export function LoginForm({
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input
+                    id="password"
+                    type="password"
+                    value={loginData.password}
+                    onChange={(e) =>
+                      setLoginData({ ...loginData, password: e.target.value })
+                    }
+                    required
+                  />
               </div>
               <Button type="submit" className="w-full">
-                Login
+                {isLoading ? "Cargando..." : "Login"}
               </Button>
             </div>
+            {errorMessage && (
+              <p className="mt-4 text-center text-sm text-red-600">
+                {errorMessage}
+              </p>
+            )}
           </form>
           <div className="bg-muted relative hidden md:block">
             <Image
@@ -58,10 +126,6 @@ export function LoginForm({
           </div>
         </CardContent>
       </Card>
-      <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
-      </div>
     </div>
   )
 }

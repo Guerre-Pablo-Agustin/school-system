@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
-import prisma from "../lib/prisma";
+import e, { Request, Response } from "express";
+import { prisma } from "../lib/prisma";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { generateAccessToken, generateRefreshToken } from "../utils/jwt";
@@ -8,6 +8,9 @@ import { generateAccessToken, generateRefreshToken } from "../utils/jwt";
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
+
+    console.log("Login request body:", email, password);
+
     const user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
@@ -34,12 +37,12 @@ export const login = async (req: Request, res: Response) => {
     });
 
     res.json({
-      mensaje: "Login exitoso",
+      message: "Login exitoso",
       accessToken,
       user: {
         id: user.id,
-        name: user.nombre,
-        role: user.rol,
+        nombre: user.nombre,
+        rol: user.rol,
         email: user.email,
       },
     });
