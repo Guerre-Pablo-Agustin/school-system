@@ -61,58 +61,75 @@ export const createUser = async (req: Request, res: Response) => {
   try {
     const { nombre, email, password, rol, materias } = req.body;
 
-    console.log("Creating user with data:", { nombre, email, password, rol, materias });
+    // Validaciones mejoradas
+    const requiredFields = ['nombre', 'email', 'password', 'rol'];
+    const missingFields = requiredFields.filter(field => !req.body[field]);
 
-    // Validaciones básicas
-    if (!nombre || !email || !password || !rol) {
-      return res.status(400).json({ error: "Todos los campos son requeridos (excepto materias)" });
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        error: "Campos requeridos faltantes",
+        missingFields,
+        details: "Todos los campos marcados son obligatorios"
+      });
     }
 
-    //verificar si el email ya existe
-    const user = await prisma.user.findUnique({
-      where: {
-        email,
-      },
+    // Verificar email único
+    const existingUser = await prisma.user.findUnique({ 
+      where: { email } 
     });
-
-    if (user) {
-      return res.status(400).json({ error: "El email ya existe" });
+    
+    if (existingUser) {
+      return res.status(409).json({
+        error: "El email ya está registrado",
+        suggestion: "Utilice otro email o recupere su cuenta"
+      });
     }
 
-    // Encriptar password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Hash de contraseña
+    const hashedPassword = await bcrypt.hash(password, 12);
 
-    // Preparar objeto de creación
-    const data: any = {
-      nombre,
-      email,
-      password: hashedPassword,
-      rol,
-    };
-
-    // Si vienen materias, mapearlas al formato correcto
-    if (materias && Array.isArray(materias) && materias.length > 0) {
-      // Si usas codigo:
-      data.materias = {
-        connect: materias.map((codigo: string) => ({
-          codigo,
-        })),
-      };
-    }
-
-    console.log("Data to be saved -🚀:", data);
-
+    // Creación del usuario
     const newUser = await prisma.user.create({
-      data,
+      data: {
+        nombre,
+        email,
+        password: hashedPassword,
+        rol,
+        ...(materias && materias.length > 0 && {
+          materias: {
+            connect: materias.map((codigo: string) => ({ codigo }))
+          }
+        })
+      },
+      include: {
+        materias: {
+          select: {
+            codigo: true,
+            nombre: true
+          }
+        }
+      }
     });
+
+    // Eliminar password de la respuesta
+    const { password: _, ...userWithoutPassword } = newUser;
 
     return res.status(201).json({
-      mensaje: "Usuario creado exitosamente",
-      data: newUser,
+      success: true,
+      message: "Usuario creado exitosamente",
+      data: userWithoutPassword
     });
-  } catch (error: any) {
-    console.error(error);
-    return res.status(500).json({ error: "Error al crear el usuario" });
+
+  } catch (error) {
+    console.error('Error en createUser:', error);
+    
+    return res.status(500).json({
+      error: "Error interno del servidor",
+      ...(process.env.NODE_ENV === 'development' && {
+        details: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      })
+    });
   }
 };
 

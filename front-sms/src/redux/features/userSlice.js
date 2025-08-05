@@ -1,7 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { users } from "@/mocks/data";
 
-console.log("Users data:", users);
 
 const userSlice = createSlice({
   name: "user",
