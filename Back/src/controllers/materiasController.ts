@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
-import { Materia } from "../types/materia.types";
 import { prisma } from "../lib/prisma";
-import { Bimestre } from "../types/nota.type";
 
 export const getMaterias = async (req: Request, res: Response) => {
   try {
@@ -12,7 +10,6 @@ export const getMaterias = async (req: Request, res: Response) => {
         nombre: true,
         ciclo: true,
         codigo: true,
-        docenteId: true,
       },
     });
 
@@ -41,7 +38,6 @@ export const getMateria = async (req: Request, res: Response) => {
         nombre: true,
         ciclo: true,
         codigo: true,
-        docenteId: true,
       },
     });
 
@@ -79,7 +75,6 @@ export const createMateria = async (req: Request, res: Response) => {
         nombre,
         ciclo,
         codigo,
-        docenteId,
       },
     });
 
@@ -104,7 +99,7 @@ export const createMateria = async (req: Request, res: Response) => {
 
 export const updateMateria = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { nombre, ciclo, codigo, docenteId } = req.body;
+  const { nombre, ciclo, codigo } = req.body;
 
   try {
     const updatedMateria = await prisma.materia.update({
@@ -115,25 +110,13 @@ export const updateMateria = async (req: Request, res: Response) => {
         nombre,
         ciclo,
         codigo,
-        docenteId,
         },
-      include: {
-        notas: true,
-      },
     });
 
-    // Mapear bimestre a enum Bimestre si es necesario
-    const materia: Materia = {
-      ...updatedMateria,
-      notas: updatedMateria.notas.map(nota => ({
-        ...nota,
-        bimestre: nota.bimestre as Bimestre
-      }))
-    };
-
+  
     res.status(200).json({
       mensaje: "Materia actualizada exitosamente",
-      data: materia,
+      data: updatedMateria,
     });
   } catch (error) {
     res.status(500).json({

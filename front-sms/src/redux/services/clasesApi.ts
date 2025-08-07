@@ -14,7 +14,7 @@ export const clasesApi = createApi({
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
     // Traer todas las clases
-    getClases: builder.query<Clase[], void>({
+    getClases: builder.query<ClasesResponse, void>({
       query: () => "/clases",
     }),
 

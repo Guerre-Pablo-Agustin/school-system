@@ -7,6 +7,7 @@ import userReducer from "./features/userSlice";
 //services
 import { authApi } from "./services/authApi";
 import { clasesApi } from "./services/clasesApi";
+import { materiasApi } from "./services/materiasApi";
 
 
 export const store = configureStore({
@@ -14,9 +15,10 @@ export const store = configureStore({
     user: userReducer,
     [authApi.reducerPath]: authApi.reducer,
     [clasesApi.reducerPath]: clasesApi.reducer,
+    [materiasApi.reducerPath]: materiasApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat([authApi.middleware, clasesApi.middleware]),
+    getDefaultMiddleware().concat([authApi.middleware, clasesApi.middleware, materiasApi.middleware]),
 });
 
 setupListeners(store.dispatch);
