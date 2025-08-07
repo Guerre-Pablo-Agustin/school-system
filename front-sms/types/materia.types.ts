@@ -3,4 +3,5 @@ export interface Materia {
   nombre: string;
   ciclo: 'PRIMARIA' | 'SECUNDARIA';
   docenteId: string;
+  codigo : string;
 }

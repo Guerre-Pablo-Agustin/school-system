@@ -17,11 +17,11 @@ import {
 
 import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
-import { User } from "../../../../types/Usuario.type";
+import { Clase } from "../../../../types/Usuario.type";
 
 // Función para generar las columnas con las acciones
 export const getColumns = (
-): ColumnDef<User>[] => [
+): ColumnDef<Clase>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -59,57 +59,30 @@ export const getColumns = (
     },
   },
   {
-    accessorKey: "name",
-    header: "Nombre",
+    id: "materiaNombre",
+    header: "Materia",
+    cell: ({ row }) => (
+      <span>{row.original.materia?.nombre ?? "-"}</span>
+    ),
   },
   {
-    accessorKey: "stock",
-    header: "Stock",
+    id: "materiaCiclo",
+    header: "Ciclo",
+    cell: ({ row }) => (
+      <span>{row.original.materia?.ciclo ?? "-"}</span>
+    ),
   },
   {
-    accessorKey: "minStock",
-    header: "Min Stock",
-  },
-  {
-    accessorKey: "expiration",
-  header: "Expiration Date",
-  cell: ({ row }) => {
-    const expiration = row.getValue("expiration") as string;
-    const formatted = expiration ? 
-      new Date(expiration).toLocaleDateString() : 
-      "N/A";
-    return <div className="text-right font-medium">{formatted}</div>;
-  },
-  },
-  {
-    accessorKey: "unit",
-    header: "Unidad",
-  },
-  {
-    accessorKey: "price",
-    header: () => <div className="text-right">Precio unitario</div>,
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("price"));
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount);
-
-      return <div className="text-right font-medium">{formatted}</div>;
-    },
-  },
-  {
-    accessorKey: "category",
-    header: "Categoría",
-  },
-  {
-    accessorKey: "description",
-    header: "Descripción",
+    id: "materiaCodigo",
+    header: "Código",
+    cell: ({ row }) => (
+      <span>{row.original.materia?.codigo ?? "-"}</span>
+    ),
   },
   {
     id: "actions",
     cell: ({ row }) => {
-      const usuario = row.original;
+      const clase = row.original;
 
       return (
         <DropdownMenu>
@@ -122,12 +95,12 @@ export const getColumns = (
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Acciones</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(usuario.clases[0].id)}
+              onClick={() => navigator.clipboard.writeText(clase.id)}
             >
               Copiar ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/clases/${usuario.id}/edit`}>
+            <Link href={`/dashboard/clases/${clase.id}/edit`}>
             <DropdownMenuItem>
               Editar <List className="ml-1 h-4 w-4" />
             </DropdownMenuItem>
