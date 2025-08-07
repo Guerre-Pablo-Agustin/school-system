@@ -11,7 +11,22 @@ export const login = async (req: Request, res: Response) => {
 
     console.log("Login request body:", email, password);
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({
+      where: { email },
+      include: {
+        clases: {
+          include: {
+            materia: {
+              select: {
+                nombre: true,
+                codigo: true,
+                ciclo: true,
+              },
+            },
+          },
+        },
+      },
+    });
 
     if (!user) {
       res.status(401).json({ message: "Usuario no encontrado" });
@@ -44,6 +59,7 @@ export const login = async (req: Request, res: Response) => {
         nombre: user.nombre,
         rol: user.rol,
         email: user.email,
+        clases: user.clases,
       },
     });
   } catch (error) {
@@ -57,17 +73,16 @@ export const logout = async (req: Request, res: Response) => {
   const token = req.cookies.refreshToken;
 
   if (token) {
-    res.clearCookie("refreshToken",{path: "/"});
+    res.clearCookie("refreshToken", { path: "/" });
   }
 
   res.json({ message: "Sesión cerrada correctamente" });
 };
 
-
 //refresh token
 export const refreshToken = async (req: Request, res: Response) => {
   console.log("Cookies recibidas en /refresh:", req.cookies);
-console.log("JWT_REFRESH_SECRET:", process.env.JWT_REFRESH_SECRET); 
+  console.log("JWT_REFRESH_SECRET:", process.env.JWT_REFRESH_SECRET);
 
   const token = req.cookies.refreshToken;
 
@@ -77,7 +92,10 @@ console.log("JWT_REFRESH_SECRET:", process.env.JWT_REFRESH_SECRET);
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET as string) as any;
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_REFRESH_SECRET as string
+    ) as any;
 
     const user = await prisma.user.findUnique({ where: { id: decoded.id } });
 

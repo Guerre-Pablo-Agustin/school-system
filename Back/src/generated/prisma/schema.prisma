@@ -15,63 +15,76 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
+  id        String   @id @default(uuid())
   nombre    String
-  email     String    @unique
+  email     String   @unique
   password  String
-  rol       UserRole
-  materias  Materia[] @relation("DocenteMaterias")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  telefono  String
+  direccion String
+  rol       Rol // ADMIN o DOCENTE (quitamos ESTUDIANTE)
+  clases    Clase[]  @relation("DocenteClases")
+  createdAt DateTime @default(now())
 }
 
-model Student {
+model Estudiante {
   id        String   @id @default(uuid())
   nombre    String
   apellido  String
-  dni       String   @unique
-  grado     String
+  dni       String?  @unique // Opcional, para identificación
+  telefono  String
+  direccion String
+  grado     Int // Ej: 1 (primero), 2 (segundo)...
+  seccion   String // Ej: "A", "B"...
   notas     Nota[]
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+}
+
+model Nota {
+  id           String     @id @default(uuid())
+  estudiante   Estudiante @relation(fields: [estudianteId], references: [id])
+  estudianteId String
+  materia      Materia    @relation(fields: [materiaId], references: [id])
+  materiaId    String
+  bimestre     Int // 1 al 4
+  nota         Float
+  docenteId    String // ID del docente (sin FK para simplificar)
+  createdAt    DateTime   @default(now())
+
+  @@unique([estudianteId, materiaId, bimestre])
 }
 
 model Materia {
   id        String   @id @default(uuid())
   nombre    String
   ciclo     Ciclo
-  codigo    String   @unique // Ejemplo: "M1SEC" o "MAT1S"
-  docente   User     @relation("DocenteMaterias", fields: [docenteId], references: [id])
-  docenteId String
+  codigo    String   @unique
+  clases    Clase[]
   notas     Nota[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Nota {
-  id        String   @id @default(uuid())
-  valor     Float
-  bimestre  Int
-  alumno    Student  @relation(fields: [alumnoId], references: [id])
-  alumnoId  String
-  materia   Materia  @relation(fields: [materiaId], references: [id])
+model Clase {
+  id        String  @id @default(uuid())
+  docente   User    @relation("DocenteClases", fields: [docenteId], references: [id])
+  docenteId String
+  materia   Materia @relation(fields: [materiaId], references: [id])
   materiaId String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+
+  @@unique([docenteId, materiaId]) // Evita duplicados
 }
 
 model Ponderacion {
   id        String   @id @default(uuid())
-  ciclo     Ciclo
-  bimestre  Int
-  peso      Float
+  ciclo     Ciclo    @unique // Solo 1 configuración por ciclo
+  formula   String // Ej: "0.3,0.3,0.2,0.2" (suma=1)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
-enum UserRole {
+enum Rol {
   ADMIN
   DOCENTE
+  SUPERADMIN
 }
 
 enum Ciclo {

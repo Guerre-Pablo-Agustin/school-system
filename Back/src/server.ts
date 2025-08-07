@@ -1,12 +1,17 @@
 // src/server.ts
+
+// Importaciones
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
+import path from "path";
+
+// Rutas
 import userRouter from "./routes/userRoutes";
 import authRouter from "./routes/authRoutes";
 import materiaRouter from "./routes/materiasRoutes";
-import path from "path";
+import alumnoRouter from "./routes/alumnosRoutes";
 
 const app = express();
 
@@ -40,6 +45,7 @@ app.use(morgan("dev"));
 app.use("/api/auth", authRouter);
 app.use("/api/users", userRouter);
 app.use("/api/materias", materiaRouter);
+app.use("/api/alumnos", alumnoRouter);
 
 
 // 👉 Servir archivos estáticos desde la carpeta 'uploads'

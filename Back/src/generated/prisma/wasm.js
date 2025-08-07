@@ -125,19 +125,32 @@ exports.Prisma.UserScalarFieldEnum = {
   nombre: 'nombre',
   email: 'email',
   password: 'password',
+  telefono: 'telefono',
+  direccion: 'direccion',
   rol: 'rol',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  createdAt: 'createdAt'
 };
 
-exports.Prisma.StudentScalarFieldEnum = {
+exports.Prisma.EstudianteScalarFieldEnum = {
   id: 'id',
   nombre: 'nombre',
   apellido: 'apellido',
   dni: 'dni',
+  telefono: 'telefono',
+  direccion: 'direccion',
   grado: 'grado',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  seccion: 'seccion',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.NotaScalarFieldEnum = {
+  id: 'id',
+  estudianteId: 'estudianteId',
+  materiaId: 'materiaId',
+  bimestre: 'bimestre',
+  nota: 'nota',
+  docenteId: 'docenteId',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.MateriaScalarFieldEnum = {
@@ -145,28 +158,21 @@ exports.Prisma.MateriaScalarFieldEnum = {
   nombre: 'nombre',
   ciclo: 'ciclo',
   codigo: 'codigo',
-  docenteId: 'docenteId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.NotaScalarFieldEnum = {
+exports.Prisma.ClaseScalarFieldEnum = {
   id: 'id',
-  valor: 'valor',
-  bimestre: 'bimestre',
-  alumnoId: 'alumnoId',
-  materiaId: 'materiaId',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  docenteId: 'docenteId',
+  materiaId: 'materiaId'
 };
 
 exports.Prisma.PonderacionScalarFieldEnum = {
   id: 'id',
   ciclo: 'ciclo',
-  bimestre: 'bimestre',
-  peso: 'peso',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  formula: 'formula',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -178,9 +184,15 @@ exports.Prisma.QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
 };
-exports.UserRole = exports.$Enums.UserRole = {
+
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+exports.Rol = exports.$Enums.Rol = {
   ADMIN: 'ADMIN',
-  DOCENTE: 'DOCENTE'
+  DOCENTE: 'DOCENTE',
+  SUPERADMIN: 'SUPERADMIN'
 };
 
 exports.Ciclo = exports.$Enums.Ciclo = {
@@ -190,9 +202,10 @@ exports.Ciclo = exports.$Enums.Ciclo = {
 
 exports.Prisma.ModelName = {
   User: 'User',
-  Student: 'Student',
-  Materia: 'Materia',
+  Estudiante: 'Estudiante',
   Nota: 'Nota',
+  Materia: 'Materia',
+  Clase: 'Clase',
   Ponderacion: 'Ponderacion'
 };
 

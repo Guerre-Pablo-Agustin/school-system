@@ -25,7 +25,23 @@ import {
 } from "@/components/ui/sidebar"
 import { useSelector } from "react-redux"
 import { selectUserLogin } from "@/redux/features/userSlice"
+import { LucideIcon } from "lucide-react"
 
+type UserRole = 'ADMIN' | 'DOCENTE' | 'SUPERADMIN';
+
+interface NavItem {
+  title: string;
+  url: string;
+  rol?: UserRole[];
+}
+
+interface NavSection {
+  title: string;
+  url: string;
+  icon: LucideIcon;
+  rol?: UserRole[];
+  items?: NavItem[];
+}
 
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -37,7 +53,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   const userRole = userLogin?.rol || "ADMIN";
 
-const fullNav = [
+const fullNav: NavSection[] = [
   {
     title: "Home",
     url: "/dashboard",
@@ -45,37 +61,62 @@ const fullNav = [
     items: [{ title: "Inicio", url: "/dashboard" }],
   },
   {
-    title: "Classes",
+    title: "Clases",
     url: "/dashboard/clases",
     icon: BookOpen,
-    rol: ["ADMIN", "SUPER_ADMIN", "DOCENTE"],
-    items: [{ 
-      title: "Listado de clases", 
-      url: "/dashboard/clases" }, 
+    rol: ["ADMIN", "SUPERADMIN", "DOCENTE"],
+    items: [
+      { 
+        title: "Listado de clases", 
+        url: "/dashboard/clases",
+        rol: ["ADMIN", "SUPERADMIN"],
+      },
+      { 
+        title: "Mis Clases", 
+        url: "/dashboard/mis-clases",
+        rol: ["ADMIN", "SUPERADMIN", "DOCENTE"],
+      },
       { 
         title: "Nueva clase", 
         url: "/dashboard/clases/nuevo",
-      }],
+        rol: ["ADMIN", "SUPERADMIN"],
+      }
+    ],
   },
   {
-    title: "Subjects",
-    url: "/dashboard/subjects",
+    title: "Materias",
+    url: "/dashboard/materias",
     icon: ClipboardList,
-    rol: ["ADMIN", "SUPER_ADMIN"],
-    items: [{ title: "Listado de materias", url: "/dashboard/subjects" }],
+    rol: ["ADMIN", "SUPERADMIN", "DOCENTE"],
+    items: [
+      { title: "Listado de materias", 
+        url: "/dashboard/materias",
+        rol: ["ADMIN", "SUPERADMIN"],
+      },
+      {
+        title: "Mis materias",
+        url: "/dashboard/materias/mis-materias",
+        rol: ["ADMIN", "SUPERADMIN", "DOCENTE"],
+      },
+      {
+        title: "Nueva materia",
+        url: "/dashboard/materias/nueva",
+        rol: ["ADMIN", "SUPERADMIN"],
+      }
+      ],
   },
   {
     title: "Teachers",
     url: "/dashboard/teachers",
     icon: Users,
-    rol: ["ADMIN", "SUPER_ADMIN"],
+    rol: ["ADMIN", "SUPERADMIN"],
     items: [{ title: "Listado de docentes", url: "/dashboard/teachers" }],
   },
   {
     title: "Students",
     url: "/dashboard/students",
     icon: GraduationCap,
-    rol: ["ADMIN", "SUPER_ADMIN", "DOCENTE"],
+    rol: ["ADMIN", "SUPERADMIN", "DOCENTE"],
     items: [{ 
       title: "Listado de estudiantes", 
       url: "/dashboard/students" },
@@ -88,14 +129,14 @@ const fullNav = [
     title: "Notices",
     url: "/dashboard/notices",
     icon: FileText,
-    rol: ["ADMIN", "SUPER_ADMIN", "DOCENTE"],
+    rol: ["ADMIN", "SUPERADMIN", "DOCENTE"],
     items: [{ title: "Comunicados", url: "/dashboard/notices" }],
   },
   {
     title: "Complains",
     url: "/dashboard/complains",
     icon: AlertCircle,
-    rol: ["ADMIN", "SUPER_ADMIN"],
+    rol: ["ADMIN", "SUPERADMIN"],
     items: [{ title: "Reclamos", url: "/dashboard/complains" }],
   },
   {
@@ -106,17 +147,28 @@ const fullNav = [
   },
 ];
 
-  // Filter the navigation items based on user rol
-  const navMain = fullNav.filter(
-    (item) => !item.rol || item.rol.includes(userRole),
-  );
+
+const navMain = fullNav
+  .filter((item) => !item.rol || item.rol.includes(userRole))
+  .map((item) => {
+    if (item.items) {
+      return {
+        ...item,
+        items: item.items.filter(
+          (subItem) => !subItem.rol || subItem.rol.includes(userRole)
+        ),
+      };
+    }
+    return item;
+  });
+
 
   // This is sample data.
 const data = {
    user: {
       name: userLogin?.nombre || "Shadcn",
       email: userLogin?.email || "m@example.com",
-      rol: userLogin?.rol || "SUPER_ADMIN",
+      rol: userLogin?.rol || "SUPERADMIN",
       avatar:
         userLogin?.avatar || "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y",
   },
