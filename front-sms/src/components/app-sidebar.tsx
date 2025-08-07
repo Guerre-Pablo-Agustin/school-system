@@ -73,7 +73,7 @@ const fullNav: NavSection[] = [
       },
       { 
         title: "Mis Clases", 
-        url: "/dashboard/mis-clases",
+        url: "/dashboard/clases/mis-clases",
         rol: ["ADMIN", "SUPERADMIN", "DOCENTE"],
       },
       { 

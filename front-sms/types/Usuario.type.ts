@@ -8,7 +8,14 @@ export interface User {
   email: string;
   password: string; // hash
   rol: UserRole;
-  materias: Materia[]; // Solo si es docente
+  clases: Clase[]; // Solo si es docente
+}
+
+export interface Clase {
+  id: string;
+  nombre: string;
+  materia: Materia;
+  docente: User;
 }
 
 export interface FilterUser {
