@@ -53,6 +53,8 @@ export const getUsers = async (req: Request, res: Response) => {
         id: true,
         nombre: true,
         email: true,
+        telefono: true,
+        direccion: true,
         rol: true,
         clases: {
           select: {

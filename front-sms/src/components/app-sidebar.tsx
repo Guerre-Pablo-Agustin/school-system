@@ -106,11 +106,21 @@ const fullNav: NavSection[] = [
       ],
   },
   {
-    title: "Teachers",
-    url: "/dashboard/teachers",
+    title: "Usuarios",
+    url: "/dashboard/usuarios",
     icon: Users,
     rol: ["ADMIN", "SUPERADMIN"],
-    items: [{ title: "Listado de docentes", url: "/dashboard/teachers" }],
+    items: [{ 
+      title: "Listado de usuarios", 
+      url: "/dashboard/usuarios" },
+      {
+        title: "Maestros",
+        url: "/dashboard/usuarios/maestros",
+      },
+    {
+      title: "Nuevo usuario",
+      url: "/dashboard/usuarios/nuevo",
+    }],
   },
   {
     title: "Alumnos",
