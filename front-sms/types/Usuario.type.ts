@@ -1,6 +1,6 @@
 import { Materia } from "./materia.types";
 
-type UserRole = 'ADMIN' | 'DOCENTE' | 'SUPER_ADMIN';
+type UserRole = 'ADMIN' | 'DOCENTE' | 'SUPERADMIN';
 
 export interface User {
   id: string;
@@ -8,6 +8,8 @@ export interface User {
   email: string;
   password: string; // hash
   rol: UserRole;
+  telefono: string;
+  direccion: string;
   clases: Clase[]; // Solo si es docente
 }
 
@@ -24,3 +26,11 @@ export interface FilterUser {
   rol?: UserRole;
   materias?: Materia[];
 }
+
+
+export type ApiError = {
+  data: {
+    message: string;
+  };
+  status: number;
+};

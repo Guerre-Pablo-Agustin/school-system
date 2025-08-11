@@ -93,6 +93,8 @@ export const authApi = createApi({
   reducerPath: "authApi",
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
+
+    //login
     login: builder.mutation<LoginResponse, LoginRequest>({
       query: (credentials) => ({
         url: "/auth/login",
@@ -100,24 +102,32 @@ export const authApi = createApi({
         body: credentials,
       }),
     }),
+
+    //logout
     logout: builder.mutation<void, void>({
       query: () => ({
         url: "/auth/logout",
         method: "POST",
       }),
     }),
+
+    //refreshToken
     refreshToken: builder.mutation<{ accessToken: string }, void>({
       query: () => ({
         url: "/auth/refresh",
         method: "POST",
       }),
     }),
+
+    //traer todos los usuarios
     getUsers: builder.query<getUsersResponse, void>({
       query: () => ({
         url: "/users",
         method: "GET",
       }),
     }),
+
+    //traer un usuario por su id
     getUserById: builder.query<UserResponse, string>({
       query: (id) => {
         console.log("ID del usuario:", id);
@@ -127,22 +137,39 @@ export const authApi = createApi({
       }
       },
     }),
-    updateUser: builder.mutation<UserResponse, { id: string; data: FormData }>({
-      query: ({ id, data }) => ({
-        url: `/users/${id}`,
-        method: "PUT",
-        body: data,
-      }),
+
+    //actualizar un usuario
+    updateUser: builder.mutation<UserResponse, { id: string; data: Partial<User> }>({
+      query: ({ id, data }) => {
+        console.log("🛠️ Enviando usuario desde mutation:", data);
+        return {
+          url: `/users/${id}`,
+          method: "PUT",
+          body: data,
+        };
+      },
     }),
-    createUser: builder.mutation<UserResponse, FormData>({
-      query: (data) => ({
-        url: "/users",
-        method: "POST",
-        body: data,
-      }),
+
+    //crear un usuario
+    createUser: builder.mutation<UserResponse, Partial<User>>({
+      query:(data)=>{
+        console.log("🛠️ Enviando usuario desde mutation:",data); // 👈 log
+        return {
+          url:"users",
+          method:"POST",
+          body:data,
+        }
+      },
     }),
   }),
 });
 
-export const { useLoginMutation, useLogoutMutation, useRefreshTokenMutation, useGetUserByIdQuery, useUpdateUserMutation, useCreateUserMutation, useGetUsersQuery } =
-  authApi;
+export const { 
+  useLoginMutation, 
+  useLogoutMutation, 
+  useRefreshTokenMutation, 
+  useGetUserByIdQuery, 
+  useUpdateUserMutation, 
+  useCreateUserMutation, 
+  useGetUsersQuery 
+} = authApi;

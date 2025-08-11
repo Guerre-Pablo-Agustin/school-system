@@ -84,7 +84,7 @@ export const getUsers = async (req: Request, res: Response) => {
 
 export const createUser = async (req: Request, res: Response) => {
   try {
-    const { nombre, email, password, rol, materias } = req.body;
+    const { nombre, email, password, rol, materias, telefono, direccion } = req.body;
 
     // Validaciones mejoradas
     const requiredFields = ['nombre', 'email', 'password', 'rol'];
@@ -120,6 +120,8 @@ export const createUser = async (req: Request, res: Response) => {
         email,
         password: hashedPassword,
         rol,
+        telefono,
+        direccion,
         ...(materias && materias.length > 0 && {
           materias: {
             connect: materias.map((codigo: string) => ({ codigo }))
@@ -167,6 +169,8 @@ export const createUser = async (req: Request, res: Response) => {
 export const updateUser = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { nombre, email, password, rol, clases } = req.body;
+
+  
 
   try {
     const user = await prisma.user.update({
