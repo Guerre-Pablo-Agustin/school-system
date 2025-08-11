@@ -168,9 +168,9 @@ export const createUser = async (req: Request, res: Response) => {
 
 export const updateUser = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { nombre, email, password, rol, clases } = req.body;
+  const { nombre, email, password, rol, clases, telefono, direccion } = req.body;
 
-  
+  console.log("💨💨 Updating user :", );
 
   try {
     const user = await prisma.user.update({
@@ -180,6 +180,8 @@ export const updateUser = async (req: Request, res: Response) => {
       data: {
         nombre,
         email,
+        telefono,
+        direccion,
         password: await bcrypt.hash(password, 10),
         rol,
         clases,

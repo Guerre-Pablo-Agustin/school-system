@@ -27,7 +27,6 @@ import {
   } from "../ui/select";
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import { Input } from '../ui/input';
-import { ApiError } from '../../../types/RootState';
 
 const formUserSchema = z.object({
     nombre: z.string().min(3, { message: "El nombre es requerido" }).optional(),
