@@ -25,7 +25,7 @@ export const getMaterias = async (req: Request, res: Response) => {
   }
 };
 
-export const getMateria = async (req: Request, res: Response) => {
+export const getMateriaByCodigo = async (req: Request, res: Response) => {
   const { codigo } = req.params;
 
   try {
@@ -53,12 +53,40 @@ export const getMateria = async (req: Request, res: Response) => {
   }
 };
 
+export const getMateriaById = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    const materia = await prisma.materia.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        nombre: true,
+        ciclo: true,
+        codigo: true,
+      },
+    });
+
+    res.status(200).json({
+      mensaje: "Materia encontrada",
+      data: materia,
+    });
+  } catch (error) {
+    res.status(500).json({
+      mensaje: "Error al obtener materia",
+      error: error,
+    });
+  }
+};
+
 export const createMateria = async (req: Request, res: Response) => {
   try {
-    const { nombre, ciclo, codigo, docenteId } = req.body;
+    const { nombre, ciclo, codigo,  } = req.body;
 
     // Validaciones mejoradas
-    const requiredFields = ['nombre', 'ciclo', 'codigo', 'docenteId'];
+    const requiredFields = ['nombre', 'ciclo', 'codigo'];
     const missingFields = requiredFields.filter(field => !req.body[field]);
 
     if (missingFields.length > 0) {

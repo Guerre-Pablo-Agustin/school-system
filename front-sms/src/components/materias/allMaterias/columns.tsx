@@ -91,7 +91,7 @@ export const getColumns = (
               Copiar ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/clases/${clase.id}/edit`}>
+            <Link href={`/dashboard/materias/${clase.id}/edit`}>
             <DropdownMenuItem>
               Editar <List className="ml-1 h-4 w-4" />
             </DropdownMenuItem>

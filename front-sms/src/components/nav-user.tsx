@@ -29,6 +29,10 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { useRouter } from "next/navigation"
+import { useDispatch } from "react-redux"
+import { useLogoutMutation } from "@/redux/services/authApi"
+import { logoutUser } from "@/redux/features/userSlice"
 
 export function NavUser({
   user,
@@ -40,6 +44,24 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
+
+
+  const routes = useRouter();
+  const dispatch = useDispatch();
+  const [logout] = useLogoutMutation();
+
+  const Handlerlogout = async () => {
+    try {
+      const response = await logout();
+      if (response?.data) {
+        dispatch(logoutUser());
+        routes.push("/login");
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
+
 
   return (
     <SidebarMenu>
@@ -102,7 +124,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={Handlerlogout}>
               <LogOut />
               Log out
             </DropdownMenuItem>
