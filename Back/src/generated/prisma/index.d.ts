@@ -2583,18 +2583,8 @@ export namespace Prisma {
 
   export type AggregateEstudiante = {
     _count: EstudianteCountAggregateOutputType | null
-    _avg: EstudianteAvgAggregateOutputType | null
-    _sum: EstudianteSumAggregateOutputType | null
     _min: EstudianteMinAggregateOutputType | null
     _max: EstudianteMaxAggregateOutputType | null
-  }
-
-  export type EstudianteAvgAggregateOutputType = {
-    grado: number | null
-  }
-
-  export type EstudianteSumAggregateOutputType = {
-    grado: number | null
   }
 
   export type EstudianteMinAggregateOutputType = {
@@ -2604,7 +2594,7 @@ export namespace Prisma {
     dni: string | null
     telefono: string | null
     direccion: string | null
-    grado: number | null
+    grado: string | null
     seccion: string | null
     createdAt: Date | null
   }
@@ -2616,7 +2606,7 @@ export namespace Prisma {
     dni: string | null
     telefono: string | null
     direccion: string | null
-    grado: number | null
+    grado: string | null
     seccion: string | null
     createdAt: Date | null
   }
@@ -2634,14 +2624,6 @@ export namespace Prisma {
     _all: number
   }
 
-
-  export type EstudianteAvgAggregateInputType = {
-    grado?: true
-  }
-
-  export type EstudianteSumAggregateInputType = {
-    grado?: true
-  }
 
   export type EstudianteMinAggregateInputType = {
     id?: true
@@ -2718,18 +2700,6 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Select which fields to average
-    **/
-    _avg?: EstudianteAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    _sum?: EstudianteSumAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
      * Select which fields to find the minimum value
     **/
     _min?: EstudianteMinAggregateInputType
@@ -2760,8 +2730,6 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: EstudianteCountAggregateInputType | true
-    _avg?: EstudianteAvgAggregateInputType
-    _sum?: EstudianteSumAggregateInputType
     _min?: EstudianteMinAggregateInputType
     _max?: EstudianteMaxAggregateInputType
   }
@@ -2773,12 +2741,10 @@ export namespace Prisma {
     dni: string | null
     telefono: string
     direccion: string
-    grado: number
+    grado: string
     seccion: string
     createdAt: Date
     _count: EstudianteCountAggregateOutputType | null
-    _avg: EstudianteAvgAggregateOutputType | null
-    _sum: EstudianteSumAggregateOutputType | null
     _min: EstudianteMinAggregateOutputType | null
     _max: EstudianteMaxAggregateOutputType | null
   }
@@ -2867,7 +2833,7 @@ export namespace Prisma {
       dni: string | null
       telefono: string
       direccion: string
-      grado: number
+      grado: string
       seccion: string
       createdAt: Date
     }, ExtArgs["result"]["estudiante"]>
@@ -3300,7 +3266,7 @@ export namespace Prisma {
     readonly dni: FieldRef<"Estudiante", 'String'>
     readonly telefono: FieldRef<"Estudiante", 'String'>
     readonly direccion: FieldRef<"Estudiante", 'String'>
-    readonly grado: FieldRef<"Estudiante", 'Int'>
+    readonly grado: FieldRef<"Estudiante", 'String'>
     readonly seccion: FieldRef<"Estudiante", 'String'>
     readonly createdAt: FieldRef<"Estudiante", 'DateTime'>
   }
@@ -8279,7 +8245,7 @@ export namespace Prisma {
     dni?: StringNullableFilter<"Estudiante"> | string | null
     telefono?: StringFilter<"Estudiante"> | string
     direccion?: StringFilter<"Estudiante"> | string
-    grado?: IntFilter<"Estudiante"> | number
+    grado?: StringFilter<"Estudiante"> | string
     seccion?: StringFilter<"Estudiante"> | string
     createdAt?: DateTimeFilter<"Estudiante"> | Date | string
     notas?: NotaListRelationFilter
@@ -8308,7 +8274,7 @@ export namespace Prisma {
     apellido?: StringFilter<"Estudiante"> | string
     telefono?: StringFilter<"Estudiante"> | string
     direccion?: StringFilter<"Estudiante"> | string
-    grado?: IntFilter<"Estudiante"> | number
+    grado?: StringFilter<"Estudiante"> | string
     seccion?: StringFilter<"Estudiante"> | string
     createdAt?: DateTimeFilter<"Estudiante"> | Date | string
     notas?: NotaListRelationFilter
@@ -8325,10 +8291,8 @@ export namespace Prisma {
     seccion?: SortOrder
     createdAt?: SortOrder
     _count?: EstudianteCountOrderByAggregateInput
-    _avg?: EstudianteAvgOrderByAggregateInput
     _max?: EstudianteMaxOrderByAggregateInput
     _min?: EstudianteMinOrderByAggregateInput
-    _sum?: EstudianteSumOrderByAggregateInput
   }
 
   export type EstudianteScalarWhereWithAggregatesInput = {
@@ -8341,7 +8305,7 @@ export namespace Prisma {
     dni?: StringNullableWithAggregatesFilter<"Estudiante"> | string | null
     telefono?: StringWithAggregatesFilter<"Estudiante"> | string
     direccion?: StringWithAggregatesFilter<"Estudiante"> | string
-    grado?: IntWithAggregatesFilter<"Estudiante"> | number
+    grado?: StringWithAggregatesFilter<"Estudiante"> | string
     seccion?: StringWithAggregatesFilter<"Estudiante"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Estudiante"> | Date | string
   }
@@ -8664,7 +8628,7 @@ export namespace Prisma {
     dni?: string | null
     telefono: string
     direccion: string
-    grado: number
+    grado: string
     seccion: string
     createdAt?: Date | string
     notas?: NotaCreateNestedManyWithoutEstudianteInput
@@ -8677,7 +8641,7 @@ export namespace Prisma {
     dni?: string | null
     telefono: string
     direccion: string
-    grado: number
+    grado: string
     seccion: string
     createdAt?: Date | string
     notas?: NotaUncheckedCreateNestedManyWithoutEstudianteInput
@@ -8690,7 +8654,7 @@ export namespace Prisma {
     dni?: NullableStringFieldUpdateOperationsInput | string | null
     telefono?: StringFieldUpdateOperationsInput | string
     direccion?: StringFieldUpdateOperationsInput | string
-    grado?: IntFieldUpdateOperationsInput | number
+    grado?: StringFieldUpdateOperationsInput | string
     seccion?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     notas?: NotaUpdateManyWithoutEstudianteNestedInput
@@ -8703,7 +8667,7 @@ export namespace Prisma {
     dni?: NullableStringFieldUpdateOperationsInput | string | null
     telefono?: StringFieldUpdateOperationsInput | string
     direccion?: StringFieldUpdateOperationsInput | string
-    grado?: IntFieldUpdateOperationsInput | number
+    grado?: StringFieldUpdateOperationsInput | string
     seccion?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     notas?: NotaUncheckedUpdateManyWithoutEstudianteNestedInput
@@ -8716,7 +8680,7 @@ export namespace Prisma {
     dni?: string | null
     telefono: string
     direccion: string
-    grado: number
+    grado: string
     seccion: string
     createdAt?: Date | string
   }
@@ -8728,7 +8692,7 @@ export namespace Prisma {
     dni?: NullableStringFieldUpdateOperationsInput | string | null
     telefono?: StringFieldUpdateOperationsInput | string
     direccion?: StringFieldUpdateOperationsInput | string
-    grado?: IntFieldUpdateOperationsInput | number
+    grado?: StringFieldUpdateOperationsInput | string
     seccion?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -8740,7 +8704,7 @@ export namespace Prisma {
     dni?: NullableStringFieldUpdateOperationsInput | string | null
     telefono?: StringFieldUpdateOperationsInput | string
     direccion?: StringFieldUpdateOperationsInput | string
-    grado?: IntFieldUpdateOperationsInput | number
+    grado?: StringFieldUpdateOperationsInput | string
     seccion?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9106,17 +9070,6 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
-  export type IntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
-  }
-
   export type NotaListRelationFilter = {
     every?: NotaWhereInput
     some?: NotaWhereInput
@@ -9144,10 +9097,6 @@ export namespace Prisma {
     createdAt?: SortOrder
   }
 
-  export type EstudianteAvgOrderByAggregateInput = {
-    grado?: SortOrder
-  }
-
   export type EstudianteMaxOrderByAggregateInput = {
     id?: SortOrder
     nombre?: SortOrder
@@ -9172,10 +9121,6 @@ export namespace Prisma {
     createdAt?: SortOrder
   }
 
-  export type EstudianteSumOrderByAggregateInput = {
-    grado?: SortOrder
-  }
-
   export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -9194,7 +9139,7 @@ export namespace Prisma {
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
-  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+  export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
     notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -9202,12 +9147,7 @@ export namespace Prisma {
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
   }
 
   export type FloatFilter<$PrismaModel = never> = {
@@ -9275,6 +9215,22 @@ export namespace Prisma {
   export type NotaSumOrderByAggregateInput = {
     bimestre?: SortOrder
     nota?: SortOrder
+  }
+
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type FloatWithAggregatesFilter<$PrismaModel = never> = {
@@ -9458,14 +9414,6 @@ export namespace Prisma {
     set?: string | null
   }
 
-  export type IntFieldUpdateOperationsInput = {
-    set?: number
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
-  }
-
   export type NotaUpdateManyWithoutEstudianteNestedInput = {
     create?: XOR<NotaCreateWithoutEstudianteInput, NotaUncheckedCreateWithoutEstudianteInput> | NotaCreateWithoutEstudianteInput[] | NotaUncheckedCreateWithoutEstudianteInput[]
     connectOrCreate?: NotaCreateOrConnectWithoutEstudianteInput | NotaCreateOrConnectWithoutEstudianteInput[]
@@ -9504,6 +9452,14 @@ export namespace Prisma {
     create?: XOR<MateriaCreateWithoutNotasInput, MateriaUncheckedCreateWithoutNotasInput>
     connectOrCreate?: MateriaCreateOrConnectWithoutNotasInput
     connect?: MateriaWhereUniqueInput
+  }
+
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
   }
 
   export type FloatFieldUpdateOperationsInput = {
@@ -9772,6 +9728,17 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
+  export type NestedFloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -9786,17 +9753,6 @@ export namespace Prisma {
     _sum?: NestedIntFilter<$PrismaModel>
     _min?: NestedIntFilter<$PrismaModel>
     _max?: NestedIntFilter<$PrismaModel>
-  }
-
-  export type NestedFloatFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatFilter<$PrismaModel> | number
   }
 
   export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
@@ -9941,7 +9897,7 @@ export namespace Prisma {
     dni?: string | null
     telefono: string
     direccion: string
-    grado: number
+    grado: string
     seccion: string
     createdAt?: Date | string
   }
@@ -9953,7 +9909,7 @@ export namespace Prisma {
     dni?: string | null
     telefono: string
     direccion: string
-    grado: number
+    grado: string
     seccion: string
     createdAt?: Date | string
   }
@@ -10006,7 +9962,7 @@ export namespace Prisma {
     dni?: NullableStringFieldUpdateOperationsInput | string | null
     telefono?: StringFieldUpdateOperationsInput | string
     direccion?: StringFieldUpdateOperationsInput | string
-    grado?: IntFieldUpdateOperationsInput | number
+    grado?: StringFieldUpdateOperationsInput | string
     seccion?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -10018,7 +9974,7 @@ export namespace Prisma {
     dni?: NullableStringFieldUpdateOperationsInput | string | null
     telefono?: StringFieldUpdateOperationsInput | string
     direccion?: StringFieldUpdateOperationsInput | string
-    grado?: IntFieldUpdateOperationsInput | number
+    grado?: StringFieldUpdateOperationsInput | string
     seccion?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

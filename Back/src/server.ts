@@ -13,6 +13,7 @@ import authRouter from "./routes/authRoutes";
 import materiaRouter from "./routes/materiasRoutes";
 import alumnoRouter from "./routes/alumnosRoutes";
 import clasesRouter from "./routes/clasesRoutes";
+import notasRouter from "./routes/notasRoutes";
 
 const app = express();
 
@@ -48,6 +49,7 @@ app.use("/api/users", userRouter);
 app.use("/api/materias", materiaRouter);
 app.use("/api/alumnos", alumnoRouter);
 app.use("/api/clases", clasesRouter);
+app.use("/api/notas", notasRouter);
 
 
 // 👉 Servir archivos estáticos desde la carpeta 'uploads'

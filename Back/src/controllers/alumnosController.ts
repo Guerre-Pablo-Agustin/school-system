@@ -11,6 +11,8 @@ export const getAlumnos = async (req: Request, res: Response) => {
         apellido: true,
         dni: true,
         grado: true,
+        telefono: true,
+        direccion: true,
         seccion: true,
         notas: {
           select: {
@@ -53,6 +55,8 @@ export const getAlumno = async (req: Request, res: Response) => {
         nombre: true,
         apellido: true,
         dni: true,
+        telefono: true,
+        direccion: true,
         grado: true,
         seccion: true,
         notas: {
@@ -97,7 +101,7 @@ export const createAlumno = async (req: Request, res: Response) => {
     } = req.body;
 
     // Validaciones mejoradas
-    const requiredFields = ["nombre", "apellido", "dni", "grado", "notas"];
+    const requiredFields = ["nombre", "apellido", "dni", "grado", "telefono", "direccion", "seccion"];
     const missingFields = requiredFields.filter((field) => !req.body[field]);
 
     if (missingFields.length > 0) {
@@ -108,6 +112,18 @@ export const createAlumno = async (req: Request, res: Response) => {
       });
     }
 
+    // Validación de DNI
+    const existingAlumno = await prisma.estudiante.findUnique({
+      where: { dni },
+    });
+    if (existingAlumno) {
+      return res.status(400).json({
+        mensaje: "El DNI ya existe en la base de datos",
+        alumno: existingAlumno,
+      });
+    }
+
+
     // Creación del alumno
     const newAlumno = await prisma.estudiante.create({
       data: {
@@ -115,7 +131,7 @@ export const createAlumno = async (req: Request, res: Response) => {
         apellido,
         dni,
         grado,
-        seccion,
+        seccion:seccion.toUpperCase(),
         notas,
         telefono,
         direccion,
@@ -142,7 +158,7 @@ export const createAlumno = async (req: Request, res: Response) => {
 
 export const updateAlumno = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { nombre, apellido, dni, grado, notas } = req.body;
+  const { nombre, apellido, dni, grado, notas, telefono, direccion } = req.body;
 
   try {
     const alumno = await prisma.estudiante.update({
@@ -153,6 +169,8 @@ export const updateAlumno = async (req: Request, res: Response) => {
         nombre,
         apellido,
         dni,
+        telefono,
+        direccion,
         grado,
         notas,
       },

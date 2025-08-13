@@ -1,11 +1,14 @@
+import { Materia } from "./materia.types";
+
 type Bimestre = 1 | 2 | 3 | 4;
 
 export interface Nota {
   id: string;
-  valor: number;
+  nota: number;
   bimestre: Bimestre;
   alumnoId: string;
-  materiaId: string;
+  materia: Materia
+  ;
 }
 
 export interface Ponderacion {

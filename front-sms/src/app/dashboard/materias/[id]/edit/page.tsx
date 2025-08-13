@@ -43,9 +43,9 @@ const Page = () => {
 
 
   return (
-    <div className="container mx-auto py-10">
+    <div className="container mx-auto py-10 px-5">
         <BreadcrumbWithCustomSeparator href="/dashboard/materias" label="materias" page="Editar materias" />
-        <div className="container mx-auto py-10">
+        <div className="container mx-auto py-10 px-5">
             <FormEditarMateria dataMateria={dataMateria} />
         </div>
     </div>

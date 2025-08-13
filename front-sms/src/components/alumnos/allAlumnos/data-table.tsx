@@ -107,7 +107,7 @@ export function DataTable<TData, TValue>({
               })}
           </DropdownMenuContent>
         </DropdownMenu>
-        <Link href="/dashboard/productos/nuevo">
+        <Link href="/dashboard/alumnos/nuevo">
           <Button variant="outline" className="ml-4">
             Nuevo 
           </Button>
