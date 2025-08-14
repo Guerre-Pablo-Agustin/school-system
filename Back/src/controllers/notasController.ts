@@ -29,12 +29,12 @@ export const getNotaById = async (req: Request, res: Response) => {
 /**
  * Crear una nueva nota
  */
-export const createNota = async (req: Request, res: Response) => {
+export const createOrUpdateNota = async (req: Request, res: Response) => {
   const { estudianteId, materiaId, bimestre, nota, docenteId } = req.body;
 
   try {
-    // Validar duplicado según @@unique
-    const existe = await prisma.nota.findUnique({
+    // Buscar si ya existe una nota para este estudiante, materia y bimestre
+    const notaExistente = await prisma.nota.findUnique({
       where: {
         estudianteId_materiaId_bimestre: {
           estudianteId,
@@ -44,12 +44,25 @@ export const createNota = async (req: Request, res: Response) => {
       },
     });
 
-    if (existe) {
-      return res.status(400).json({
-        message: "Ya existe una nota para este estudiante, materia y bimestre",
+    if (notaExistente) {
+      // Si existe, actualizarla
+      const notaActualizada = await prisma.nota.update({
+        where: { id: notaExistente.id },
+        data: { nota },
+      });
+
+      return res.status(200).json({
+        message: "Nota actualizada correctamente",
+        data: notaActualizada,
+        action: "updated",
+        existingData: {
+          id: notaExistente.id,
+          notaActual: notaExistente.nota
+        }
       });
     }
 
+    // Si no existe, crear nueva
     const nuevaNota = await prisma.nota.create({
       data: {
         estudianteId,
@@ -63,9 +76,13 @@ export const createNota = async (req: Request, res: Response) => {
     res.status(201).json({
       message: "Nota creada correctamente",
       data: nuevaNota,
+      action: "created"
     });
   } catch (error) {
-    res.status(500).json({ message: "Error al crear la nota", error });
+    res.status(500).json({ 
+      message: "Error al procesar la nota", 
+      error: error
+    });
   }
 };
 

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { useCreateNotasMutation } from "@/redux/services/notasApi";
+import { useCreateOrUpdateNotaMutation } from "@/redux/services/notasApi";
 import { useGetMateriasQuery } from "@/redux/services/materiasApi";
 import { useSelector } from "react-redux";
 import { selectUserLogin } from "@/redux/features/userSlice";
@@ -15,8 +15,8 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Alert, AlertDescription } from "../ui/alert";
-import { AlertCircle, CheckCircle2, X } from "lucide-react";
-
+import { AlertCircle, CheckCircle2, Loader2, X } from "lucide-react";
+import { toast } from "sonner";
 
 interface FormAgregarNotaProps {
   alumnoId: string;
@@ -25,20 +25,24 @@ interface FormAgregarNotaProps {
 }
 
 const FormAgregarNota = ({ alumnoId, onNotaAgregada, onCancelar }: FormAgregarNotaProps) => {
-  const [createNota] = useCreateNotasMutation();
+  const [createOrUpdateNota] = useCreateOrUpdateNotaMutation();
   const { data: materiasData } = useGetMateriasQuery();
   const userLogin = useSelector(selectUserLogin);
-  
+
   const [materiaId, setMateriaId] = useState("");
   const [bimestre, setBimestre] = useState<"1" | "2" | "3" | "4">("1");
   const [nota, setNota] = useState("");
   const [mensaje, setMensaje] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [notaExistente, setNotaExistente] = useState<{
+    id: string;
+    notaActual: number;
+  } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!userLogin?.id) {
       setError("Usuario no autenticado");
       return;
@@ -49,12 +53,12 @@ const FormAgregarNota = ({ alumnoId, onNotaAgregada, onCancelar }: FormAgregarNo
       return;
     }
 
-    if (!nota || isNaN(Number(nota))) {
+    const notaNum = parseFloat(nota);
+    if (isNaN(notaNum)) {
       setError("Debes ingresar una nota válida");
       return;
     }
 
-    const notaNum = parseFloat(nota);
     if (notaNum < 1 || notaNum > 10) {
       setError("La nota debe estar entre 1 y 10");
       return;
@@ -65,64 +69,57 @@ const FormAgregarNota = ({ alumnoId, onNotaAgregada, onCancelar }: FormAgregarNo
     setError("");
 
     try {
-      const notaData = {
-        docenteId: userLogin.id,
+      const result = await createOrUpdateNota({
         estudianteId: alumnoId,
-        materiaId: materiaId,
-        bimestre: parseInt(bimestre) as 1 | 2 | 3 | 4,
-        nota: notaNum
-      };
+        materiaId,
+        bimestre: parseInt(bimestre),
+        nota: notaNum,
+        docenteId: userLogin.id
+      }).unwrap();
 
-      await createNota(notaData).unwrap();
-      
-      setMensaje("Nota agregada correctamente");
+      if (result.action === "updated") {
+        toast.success("Nota actualizada correctamente");
+      } else {
+        toast.success("Nota creada correctamente");
+      }
+
+      // Resetear formulario
       setMateriaId("");
       setBimestre("1");
       setNota("");
-      
-      // Limpiar mensaje después de 2 segundos
-      setTimeout(() => {
-        setMensaje("");
-        onNotaAgregada(); // Actualizar la tabla
-      }, 2000);
 
-    } catch (error: unknown) {
-            console.error("Error al actualizar materia:", error);
-            
-            // Asegurar que siempre sea un string
-            let errorMessage = "Error inesperado al actualizar la materia.";
-            
-            if (typeof error === 'string') {
-                errorMessage = error;
-            } else if (error && typeof error === 'object' && 'data' in error) {
-                const errorData = error.data as { error?: string; message?: string };
-                if (errorData?.error && typeof errorData.error === 'string') {
-                    errorMessage = errorData.error;
-                } else if (errorData?.message && typeof errorData.message === 'string') {
-                    errorMessage = errorData.message;
-                }
-            } else if (error && typeof error === 'object' && 'message' in error) {
-                const errorObj = error as { message: string };
-                if (typeof errorObj.message === 'string') {
-                    errorMessage = errorObj.message;
-                }
-            }
-            
-            setError(errorMessage);
-            setTimeout(() => {
-               setError(""); 
-             },2000);
-        } finally {
+      // Cerrar el formulario después de 1 segundo
+      setTimeout(() => {
+        onNotaAgregada();
+      }, 1000);
+
+    } catch (error) {
+      console.error("Error al procesar nota:", error);
+      let errorMessage = "Error al procesar la nota";
+
+      // Verificar si es un error de RTK Query
+      if (typeof error === 'object' && error !== null && 'data' in error) {
+        const rtkError = error as { data?: { message?: string } };
+        if (rtkError.data?.message) {
+          errorMessage = rtkError.data.message;
+        }
+      }
+      // Verificar si es un Error estándar
+      else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
+      toast.error(errorMessage);
+    } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className=" border rounded-lg p-6 shadow-sm">
+    <div className="border rounded-lg p-6 shadow-sm ">
       <div className="flex justify-between items-center mb-6">
-        <h3 className="text-lg font-semibold">Agregar Nueva Nota</h3>
+        <h3 className="text-lg font-semibold">Agregar/Editar Nota</h3>
         <Button
-          type="button"
           variant="ghost"
           size="sm"
           onClick={onCancelar}
@@ -133,39 +130,49 @@ const FormAgregarNota = ({ alumnoId, onNotaAgregada, onCancelar }: FormAgregarNo
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="materia">Materia</Label>
-          <Select value={materiaId} onValueChange={setMateriaId}>
-            <SelectTrigger>
-              <SelectValue placeholder="Selecciona una materia" />
-            </SelectTrigger>
-            <SelectContent>
-              {materiasData?.data?.map((materia) => (
-                <SelectItem key={materia.id} value={materia.id}>
-                  {materia.nombre}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="materia">Materia *</Label>
+            <Select
+              value={materiaId}
+              onValueChange={setMateriaId}
+              required
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecciona una materia" />
+              </SelectTrigger>
+              <SelectContent>
+                {materiasData?.data?.map((materia) => (
+                  <SelectItem key={materia.id} value={materia.id}>
+                    {materia.nombre}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="bimestre">Bimestre *</Label>
+            <Select
+              value={bimestre}
+              onValueChange={(v) => setBimestre(v as "1" | "2" | "3" | "4")}
+              required
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1">1° Bimestre</SelectItem>
+                <SelectItem value="2">2° Bimestre</SelectItem>
+                <SelectItem value="3">3° Bimestre</SelectItem>
+                <SelectItem value="4">4° Bimestre</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="bimestre">Bimestre</Label>
-          <Select value={bimestre} onValueChange={(value) => setBimestre(value as "1" | "2" | "3" | "4")}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1">1° Bimestre</SelectItem>
-              <SelectItem value="2">2° Bimestre</SelectItem>
-              <SelectItem value="3">3° Bimestre</SelectItem>
-              <SelectItem value="4">4° Bimestre</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="nota">Nota</Label>
+          <Label htmlFor="nota">Nota (1-10) *</Label>
           <Input
             id="nota"
             type="number"
@@ -176,27 +183,9 @@ const FormAgregarNota = ({ alumnoId, onNotaAgregada, onCancelar }: FormAgregarNo
             onChange={(e) => setNota(e.target.value)}
             placeholder="Ej: 8.5"
             className="w-full"
+            required
           />
-          <p className="text-sm text-gray-500">La nota debe estar entre 1 y 10</p>
         </div>
-
-        {mensaje && (
-          <Alert className="">
-            <CheckCircle2 className="h-4 w-4 text-green-600" />
-            <AlertDescription className="text-green-800">
-              {mensaje}
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {error && (
-          <Alert className="">
-            <AlertCircle className="h-4 w-4 text-red-600" />
-            <AlertDescription className="text-red-800">
-              {error}
-            </AlertDescription>
-          </Alert>
-        )}
 
         <div className="flex gap-3 pt-4">
           <Button
@@ -204,7 +193,16 @@ const FormAgregarNota = ({ alumnoId, onNotaAgregada, onCancelar }: FormAgregarNo
             disabled={isLoading}
             className="flex-1"
           >
-            {isLoading ? "Agregando..." : "Agregar Nota"}
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Procesando...
+              </>
+            ) : notaExistente ? (
+              "Actualizar Nota"
+            ) : (
+              "Agregar Nota"
+            )}
           </Button>
           <Button
             type="button"
@@ -216,6 +214,25 @@ const FormAgregarNota = ({ alumnoId, onNotaAgregada, onCancelar }: FormAgregarNo
           </Button>
         </div>
       </form>
+
+       {/* Alertas de estado */}
+      <div className="mt-5 space-y-3">
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        {mensaje && (
+          <Alert className="border-green-200 ">
+            <CheckCircle2 className="h-4 w-4 text-green-600" />
+            <AlertDescription className="text-green-700">
+              {mensaje}
+            </AlertDescription>
+          </Alert>
+        )}
+      </div>
     </div>
   );
 };

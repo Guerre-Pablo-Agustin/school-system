@@ -9,6 +9,12 @@ interface ClasesResponse {
   error?: string;
 }
 
+interface ClaseResponse {
+  message: string;
+  data: Clase;
+  error?: string;
+}
+
 export const clasesApi = createApi({
   reducerPath: "clasesApi",
   baseQuery: baseQueryWithReauth,
@@ -16,6 +22,11 @@ export const clasesApi = createApi({
     // Traer todas las clases
     getClases: builder.query<ClasesResponse, void>({
       query: () => "/clases",
+    }),
+
+    // Traer clases por id
+    getClasesbyId: builder.query<ClaseResponse, string>({
+      query: (id) => `/clases/${id}`,
     }),
 
     // Traer clases por docente
@@ -41,6 +52,7 @@ export const {
   useGetClasesByDocenteQuery,
   useGetClasesByMateriaQuery,
   useGetClasesByAlumnoQuery,
+  useGetClasesbyIdQuery,
 } = clasesApi;
 
 

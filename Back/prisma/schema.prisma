@@ -37,6 +37,7 @@ model Estudiante {
   grado      String      // Ej: 1 (primero), 2 (segundo)...
   seccion    String   // Ej: "A", "B"...
   notas      Nota[]
+  clases     Clase[] 
   createdAt  DateTime @default(now())
 }
 
@@ -71,6 +72,7 @@ model Clase {
   docenteId  String
   materia    Materia  @relation(fields: [materiaId], references: [id])
   materiaId  String
+  estudiantes Estudiante[]
   @@unique([docenteId, materiaId]) // Evita duplicados
 }
 

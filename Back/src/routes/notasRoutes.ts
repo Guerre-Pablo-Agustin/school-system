@@ -1,11 +1,13 @@
 import { Router } from "express";
-import { getNotaById, createNota, updateNota, deleteNota } from "../controllers/notasController";
+import { getNotaById, createOrUpdateNota, updateNota, deleteNota } from "../controllers/notasController";
 
 const notasRouter = Router();
 
 notasRouter.get("/:id", getNotaById);
-notasRouter.post("/", createNota);
+notasRouter.post("/", createOrUpdateNota);
 notasRouter.put("/:id", updateNota);
 notasRouter.delete("/:id", deleteNota);
+
+
 
 export default notasRouter;

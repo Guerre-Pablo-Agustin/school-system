@@ -27,6 +27,18 @@ export const getAlumnos = async (req: Request, res: Response) => {
               },
           },
         },
+        clases: {
+          select: {
+            id: true,
+            materia: {
+              select: {
+                nombre: true,
+                codigo: true,
+                ciclo: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -202,3 +214,5 @@ export const deleteAlumno = async (req: Request, res: Response) => {
 
   res.status(200).json(alumno);
 };
+
+

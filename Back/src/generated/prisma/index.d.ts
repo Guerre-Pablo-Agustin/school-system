@@ -1399,10 +1399,12 @@ export namespace Prisma {
 
   export type EstudianteCountOutputType = {
     notas: number
+    clases: number
   }
 
   export type EstudianteCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     notas?: boolean | EstudianteCountOutputTypeCountNotasArgs
+    clases?: boolean | EstudianteCountOutputTypeCountClasesArgs
   }
 
   // Custom InputTypes
@@ -1421,6 +1423,13 @@ export namespace Prisma {
    */
   export type EstudianteCountOutputTypeCountNotasArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: NotaWhereInput
+  }
+
+  /**
+   * EstudianteCountOutputType without action
+   */
+  export type EstudianteCountOutputTypeCountClasesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ClaseWhereInput
   }
 
 
@@ -1461,6 +1470,37 @@ export namespace Prisma {
    */
   export type MateriaCountOutputTypeCountNotasArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: NotaWhereInput
+  }
+
+
+  /**
+   * Count Type ClaseCountOutputType
+   */
+
+  export type ClaseCountOutputType = {
+    estudiantes: number
+  }
+
+  export type ClaseCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    estudiantes?: boolean | ClaseCountOutputTypeCountEstudiantesArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * ClaseCountOutputType without action
+   */
+  export type ClaseCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ClaseCountOutputType
+     */
+    select?: ClaseCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * ClaseCountOutputType without action
+   */
+  export type ClaseCountOutputTypeCountEstudiantesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EstudianteWhereInput
   }
 
 
@@ -2774,6 +2814,7 @@ export namespace Prisma {
     seccion?: boolean
     createdAt?: boolean
     notas?: boolean | Estudiante$notasArgs<ExtArgs>
+    clases?: boolean | Estudiante$clasesArgs<ExtArgs>
     _count?: boolean | EstudianteCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["estudiante"]>
 
@@ -2816,6 +2857,7 @@ export namespace Prisma {
   export type EstudianteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "nombre" | "apellido" | "dni" | "telefono" | "direccion" | "grado" | "seccion" | "createdAt", ExtArgs["result"]["estudiante"]>
   export type EstudianteInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     notas?: boolean | Estudiante$notasArgs<ExtArgs>
+    clases?: boolean | Estudiante$clasesArgs<ExtArgs>
     _count?: boolean | EstudianteCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type EstudianteIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -2825,6 +2867,7 @@ export namespace Prisma {
     name: "Estudiante"
     objects: {
       notas: Prisma.$NotaPayload<ExtArgs>[]
+      clases: Prisma.$ClasePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -3231,6 +3274,7 @@ export namespace Prisma {
   export interface Prisma__EstudianteClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     notas<T extends Estudiante$notasArgs<ExtArgs> = {}>(args?: Subset<T, Estudiante$notasArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    clases<T extends Estudiante$clasesArgs<ExtArgs> = {}>(args?: Subset<T, Estudiante$clasesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ClasePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3678,6 +3722,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: NotaScalarFieldEnum | NotaScalarFieldEnum[]
+  }
+
+  /**
+   * Estudiante.clases
+   */
+  export type Estudiante$clasesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Clase
+     */
+    select?: ClaseSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Clase
+     */
+    omit?: ClaseOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ClaseInclude<ExtArgs> | null
+    where?: ClaseWhereInput
+    orderBy?: ClaseOrderByWithRelationInput | ClaseOrderByWithRelationInput[]
+    cursor?: ClaseWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ClaseScalarFieldEnum | ClaseScalarFieldEnum[]
   }
 
   /**
@@ -6090,6 +6158,8 @@ export namespace Prisma {
     materiaId?: boolean
     docente?: boolean | UserDefaultArgs<ExtArgs>
     materia?: boolean | MateriaDefaultArgs<ExtArgs>
+    estudiantes?: boolean | Clase$estudiantesArgs<ExtArgs>
+    _count?: boolean | ClaseCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["clase"]>
 
   export type ClaseSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -6118,6 +6188,8 @@ export namespace Prisma {
   export type ClaseInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     docente?: boolean | UserDefaultArgs<ExtArgs>
     materia?: boolean | MateriaDefaultArgs<ExtArgs>
+    estudiantes?: boolean | Clase$estudiantesArgs<ExtArgs>
+    _count?: boolean | ClaseCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ClaseIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     docente?: boolean | UserDefaultArgs<ExtArgs>
@@ -6133,6 +6205,7 @@ export namespace Prisma {
     objects: {
       docente: Prisma.$UserPayload<ExtArgs>
       materia: Prisma.$MateriaPayload<ExtArgs>
+      estudiantes: Prisma.$EstudiantePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -6534,6 +6607,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     docente<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     materia<T extends MateriaDefaultArgs<ExtArgs> = {}>(args?: Subset<T, MateriaDefaultArgs<ExtArgs>>): Prisma__MateriaClient<$Result.GetResult<Prisma.$MateriaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    estudiantes<T extends Clase$estudiantesArgs<ExtArgs> = {}>(args?: Subset<T, Clase$estudiantesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EstudiantePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6959,6 +7033,30 @@ export namespace Prisma {
      * Limit how many Clases to delete.
      */
     limit?: number
+  }
+
+  /**
+   * Clase.estudiantes
+   */
+  export type Clase$estudiantesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Estudiante
+     */
+    select?: EstudianteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Estudiante
+     */
+    omit?: EstudianteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EstudianteInclude<ExtArgs> | null
+    where?: EstudianteWhereInput
+    orderBy?: EstudianteOrderByWithRelationInput | EstudianteOrderByWithRelationInput[]
+    cursor?: EstudianteWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EstudianteScalarFieldEnum | EstudianteScalarFieldEnum[]
   }
 
   /**
@@ -8249,6 +8347,7 @@ export namespace Prisma {
     seccion?: StringFilter<"Estudiante"> | string
     createdAt?: DateTimeFilter<"Estudiante"> | Date | string
     notas?: NotaListRelationFilter
+    clases?: ClaseListRelationFilter
   }
 
   export type EstudianteOrderByWithRelationInput = {
@@ -8262,6 +8361,7 @@ export namespace Prisma {
     seccion?: SortOrder
     createdAt?: SortOrder
     notas?: NotaOrderByRelationAggregateInput
+    clases?: ClaseOrderByRelationAggregateInput
   }
 
   export type EstudianteWhereUniqueInput = Prisma.AtLeast<{
@@ -8278,6 +8378,7 @@ export namespace Prisma {
     seccion?: StringFilter<"Estudiante"> | string
     createdAt?: DateTimeFilter<"Estudiante"> | Date | string
     notas?: NotaListRelationFilter
+    clases?: ClaseListRelationFilter
   }, "id" | "dni">
 
   export type EstudianteOrderByWithAggregationInput = {
@@ -8453,6 +8554,7 @@ export namespace Prisma {
     materiaId?: StringFilter<"Clase"> | string
     docente?: XOR<UserScalarRelationFilter, UserWhereInput>
     materia?: XOR<MateriaScalarRelationFilter, MateriaWhereInput>
+    estudiantes?: EstudianteListRelationFilter
   }
 
   export type ClaseOrderByWithRelationInput = {
@@ -8461,6 +8563,7 @@ export namespace Prisma {
     materiaId?: SortOrder
     docente?: UserOrderByWithRelationInput
     materia?: MateriaOrderByWithRelationInput
+    estudiantes?: EstudianteOrderByRelationAggregateInput
   }
 
   export type ClaseWhereUniqueInput = Prisma.AtLeast<{
@@ -8473,6 +8576,7 @@ export namespace Prisma {
     materiaId?: StringFilter<"Clase"> | string
     docente?: XOR<UserScalarRelationFilter, UserWhereInput>
     materia?: XOR<MateriaScalarRelationFilter, MateriaWhereInput>
+    estudiantes?: EstudianteListRelationFilter
   }, "id" | "docenteId_materiaId">
 
   export type ClaseOrderByWithAggregationInput = {
@@ -8632,6 +8736,7 @@ export namespace Prisma {
     seccion: string
     createdAt?: Date | string
     notas?: NotaCreateNestedManyWithoutEstudianteInput
+    clases?: ClaseCreateNestedManyWithoutEstudiantesInput
   }
 
   export type EstudianteUncheckedCreateInput = {
@@ -8645,6 +8750,7 @@ export namespace Prisma {
     seccion: string
     createdAt?: Date | string
     notas?: NotaUncheckedCreateNestedManyWithoutEstudianteInput
+    clases?: ClaseUncheckedCreateNestedManyWithoutEstudiantesInput
   }
 
   export type EstudianteUpdateInput = {
@@ -8658,6 +8764,7 @@ export namespace Prisma {
     seccion?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     notas?: NotaUpdateManyWithoutEstudianteNestedInput
+    clases?: ClaseUpdateManyWithoutEstudiantesNestedInput
   }
 
   export type EstudianteUncheckedUpdateInput = {
@@ -8671,6 +8778,7 @@ export namespace Prisma {
     seccion?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     notas?: NotaUncheckedUpdateManyWithoutEstudianteNestedInput
+    clases?: ClaseUncheckedUpdateManyWithoutEstudiantesNestedInput
   }
 
   export type EstudianteCreateManyInput = {
@@ -8852,24 +8960,28 @@ export namespace Prisma {
     id?: string
     docente: UserCreateNestedOneWithoutClasesInput
     materia: MateriaCreateNestedOneWithoutClasesInput
+    estudiantes?: EstudianteCreateNestedManyWithoutClasesInput
   }
 
   export type ClaseUncheckedCreateInput = {
     id?: string
     docenteId: string
     materiaId: string
+    estudiantes?: EstudianteUncheckedCreateNestedManyWithoutClasesInput
   }
 
   export type ClaseUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     docente?: UserUpdateOneRequiredWithoutClasesNestedInput
     materia?: MateriaUpdateOneRequiredWithoutClasesNestedInput
+    estudiantes?: EstudianteUpdateManyWithoutClasesNestedInput
   }
 
   export type ClaseUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     docenteId?: StringFieldUpdateOperationsInput | string
     materiaId?: StringFieldUpdateOperationsInput | string
+    estudiantes?: EstudianteUncheckedUpdateManyWithoutClasesNestedInput
   }
 
   export type ClaseCreateManyInput = {
@@ -9298,6 +9410,16 @@ export namespace Prisma {
     isNot?: UserWhereInput
   }
 
+  export type EstudianteListRelationFilter = {
+    every?: EstudianteWhereInput
+    some?: EstudianteWhereInput
+    none?: EstudianteWhereInput
+  }
+
+  export type EstudianteOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type ClaseDocenteIdMateriaIdCompoundUniqueInput = {
     docenteId: string
     materiaId: string
@@ -9403,11 +9525,23 @@ export namespace Prisma {
     connect?: NotaWhereUniqueInput | NotaWhereUniqueInput[]
   }
 
+  export type ClaseCreateNestedManyWithoutEstudiantesInput = {
+    create?: XOR<ClaseCreateWithoutEstudiantesInput, ClaseUncheckedCreateWithoutEstudiantesInput> | ClaseCreateWithoutEstudiantesInput[] | ClaseUncheckedCreateWithoutEstudiantesInput[]
+    connectOrCreate?: ClaseCreateOrConnectWithoutEstudiantesInput | ClaseCreateOrConnectWithoutEstudiantesInput[]
+    connect?: ClaseWhereUniqueInput | ClaseWhereUniqueInput[]
+  }
+
   export type NotaUncheckedCreateNestedManyWithoutEstudianteInput = {
     create?: XOR<NotaCreateWithoutEstudianteInput, NotaUncheckedCreateWithoutEstudianteInput> | NotaCreateWithoutEstudianteInput[] | NotaUncheckedCreateWithoutEstudianteInput[]
     connectOrCreate?: NotaCreateOrConnectWithoutEstudianteInput | NotaCreateOrConnectWithoutEstudianteInput[]
     createMany?: NotaCreateManyEstudianteInputEnvelope
     connect?: NotaWhereUniqueInput | NotaWhereUniqueInput[]
+  }
+
+  export type ClaseUncheckedCreateNestedManyWithoutEstudiantesInput = {
+    create?: XOR<ClaseCreateWithoutEstudiantesInput, ClaseUncheckedCreateWithoutEstudiantesInput> | ClaseCreateWithoutEstudiantesInput[] | ClaseUncheckedCreateWithoutEstudiantesInput[]
+    connectOrCreate?: ClaseCreateOrConnectWithoutEstudiantesInput | ClaseCreateOrConnectWithoutEstudiantesInput[]
+    connect?: ClaseWhereUniqueInput | ClaseWhereUniqueInput[]
   }
 
   export type NullableStringFieldUpdateOperationsInput = {
@@ -9428,6 +9562,19 @@ export namespace Prisma {
     deleteMany?: NotaScalarWhereInput | NotaScalarWhereInput[]
   }
 
+  export type ClaseUpdateManyWithoutEstudiantesNestedInput = {
+    create?: XOR<ClaseCreateWithoutEstudiantesInput, ClaseUncheckedCreateWithoutEstudiantesInput> | ClaseCreateWithoutEstudiantesInput[] | ClaseUncheckedCreateWithoutEstudiantesInput[]
+    connectOrCreate?: ClaseCreateOrConnectWithoutEstudiantesInput | ClaseCreateOrConnectWithoutEstudiantesInput[]
+    upsert?: ClaseUpsertWithWhereUniqueWithoutEstudiantesInput | ClaseUpsertWithWhereUniqueWithoutEstudiantesInput[]
+    set?: ClaseWhereUniqueInput | ClaseWhereUniqueInput[]
+    disconnect?: ClaseWhereUniqueInput | ClaseWhereUniqueInput[]
+    delete?: ClaseWhereUniqueInput | ClaseWhereUniqueInput[]
+    connect?: ClaseWhereUniqueInput | ClaseWhereUniqueInput[]
+    update?: ClaseUpdateWithWhereUniqueWithoutEstudiantesInput | ClaseUpdateWithWhereUniqueWithoutEstudiantesInput[]
+    updateMany?: ClaseUpdateManyWithWhereWithoutEstudiantesInput | ClaseUpdateManyWithWhereWithoutEstudiantesInput[]
+    deleteMany?: ClaseScalarWhereInput | ClaseScalarWhereInput[]
+  }
+
   export type NotaUncheckedUpdateManyWithoutEstudianteNestedInput = {
     create?: XOR<NotaCreateWithoutEstudianteInput, NotaUncheckedCreateWithoutEstudianteInput> | NotaCreateWithoutEstudianteInput[] | NotaUncheckedCreateWithoutEstudianteInput[]
     connectOrCreate?: NotaCreateOrConnectWithoutEstudianteInput | NotaCreateOrConnectWithoutEstudianteInput[]
@@ -9440,6 +9587,19 @@ export namespace Prisma {
     update?: NotaUpdateWithWhereUniqueWithoutEstudianteInput | NotaUpdateWithWhereUniqueWithoutEstudianteInput[]
     updateMany?: NotaUpdateManyWithWhereWithoutEstudianteInput | NotaUpdateManyWithWhereWithoutEstudianteInput[]
     deleteMany?: NotaScalarWhereInput | NotaScalarWhereInput[]
+  }
+
+  export type ClaseUncheckedUpdateManyWithoutEstudiantesNestedInput = {
+    create?: XOR<ClaseCreateWithoutEstudiantesInput, ClaseUncheckedCreateWithoutEstudiantesInput> | ClaseCreateWithoutEstudiantesInput[] | ClaseUncheckedCreateWithoutEstudiantesInput[]
+    connectOrCreate?: ClaseCreateOrConnectWithoutEstudiantesInput | ClaseCreateOrConnectWithoutEstudiantesInput[]
+    upsert?: ClaseUpsertWithWhereUniqueWithoutEstudiantesInput | ClaseUpsertWithWhereUniqueWithoutEstudiantesInput[]
+    set?: ClaseWhereUniqueInput | ClaseWhereUniqueInput[]
+    disconnect?: ClaseWhereUniqueInput | ClaseWhereUniqueInput[]
+    delete?: ClaseWhereUniqueInput | ClaseWhereUniqueInput[]
+    connect?: ClaseWhereUniqueInput | ClaseWhereUniqueInput[]
+    update?: ClaseUpdateWithWhereUniqueWithoutEstudiantesInput | ClaseUpdateWithWhereUniqueWithoutEstudiantesInput[]
+    updateMany?: ClaseUpdateManyWithWhereWithoutEstudiantesInput | ClaseUpdateManyWithWhereWithoutEstudiantesInput[]
+    deleteMany?: ClaseScalarWhereInput | ClaseScalarWhereInput[]
   }
 
   export type EstudianteCreateNestedOneWithoutNotasInput = {
@@ -9586,6 +9746,18 @@ export namespace Prisma {
     connect?: MateriaWhereUniqueInput
   }
 
+  export type EstudianteCreateNestedManyWithoutClasesInput = {
+    create?: XOR<EstudianteCreateWithoutClasesInput, EstudianteUncheckedCreateWithoutClasesInput> | EstudianteCreateWithoutClasesInput[] | EstudianteUncheckedCreateWithoutClasesInput[]
+    connectOrCreate?: EstudianteCreateOrConnectWithoutClasesInput | EstudianteCreateOrConnectWithoutClasesInput[]
+    connect?: EstudianteWhereUniqueInput | EstudianteWhereUniqueInput[]
+  }
+
+  export type EstudianteUncheckedCreateNestedManyWithoutClasesInput = {
+    create?: XOR<EstudianteCreateWithoutClasesInput, EstudianteUncheckedCreateWithoutClasesInput> | EstudianteCreateWithoutClasesInput[] | EstudianteUncheckedCreateWithoutClasesInput[]
+    connectOrCreate?: EstudianteCreateOrConnectWithoutClasesInput | EstudianteCreateOrConnectWithoutClasesInput[]
+    connect?: EstudianteWhereUniqueInput | EstudianteWhereUniqueInput[]
+  }
+
   export type UserUpdateOneRequiredWithoutClasesNestedInput = {
     create?: XOR<UserCreateWithoutClasesInput, UserUncheckedCreateWithoutClasesInput>
     connectOrCreate?: UserCreateOrConnectWithoutClasesInput
@@ -9600,6 +9772,32 @@ export namespace Prisma {
     upsert?: MateriaUpsertWithoutClasesInput
     connect?: MateriaWhereUniqueInput
     update?: XOR<XOR<MateriaUpdateToOneWithWhereWithoutClasesInput, MateriaUpdateWithoutClasesInput>, MateriaUncheckedUpdateWithoutClasesInput>
+  }
+
+  export type EstudianteUpdateManyWithoutClasesNestedInput = {
+    create?: XOR<EstudianteCreateWithoutClasesInput, EstudianteUncheckedCreateWithoutClasesInput> | EstudianteCreateWithoutClasesInput[] | EstudianteUncheckedCreateWithoutClasesInput[]
+    connectOrCreate?: EstudianteCreateOrConnectWithoutClasesInput | EstudianteCreateOrConnectWithoutClasesInput[]
+    upsert?: EstudianteUpsertWithWhereUniqueWithoutClasesInput | EstudianteUpsertWithWhereUniqueWithoutClasesInput[]
+    set?: EstudianteWhereUniqueInput | EstudianteWhereUniqueInput[]
+    disconnect?: EstudianteWhereUniqueInput | EstudianteWhereUniqueInput[]
+    delete?: EstudianteWhereUniqueInput | EstudianteWhereUniqueInput[]
+    connect?: EstudianteWhereUniqueInput | EstudianteWhereUniqueInput[]
+    update?: EstudianteUpdateWithWhereUniqueWithoutClasesInput | EstudianteUpdateWithWhereUniqueWithoutClasesInput[]
+    updateMany?: EstudianteUpdateManyWithWhereWithoutClasesInput | EstudianteUpdateManyWithWhereWithoutClasesInput[]
+    deleteMany?: EstudianteScalarWhereInput | EstudianteScalarWhereInput[]
+  }
+
+  export type EstudianteUncheckedUpdateManyWithoutClasesNestedInput = {
+    create?: XOR<EstudianteCreateWithoutClasesInput, EstudianteUncheckedCreateWithoutClasesInput> | EstudianteCreateWithoutClasesInput[] | EstudianteUncheckedCreateWithoutClasesInput[]
+    connectOrCreate?: EstudianteCreateOrConnectWithoutClasesInput | EstudianteCreateOrConnectWithoutClasesInput[]
+    upsert?: EstudianteUpsertWithWhereUniqueWithoutClasesInput | EstudianteUpsertWithWhereUniqueWithoutClasesInput[]
+    set?: EstudianteWhereUniqueInput | EstudianteWhereUniqueInput[]
+    disconnect?: EstudianteWhereUniqueInput | EstudianteWhereUniqueInput[]
+    delete?: EstudianteWhereUniqueInput | EstudianteWhereUniqueInput[]
+    connect?: EstudianteWhereUniqueInput | EstudianteWhereUniqueInput[]
+    update?: EstudianteUpdateWithWhereUniqueWithoutClasesInput | EstudianteUpdateWithWhereUniqueWithoutClasesInput[]
+    updateMany?: EstudianteUpdateManyWithWhereWithoutClasesInput | EstudianteUpdateManyWithWhereWithoutClasesInput[]
+    deleteMany?: EstudianteScalarWhereInput | EstudianteScalarWhereInput[]
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -9791,11 +9989,13 @@ export namespace Prisma {
   export type ClaseCreateWithoutDocenteInput = {
     id?: string
     materia: MateriaCreateNestedOneWithoutClasesInput
+    estudiantes?: EstudianteCreateNestedManyWithoutClasesInput
   }
 
   export type ClaseUncheckedCreateWithoutDocenteInput = {
     id?: string
     materiaId: string
+    estudiantes?: EstudianteUncheckedCreateNestedManyWithoutClasesInput
   }
 
   export type ClaseCreateOrConnectWithoutDocenteInput = {
@@ -9861,6 +10061,23 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type ClaseCreateWithoutEstudiantesInput = {
+    id?: string
+    docente: UserCreateNestedOneWithoutClasesInput
+    materia: MateriaCreateNestedOneWithoutClasesInput
+  }
+
+  export type ClaseUncheckedCreateWithoutEstudiantesInput = {
+    id?: string
+    docenteId: string
+    materiaId: string
+  }
+
+  export type ClaseCreateOrConnectWithoutEstudiantesInput = {
+    where: ClaseWhereUniqueInput
+    create: XOR<ClaseCreateWithoutEstudiantesInput, ClaseUncheckedCreateWithoutEstudiantesInput>
+  }
+
   export type NotaUpsertWithWhereUniqueWithoutEstudianteInput = {
     where: NotaWhereUniqueInput
     update: XOR<NotaUpdateWithoutEstudianteInput, NotaUncheckedUpdateWithoutEstudianteInput>
@@ -9890,6 +10107,22 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Nota"> | Date | string
   }
 
+  export type ClaseUpsertWithWhereUniqueWithoutEstudiantesInput = {
+    where: ClaseWhereUniqueInput
+    update: XOR<ClaseUpdateWithoutEstudiantesInput, ClaseUncheckedUpdateWithoutEstudiantesInput>
+    create: XOR<ClaseCreateWithoutEstudiantesInput, ClaseUncheckedCreateWithoutEstudiantesInput>
+  }
+
+  export type ClaseUpdateWithWhereUniqueWithoutEstudiantesInput = {
+    where: ClaseWhereUniqueInput
+    data: XOR<ClaseUpdateWithoutEstudiantesInput, ClaseUncheckedUpdateWithoutEstudiantesInput>
+  }
+
+  export type ClaseUpdateManyWithWhereWithoutEstudiantesInput = {
+    where: ClaseScalarWhereInput
+    data: XOR<ClaseUpdateManyMutationInput, ClaseUncheckedUpdateManyWithoutEstudiantesInput>
+  }
+
   export type EstudianteCreateWithoutNotasInput = {
     id?: string
     nombre: string
@@ -9900,6 +10133,7 @@ export namespace Prisma {
     grado: string
     seccion: string
     createdAt?: Date | string
+    clases?: ClaseCreateNestedManyWithoutEstudiantesInput
   }
 
   export type EstudianteUncheckedCreateWithoutNotasInput = {
@@ -9912,6 +10146,7 @@ export namespace Prisma {
     grado: string
     seccion: string
     createdAt?: Date | string
+    clases?: ClaseUncheckedCreateNestedManyWithoutEstudiantesInput
   }
 
   export type EstudianteCreateOrConnectWithoutNotasInput = {
@@ -9965,6 +10200,7 @@ export namespace Prisma {
     grado?: StringFieldUpdateOperationsInput | string
     seccion?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    clases?: ClaseUpdateManyWithoutEstudiantesNestedInput
   }
 
   export type EstudianteUncheckedUpdateWithoutNotasInput = {
@@ -9977,6 +10213,7 @@ export namespace Prisma {
     grado?: StringFieldUpdateOperationsInput | string
     seccion?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    clases?: ClaseUncheckedUpdateManyWithoutEstudiantesNestedInput
   }
 
   export type MateriaUpsertWithoutNotasInput = {
@@ -10013,11 +10250,13 @@ export namespace Prisma {
   export type ClaseCreateWithoutMateriaInput = {
     id?: string
     docente: UserCreateNestedOneWithoutClasesInput
+    estudiantes?: EstudianteCreateNestedManyWithoutClasesInput
   }
 
   export type ClaseUncheckedCreateWithoutMateriaInput = {
     id?: string
     docenteId: string
+    estudiantes?: EstudianteUncheckedCreateNestedManyWithoutClasesInput
   }
 
   export type ClaseCreateOrConnectWithoutMateriaInput = {
@@ -10142,6 +10381,37 @@ export namespace Prisma {
     create: XOR<MateriaCreateWithoutClasesInput, MateriaUncheckedCreateWithoutClasesInput>
   }
 
+  export type EstudianteCreateWithoutClasesInput = {
+    id?: string
+    nombre: string
+    apellido: string
+    dni?: string | null
+    telefono: string
+    direccion: string
+    grado: string
+    seccion: string
+    createdAt?: Date | string
+    notas?: NotaCreateNestedManyWithoutEstudianteInput
+  }
+
+  export type EstudianteUncheckedCreateWithoutClasesInput = {
+    id?: string
+    nombre: string
+    apellido: string
+    dni?: string | null
+    telefono: string
+    direccion: string
+    grado: string
+    seccion: string
+    createdAt?: Date | string
+    notas?: NotaUncheckedCreateNestedManyWithoutEstudianteInput
+  }
+
+  export type EstudianteCreateOrConnectWithoutClasesInput = {
+    where: EstudianteWhereUniqueInput
+    create: XOR<EstudianteCreateWithoutClasesInput, EstudianteUncheckedCreateWithoutClasesInput>
+  }
+
   export type UserUpsertWithoutClasesInput = {
     update: XOR<UserUpdateWithoutClasesInput, UserUncheckedUpdateWithoutClasesInput>
     create: XOR<UserCreateWithoutClasesInput, UserUncheckedCreateWithoutClasesInput>
@@ -10206,6 +10476,37 @@ export namespace Prisma {
     notas?: NotaUncheckedUpdateManyWithoutMateriaNestedInput
   }
 
+  export type EstudianteUpsertWithWhereUniqueWithoutClasesInput = {
+    where: EstudianteWhereUniqueInput
+    update: XOR<EstudianteUpdateWithoutClasesInput, EstudianteUncheckedUpdateWithoutClasesInput>
+    create: XOR<EstudianteCreateWithoutClasesInput, EstudianteUncheckedCreateWithoutClasesInput>
+  }
+
+  export type EstudianteUpdateWithWhereUniqueWithoutClasesInput = {
+    where: EstudianteWhereUniqueInput
+    data: XOR<EstudianteUpdateWithoutClasesInput, EstudianteUncheckedUpdateWithoutClasesInput>
+  }
+
+  export type EstudianteUpdateManyWithWhereWithoutClasesInput = {
+    where: EstudianteScalarWhereInput
+    data: XOR<EstudianteUpdateManyMutationInput, EstudianteUncheckedUpdateManyWithoutClasesInput>
+  }
+
+  export type EstudianteScalarWhereInput = {
+    AND?: EstudianteScalarWhereInput | EstudianteScalarWhereInput[]
+    OR?: EstudianteScalarWhereInput[]
+    NOT?: EstudianteScalarWhereInput | EstudianteScalarWhereInput[]
+    id?: StringFilter<"Estudiante"> | string
+    nombre?: StringFilter<"Estudiante"> | string
+    apellido?: StringFilter<"Estudiante"> | string
+    dni?: StringNullableFilter<"Estudiante"> | string | null
+    telefono?: StringFilter<"Estudiante"> | string
+    direccion?: StringFilter<"Estudiante"> | string
+    grado?: StringFilter<"Estudiante"> | string
+    seccion?: StringFilter<"Estudiante"> | string
+    createdAt?: DateTimeFilter<"Estudiante"> | Date | string
+  }
+
   export type ClaseCreateManyDocenteInput = {
     id?: string
     materiaId: string
@@ -10214,11 +10515,13 @@ export namespace Prisma {
   export type ClaseUpdateWithoutDocenteInput = {
     id?: StringFieldUpdateOperationsInput | string
     materia?: MateriaUpdateOneRequiredWithoutClasesNestedInput
+    estudiantes?: EstudianteUpdateManyWithoutClasesNestedInput
   }
 
   export type ClaseUncheckedUpdateWithoutDocenteInput = {
     id?: StringFieldUpdateOperationsInput | string
     materiaId?: StringFieldUpdateOperationsInput | string
+    estudiantes?: EstudianteUncheckedUpdateManyWithoutClasesNestedInput
   }
 
   export type ClaseUncheckedUpdateManyWithoutDocenteInput = {
@@ -10262,6 +10565,24 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ClaseUpdateWithoutEstudiantesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    docente?: UserUpdateOneRequiredWithoutClasesNestedInput
+    materia?: MateriaUpdateOneRequiredWithoutClasesNestedInput
+  }
+
+  export type ClaseUncheckedUpdateWithoutEstudiantesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    docenteId?: StringFieldUpdateOperationsInput | string
+    materiaId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type ClaseUncheckedUpdateManyWithoutEstudiantesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    docenteId?: StringFieldUpdateOperationsInput | string
+    materiaId?: StringFieldUpdateOperationsInput | string
+  }
+
   export type ClaseCreateManyMateriaInput = {
     id?: string
     docenteId: string
@@ -10279,11 +10600,13 @@ export namespace Prisma {
   export type ClaseUpdateWithoutMateriaInput = {
     id?: StringFieldUpdateOperationsInput | string
     docente?: UserUpdateOneRequiredWithoutClasesNestedInput
+    estudiantes?: EstudianteUpdateManyWithoutClasesNestedInput
   }
 
   export type ClaseUncheckedUpdateWithoutMateriaInput = {
     id?: StringFieldUpdateOperationsInput | string
     docenteId?: StringFieldUpdateOperationsInput | string
+    estudiantes?: EstudianteUncheckedUpdateManyWithoutClasesNestedInput
   }
 
   export type ClaseUncheckedUpdateManyWithoutMateriaInput = {
@@ -10315,6 +10638,44 @@ export namespace Prisma {
     bimestre?: IntFieldUpdateOperationsInput | number
     nota?: FloatFieldUpdateOperationsInput | number
     docenteId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EstudianteUpdateWithoutClasesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nombre?: StringFieldUpdateOperationsInput | string
+    apellido?: StringFieldUpdateOperationsInput | string
+    dni?: NullableStringFieldUpdateOperationsInput | string | null
+    telefono?: StringFieldUpdateOperationsInput | string
+    direccion?: StringFieldUpdateOperationsInput | string
+    grado?: StringFieldUpdateOperationsInput | string
+    seccion?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    notas?: NotaUpdateManyWithoutEstudianteNestedInput
+  }
+
+  export type EstudianteUncheckedUpdateWithoutClasesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nombre?: StringFieldUpdateOperationsInput | string
+    apellido?: StringFieldUpdateOperationsInput | string
+    dni?: NullableStringFieldUpdateOperationsInput | string | null
+    telefono?: StringFieldUpdateOperationsInput | string
+    direccion?: StringFieldUpdateOperationsInput | string
+    grado?: StringFieldUpdateOperationsInput | string
+    seccion?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    notas?: NotaUncheckedUpdateManyWithoutEstudianteNestedInput
+  }
+
+  export type EstudianteUncheckedUpdateManyWithoutClasesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nombre?: StringFieldUpdateOperationsInput | string
+    apellido?: StringFieldUpdateOperationsInput | string
+    dni?: NullableStringFieldUpdateOperationsInput | string | null
+    telefono?: StringFieldUpdateOperationsInput | string
+    direccion?: StringFieldUpdateOperationsInput | string
+    grado?: StringFieldUpdateOperationsInput | string
+    seccion?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 

@@ -1,3 +1,4 @@
+import { Alumno } from "./alumnos.types";
 import { Materia } from "./materia.types";
 
 type UserRole = 'ADMIN' | 'DOCENTE' | 'SUPERADMIN';
@@ -18,6 +19,7 @@ export interface Clase {
   nombre: string;
   materia: Materia;
   docente: User;
+  estudiantes: Alumno[];
 }
 
 export interface FilterUser {

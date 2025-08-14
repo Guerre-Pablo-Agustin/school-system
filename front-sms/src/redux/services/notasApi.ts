@@ -12,10 +12,22 @@ interface NotasResponse {
 
 interface NotaResponse {
   message: string;
-  data: Nota;
-  error?: string;
+  data: {
+    id: string;
+    estudianteId: string;
+    materiaId: string;
+    bimestre: number;
+    nota: number;
+    docenteId: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+  action: "created" | "updated";
+  existingData?: {
+    id: string;
+    notaActual: number;
+  };
 }
-
 export const notasApi = createApi({
   reducerPath: "notasApi = createApi({",
   baseQuery: baseQueryWithReauth,
@@ -54,6 +66,23 @@ export const notasApi = createApi({
         };
       },
     }),
+
+    //agregar o editar nota
+     createOrUpdateNota: builder.mutation<NotaResponse, {
+      estudianteId: string;
+      materiaId: string;
+      bimestre: number;
+      nota: number;
+      docenteId: string;
+    }>({
+      query: (body) => ({
+        url: "/notas",
+        method: "POST",
+        body,
+      }),
+    }),
+
+
   }),
 });
 
@@ -63,6 +92,7 @@ export const {
     useCreateNotasMutation,
     useUpdateNotasMutation, 
     useGetNotasbyIdQuery,
+    useCreateOrUpdateNotaMutation
 } = notasApi
 
 
