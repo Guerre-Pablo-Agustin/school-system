@@ -45,67 +45,58 @@ export const getById = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
+    // 1) Traigo la clase con la materia
     const clase = await prisma.clase.findUnique({
       where: { id },
       include: {
-        materia: {
-          select: {
-            nombre: true,
-            codigo: true,
-            ciclo: true,
-          },
-        },
+        materia: true,
         docente: {
-          select: {
-            nombre: true,
-            email: true,
-          },
-        },
-        estudiantes: {
-          select: {
-            id: true,
-            nombre: true,
-            apellido: true,
-            grado: true,
-            seccion: true,
-            notas: {
-              where: {
-                materiaId: id
-              },
-              select: {
-                bimestre: true,
-                nota: true,
-                createdAt: true 
-              },
-              orderBy: {
-                bimestre: 'asc' 
-              }
-            },
-          },
+          select: { nombre: true, email: true },
         },
       },
     });
 
     if (!clase) {
-      return res.status(404).json({
-        mensaje: "Clase no encontrada",
-      });
+      return res.status(404).json({ mensaje: "Clase no encontrada" });
     }
 
-    // Opcional: Calcular promedios por estudiante
-    const claseConPromedios = {
-      ...clase,
-      estudiantes: clase.estudiantes.map(estudiante => ({
-        ...estudiante,
-        promedio: estudiante.notas.length > 0 
-          ? estudiante.notas.reduce((sum, nota) => sum + nota.nota, 0) / estudiante.notas.length
-          : null
-      }))
-    };
+    // 2) Traigo los estudiantes de la clase con sus notas SOLO de esa materia
+    const estudiantes = await prisma.estudiante.findMany({
+      where: {
+        clases: {
+          some: { id: clase.id },
+        },
+      },
+      select: {
+        id: true,
+        nombre: true,
+        apellido: true,
+        grado: true,
+        seccion: true,
+        notas: {
+          where: { materiaId: clase.materiaId }, // ✅ ahora sí funciona
+          select: {
+            bimestre: true,
+            nota: true,
+            createdAt: true,
+          },
+          orderBy: { bimestre: "asc" },
+        },
+      },
+    });
+
+    // 3) Agrego el promedio
+    const estudiantesConPromedio = estudiantes.map((est) => ({
+      ...est,
+      promedio:
+        est.notas.length > 0
+          ? est.notas.reduce((s, n) => s + n.nota, 0) / est.notas.length
+          : null,
+    }));
 
     res.status(200).json({
       mensaje: "Clase encontrada",
-      data: claseConPromedios,
+      data: { ...clase, estudiantes: estudiantesConPromedio },
     });
   } catch (error) {
     res.status(500).json({
@@ -114,6 +105,7 @@ export const getById = async (req: Request, res: Response) => {
     });
   }
 };
+
 
 
 //get classes by docente

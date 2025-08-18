@@ -1,4 +1,6 @@
 "use client"
+import InformacionDocente from '@/components/clases/informacionDocente'
+import TablasAlumnosClases from '@/components/clases/tablasAlumnosClases'
 import { BreadcrumbWithCustomSeparator } from '@/components/ui/breadcrumbSeparator'
 import { useGetClasesbyIdQuery } from '@/redux/services/clasesApi'
 import { Loader2 } from 'lucide-react'
@@ -33,11 +35,25 @@ const Page = () => {
 
   const claseData = data?.data
   const AlumnosClase = claseData?.estudiantes
+  const docente = claseData?.docente
+  const docenteId = claseData?.docenteId
+  const materiaId = claseData?.materiaId
+
+  if(!docente) return <div>No se encontro el docente</div>
+
+  if(!docenteId) return <div className='text-red-500 container mx-auto py-10 px-5'>No se encontro datos del docente</div>
+  if(!materiaId) return <div className='text-red-500 container mx-auto py-10 px-5'>No se encontro datos de la materia</div>
 
   return (
-    <div>
+    <main className="container mx-auto py-10 px-5">
        <BreadcrumbWithCustomSeparator href="/dashboard/clases" label="clases" page="Informacion" />
-    </div>
+       <section className="container mx-auto py-10 px-5">
+       <InformacionDocente  docente={docente} />
+       </section>
+       <section className="container mx-auto py-10 px-5">
+         <TablasAlumnosClases  AlumnosClase={AlumnosClase} docenteId={docenteId} materiaId={materiaId} />
+       </section>
+    </main>
   )
 }
 
