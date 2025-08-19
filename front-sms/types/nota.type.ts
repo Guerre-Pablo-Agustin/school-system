@@ -17,3 +17,12 @@ export interface Ponderacion {
   bimestre: Bimestre;
   peso: number; // porcentaje (ej: 0.25)
 }
+
+export interface NotaParcial {
+  id?: string;
+  nota: number;
+  bimestre: number;
+  alumnoId?: string;
+  materia?: Materia;
+}
+

@@ -77,6 +77,7 @@ export const getAlumno = async (req: Request, res: Response) => {
             nota: true,
               materia: {
                 select: {
+                  id: true,
                   nombre: true,
                   codigo: true,
                   ciclo: true,

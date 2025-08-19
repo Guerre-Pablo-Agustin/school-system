@@ -1,4 +1,4 @@
-import { Alumno } from "./alumnos.types";
+
 import { Materia } from "./materia.types";
 import { Nota } from "./nota.type";
 

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Table,
     TableBody,
@@ -13,16 +13,16 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useCreateOrUpdateNotaMutation } from "@/redux/services/notasApi";
-import { Nota } from "../../../types/nota.type";
+import {  NotaParcial } from "../../../types/nota.type";
 
 interface AlumnoClase {
-    id: string;
-    nombre: string;
-    apellido: string;
-    grado: string;
-    seccion: string;
-    notas: Nota[];
-    promedio: number | null;
+  id: string;
+  nombre: string;
+  apellido: string;
+  grado: string;
+  seccion: string;
+  notas: NotaParcial[];
+  promedio: number | null;
 }
 
 interface TablasAlumnosClasesProps {
@@ -38,8 +38,16 @@ const TablasAlumnosClases = ({
 }: TablasAlumnosClasesProps) => {
     const [createOrUpdateNota] = useCreateOrUpdateNotaMutation();
 
-    // Estado local para edición de notas en tabla
+    // fila en edición
+    const [editandoId, setEditandoId] = useState<string | null>(null);
+    // notas locales para edición
     const [editNotas, setEditNotas] = useState<Record<string, Record<number, string>>>({});
+    const [alumnos, setAlumnos] = useState(AlumnosClase ?? []);
+
+    useEffect(() => {
+        if (AlumnosClase) setAlumnos(AlumnosClase);
+    }, [AlumnosClase]);
+
 
     if (!AlumnosClase || AlumnosClase.length === 0) {
         return <p>No hay alumnos en esta clase</p>;
@@ -59,40 +67,51 @@ const TablasAlumnosClases = ({
         }));
     };
 
-    const handleGuardar = async (alumnoId: string, bimestre: number) => {
-        const valor = editNotas[alumnoId]?.[bimestre];
-        if (!valor) return;
 
-        const notaNum = parseFloat(valor);
-        if (isNaN(notaNum) || notaNum < 1 || notaNum > 10) {
-            toast.error("La nota debe estar entre 1 y 10");
-            return;
-        }
+
+    const handleGuardarFila = async (alumnoId: string) => {
+        const notasDelAlumno = editNotas[alumnoId];
+        if (!notasDelAlumno) return;
 
         try {
-            const result = await createOrUpdateNota({
-                estudianteId: alumnoId,
-                materiaId,
-                bimestre,
-                nota: notaNum,
-                docenteId,
-            }).unwrap();
+            for (const [bimestreStr, valor] of Object.entries(notasDelAlumno)) {
+                const bimestre = parseInt(bimestreStr, 10);
+                const notaNum = parseFloat(valor);
 
-            if (result.action === "updated") {
-                toast.success("Nota actualizada correctamente");
-            } else {
-                toast.success("Nota agregada correctamente");
+                await createOrUpdateNota({
+                    estudianteId: alumnoId,
+                    materiaId,
+                    bimestre,
+                    nota: notaNum,
+                    docenteId,
+                }).unwrap();
+
+                // 🔥 actualizar en memoria
+                setAlumnos((prev) =>
+                    prev.map((a) =>
+                        a.id === alumnoId
+                            ? {
+                                ...a,
+                                notas: [
+                                    ...a.notas.filter((n) => n.bimestre !== bimestre),
+                                    { bimestre, nota: notaNum }, // nueva nota
+                                ],
+                            }
+                            : a
+                    )
+                );
             }
 
-            // limpiar estado local para esa celda
+            toast.success("Notas guardadas correctamente");
+            setEditandoId(null);
             setEditNotas((prev) => {
-                const updated = { ...prev };
-                delete updated[alumnoId][bimestre];
-                return updated;
+                const nuevo = { ...prev };
+                delete nuevo[alumnoId];
+                return nuevo;
             });
         } catch (error) {
-            console.error("Error al guardar nota:", error);
-            toast.error("Error al guardar la nota");
+            console.error(error);
+            toast.error("Error al guardar las notas");
         }
     };
 
@@ -112,53 +131,84 @@ const TablasAlumnosClases = ({
                         <TableHead>3° Bimestre</TableHead>
                         <TableHead>4° Bimestre</TableHead>
                         <TableHead>Promedio</TableHead>
+                        <TableHead>Acciones</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {AlumnosClase.map((alumno) => (
-                        <TableRow key={alumno.id}>
-                            <TableCell>{alumno.nombre}</TableCell>
-                            <TableCell>{alumno.apellido}</TableCell>
-                            <TableCell>{alumno.grado}</TableCell>
-                            <TableCell>{alumno.seccion}</TableCell>
-                            {[1, 2, 3, 4].map((bimestre) => {
-                                const notaExistente = alumno.notas.find(
-                                    (n) => n.bimestre === bimestre
-                                );
-                                const valorLocal = editNotas[alumno.id]?.[bimestre] ?? "";
+                    {alumnos.map((alumno) => {
+                        const estaEditando = editandoId === alumno.id;
 
-                                return (
-                                    <TableCell key={bimestre}>
-                                        <div className="flex gap-2 items-center">
-                                            <Input
-                                                type="number"
-                                                step="0.1"
-                                                min="1"
-                                                max="10"
-                                                className="w-20"
-                                                value={
-                                                    valorLocal !== ""
-                                                        ? valorLocal
-                                                        : notaExistente?.nota?.toString() ?? ""
-                                                }
-                                                onChange={(e) =>
-                                                    handleNotaChange(alumno.id, bimestre, e.target.value)
-                                                }
-                                            />
+                        return (
+                            <TableRow key={alumno.id}>
+                                <TableCell>{alumno.nombre}</TableCell>
+                                <TableCell>{alumno.apellido}</TableCell>
+                                <TableCell>{alumno.grado}</TableCell>
+                                <TableCell>{alumno.seccion}</TableCell>
+                                {[1, 2, 3, 4].map((bimestre) => {
+                                    const notaExistente = alumno.notas.find(
+                                        (n) => n.bimestre === bimestre
+                                    );
+                                    const valorLocal = editNotas[alumno.id]?.[bimestre] ?? "";
+
+                                    return (
+                                        <TableCell key={bimestre}>
+                                            {estaEditando ? (
+                                                <Input
+                                                    type="number"
+                                                    step="0.1"
+                                                    min="1"
+                                                    max="10"
+                                                    className="w-20"
+                                                    value={
+                                                        valorLocal !== ""
+                                                            ? valorLocal
+                                                            : notaExistente?.nota?.toString() ?? ""
+                                                    }
+                                                    onChange={(e) =>
+                                                        handleNotaChange(alumno.id, bimestre, e.target.value)
+                                                    }
+                                                />
+                                            ) : (
+                                                <span>{notaExistente?.nota ?? "-"}</span>
+                                            )}
+                                        </TableCell>
+                                    );
+                                })}
+                                <TableCell>{alumno.promedio ?? "-"}</TableCell>
+                                <TableCell>
+                                    {estaEditando ? (
+                                        <div className="flex gap-2">
                                             <Button
                                                 size="sm"
-                                                onClick={() => handleGuardar(alumno.id, bimestre)}
-                                                disabled={!valorLocal}
+                                                variant="outline"
+                                                onClick={() => handleGuardarFila(alumno.id)}
+                                                className="cursor-pointer"
                                             >
                                                 Guardar
                                             </Button>
+                                            <Button
+                                                size="sm"
+                                                variant="secondary"
+                                                className="cursor-pointer"
+                                                onClick={() => setEditandoId(null)}
+                                            >
+                                                Cancelar
+                                            </Button>
                                         </div>
-                                    </TableCell>
-                                );
-                            })}
-                            <TableCell>{alumno.promedio ?? "-"}</TableCell>
-                        </TableRow>
-                    ))}
+                                    ) : (
+                                        <Button
+                                            size="sm"
+                                            variant="outline"
+                                            className="cursor-pointer"
+                                            onClick={() => setEditandoId(alumno.id)}
+                                        >
+                                            Editar
+                                        </Button>
+                                    )}
+                                </TableCell>
+                            </TableRow>
+                        );
+                    })}
                 </TableBody>
             </Table>
         </div>
