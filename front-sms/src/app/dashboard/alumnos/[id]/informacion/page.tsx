@@ -51,6 +51,7 @@ const Page = () => {
             alumnoId={dataAlumno.id}
             dataNotas={dataNotas}
             onSaved={() => refetch()} // 🔄 después de guardar en la tabla
+            alumnoNombre={dataAlumno.nombre}
           />
       </div>
     </section>

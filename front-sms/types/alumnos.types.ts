@@ -7,7 +7,7 @@ export interface Alumno {
   dni: string;
   telefono: string;
   direccion: string;
-  grado: string; // Ej: "1ro, 2do"
+  grado: number; // Ej: "1ro, 2do"
   seccion: string; // Ej: "A, B"
   notas: Nota[];
 }

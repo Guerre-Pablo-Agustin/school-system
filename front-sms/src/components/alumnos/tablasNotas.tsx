@@ -14,8 +14,9 @@ import autoTable from "jspdf-autotable";
 
 interface TablasNotasProps {
   alumnoId: string;
-  dataNotas: Nota[] | undefined;
+  dataNotas: Nota[];
   onSaved?: () => void; // opcional: para refetch externo
+  alumnoNombre: string;
 }
 
 type Bim = 1 | 2 | 3 | 4;
@@ -32,9 +33,11 @@ interface FilaTabla {
   promedio: number | string;
 }
 
-const TablasNotas = ({ alumnoId, dataNotas = [], onSaved }: TablasNotasProps) => {
+const TablasNotas = ({ alumnoId, dataNotas = [], onSaved, alumnoNombre }: TablasNotasProps) => {
   const userLogin = useSelector(selectUserLogin);
   const [createOrUpdateNota, { isLoading: saving }] = useCreateOrUpdateNotaMutation();
+
+  console.log("dataNotas", dataNotas);
 
   // 1) PIVOT inicial desde props
   const materiasPivot = useMemo(() => {
@@ -55,7 +58,7 @@ const TablasNotas = ({ alumnoId, dataNotas = [], onSaved }: TablasNotasProps) =>
         });
       }
       const row = map.get(key)!;
-      (row)[`bimestre${n.bimestre}`] = n.nota; // número
+      (row)[`bimestre${n.bimestre}`] = n.valor; // número
     });
     
     // Calcular promedios
@@ -141,15 +144,26 @@ const TablasNotas = ({ alumnoId, dataNotas = [], onSaved }: TablasNotasProps) =>
     }
 
     try {
-      for (const { b, val } of ops) {
-        await createOrUpdateNota({
-          estudianteId: alumnoId,
-          materiaId: fila.materiaId,
-          bimestre: b,
-          nota: val,
-          docenteId: userLogin.id,
-        }).unwrap();
-      }
+     for (const { b, val } of ops) {
+  // Buscar la nota más reciente para esta materia y bimestre
+  const notasDeMateriaYBimestre = dataNotas
+    .filter(n => n.materia.id === fila.materiaId && n.bimestre === b)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  
+  // Tomar la claseId de la nota más reciente, o null si no existe
+  const claseIdMasReciente = notasDeMateriaYBimestre.length > 0 
+    ? notasDeMateriaYBimestre[0].clase?.id || null 
+    : null;
+
+  await createOrUpdateNota({
+    estudianteId: alumnoId,
+    materiaId: fila.materiaId,
+    claseId: claseIdMasReciente,
+    bimestre: b,
+    valor: val,
+    docenteId: userLogin.id,
+  }).unwrap();
+}
 
       // Actualizar fila local
       setRows((prev) =>
@@ -265,7 +279,7 @@ const TablasNotas = ({ alumnoId, dataNotas = [], onSaved }: TablasNotasProps) =>
       doc.setFontSize(18);
       doc.text("Reporte de Notas", 14, 15);
       doc.setFontSize(12);
-      doc.text(`Alumno ID: ${alumnoId} - Fecha: ${new Date().toLocaleDateString()}`, 14, 22);
+      doc.text(`Alumno : ${alumnoNombre} - Fecha: ${new Date().toLocaleDateString()}`, 14, 22);
       
       // Preparar datos para la tabla
       const headers = [

@@ -1,14 +1,17 @@
 import { Materia } from "./materia.types";
+import { Clase } from "./Usuario.type";
 
 type Bimestre = 1 | 2 | 3 | 4;
 
 export interface Nota {
   id: string;
-  nota: number;
+  clase: Clase,
+  valor: number;
   bimestre: Bimestre;
   alumnoId: string;
-  materia: Materia
-  ;
+  materia: Materia;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Ponderacion {

@@ -27,7 +27,7 @@ const formAlumnoSchema = z.object({
   nombre: z.string().min(3, { message: "El nombre es requerido" }),
   apellido: z.string().min(3, { message: "El apellido es requerido" }),
   dni: z.string().min(8, { message: "El dni es requerido" }),
-  grado: z.string().min(1, { message: "El grado es requerido" }).max(2, { message: "El grado es requerido" }),
+  grado: z.number().min(1, { message: "El grado es requerido" }),
   seccion: z.string().min(1, { message: "El seccion es requerido" }).max(2, { message: "El seccion es requerido" }),
   telefono: z
   .string()
@@ -51,7 +51,7 @@ const InformacionAlumno = ({ dataAlumno }: InformacionAlumnoProps) => {
             nombre: dataAlumno?.nombre || "",
             apellido: dataAlumno?.apellido || "",
             dni: dataAlumno?.dni || "",
-            grado: dataAlumno?.grado || "",
+            grado: dataAlumno?.grado,
             seccion: dataAlumno?.seccion || "",
             telefono: dataAlumno?.telefono || "",
             direccion: dataAlumno?.direccion || "",
