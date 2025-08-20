@@ -19,19 +19,30 @@ export const getAll = async (req: Request, res: Response) => {
           },
         },
         estudiantes: {
-          select: {
-            id: true,
-            nombre: true,
-            apellido: true,
-            grado: true,
-            seccion: true,
+          include: { 
+            estudiante: { 
+              select: {
+                id: true,
+                nombre: true,
+                apellido: true,
+                grado: true,
+                seccion: true,
+              },
+            },
           },
         },
       },
     });
+
+    // ✅ Opcional: Transformar la respuesta para que sea más clara
+    const clasesTransformadas = clases.map(clase => ({
+      ...clase,
+      estudiantes: clase.estudiantes.map(inscripcion => inscripcion.estudiante)
+    }));
+
     res.status(200).json({
       mensaje: "Clases obtenidas exitosamente",
-      data: clases,
+      data: clasesTransformadas,
     });
   } catch (error) {
     res.status(500).json({
@@ -41,17 +52,22 @@ export const getAll = async (req: Request, res: Response) => {
   }
 };
 
+// 1. GET BY ID 
 export const getById = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
-    // 1) Traigo la clase con la materia
     const clase = await prisma.clase.findUnique({
       where: { id },
       include: {
         materia: true,
         docente: {
           select: { nombre: true, email: true },
+        },
+        estudiantes: {
+          include: {
+            estudiante: true
+          }
         },
       },
     });
@@ -60,43 +76,41 @@ export const getById = async (req: Request, res: Response) => {
       return res.status(404).json({ mensaje: "Clase no encontrada" });
     }
 
-    // 2) Traigo los estudiantes de la clase con sus notas SOLO de esa materia
-    const estudiantes = await prisma.estudiante.findMany({
-      where: {
-        clases: {
-          some: { id: clase.id },
-        },
-      },
-      select: {
-        id: true,
-        nombre: true,
-        apellido: true,
-        grado: true,
-        seccion: true,
-        notas: {
-          where: { materiaId: clase.materiaId }, // ✅ ahora sí funciona
+    // 2) Traigo las notas de los estudiantes para esta materia
+    const estudiantesConNotas = await Promise.all(
+      clase.estudiantes.map(async (inscripcion) => {
+        const notas = await prisma.nota.findMany({
+          where: {
+            estudianteId: inscripcion.estudianteId,
+            materiaId: clase.materiaId,
+            claseId: clase.id
+          },
           select: {
             bimestre: true,
-            nota: true,
+            valor: true, 
             createdAt: true,
           },
           orderBy: { bimestre: "asc" },
-        },
-      },
-    });
+        });
 
-    // 3) Agrego el promedio
-    const estudiantesConPromedio = estudiantes.map((est) => ({
-      ...est,
-      promedio:
-        est.notas.length > 0
-          ? est.notas.reduce((s, n) => s + n.nota, 0) / est.notas.length
-          : null,
-    }));
+        const promedio = notas.length > 0
+          ? notas.reduce((sum, nota) => sum + nota.valor, 0) / notas.length
+          : null;
+
+        return {
+          ...inscripcion.estudiante,
+          notas,
+          promedio
+        };
+      })
+    );
 
     res.status(200).json({
       mensaje: "Clase encontrada",
-      data: { ...clase, estudiantes: estudiantesConPromedio },
+      data: {
+        ...clase,
+        estudiantes: estudiantesConNotas
+      },
     });
   } catch (error) {
     res.status(500).json({
@@ -106,9 +120,7 @@ export const getById = async (req: Request, res: Response) => {
   }
 };
 
-
-
-//get classes by docente
+// 2. GET BY DOCENTE - Ya está correcto
 export const getByDocente = async (req: Request, res: Response) => {
   const { id } = req.params;
 
@@ -143,13 +155,31 @@ export const getByDocente = async (req: Request, res: Response) => {
   }
 };
 
+// 3. CREATE CLASS - Agregar año lectivo
 export const createClass = async (req: Request, res: Response) => {
-  const { docenteId, materiaId } = req.body;
+  const { docenteId, materiaId, anioLectivo } = req.body;
+  
   try {
+    // Verificar si ya existe la clase para evitar duplicados
+    const claseExistente = await prisma.clase.findFirst({
+      where: {
+        docenteId,
+        materiaId,
+        anioLectivo: anioLectivo || new Date().getFullYear()
+      }
+    });
+
+    if (claseExistente) {
+      return res.status(400).json({
+        mensaje: "Ya existe una clase con este docente y materia para este año"
+      });
+    }
+
     const newClass = await prisma.clase.create({
       data: {
         docenteId,
         materiaId,
+        anioLectivo: anioLectivo || new Date().getFullYear()
       },
     });
 
@@ -165,17 +195,18 @@ export const createClass = async (req: Request, res: Response) => {
   }
 };
 
+// 4. UPDATE CLASS - Corregido
 export const updateClass = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { docenteId, materiaId } = req.body;
+  const { docenteId, materiaId, anioLectivo } = req.body;
+  
   try {
-    const newClass = await prisma.clase.update({
-      where: {
-        id,
-      },
+    const updatedClass = await prisma.clase.update({
+      where: { id },
       data: {
         docenteId,
         materiaId,
+        anioLectivo
       },
       include: {
         materia: {
@@ -185,12 +216,18 @@ export const updateClass = async (req: Request, res: Response) => {
             ciclo: true,
           },
         },
+        docente: {
+          select: {
+            nombre: true,
+            email: true
+          }
+        }
       },
     });
 
     res.status(200).json({
       mensaje: "Clase actualizada exitosamente",
-      data: newClass,
+      data: updatedClass,
     });
   } catch (error) {
     res.status(500).json({
@@ -200,37 +237,80 @@ export const updateClass = async (req: Request, res: Response) => {
   }
 };
 
+// 5. DELETE CLASS - Corregido (estaba eliminando usuario)
 export const deleteClass = async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const user = await prisma.user.delete({
-    where: {
-      id,
-    },
-  });
+  try {
+    // Primero eliminar las inscripciones (relaciones muchos-a-muchos)
+    await prisma.claseEstudiante.deleteMany({
+      where: { claseId: id }
+    });
 
-  res.status(200).json(user);
+    // Luego eliminar las notas asociadas a la clase
+    await prisma.nota.deleteMany({
+      where: { claseId: id }
+    });
+
+    // Finalmente eliminar la clase
+    const clase = await prisma.clase.delete({
+      where: { id }
+    });
+
+    res.status(200).json({
+      mensaje: "Clase eliminada exitosamente",
+      data: clase
+    });
+  } catch (error) {
+    res.status(500).json({
+      mensaje: "Error al eliminar clase",
+      error: error,
+    });
+  }
 };
 
-
-//agregar alumno a clase
+// 6. ADD ALUMNO TO CLASS - Corregido para usar tabla intermedia
 export const addAlumnoToClass = async (req: Request, res: Response) => {
-  const { id, alumnoid } = req.body;
+  const { claseId, estudianteId } = req.body;
 
-  console.log("parametros de addAlumnoToClass", id, alumnoid);
   try {
-    const newClass = await prisma.clase.update({
-       where: { id: id },
-    data: {
-      estudiantes: {
-        connect: { id: alumnoid }
+    // Verificar si el estudiante ya está inscrito
+    const inscripcionExistente = await prisma.claseEstudiante.findUnique({
+      where: {
+        claseId_estudianteId: {
+          claseId,
+          estudianteId
+        }
       }
+    });
+
+    if (inscripcionExistente) {
+      return res.status(400).json({
+        mensaje: "El estudiante ya está inscrito en esta clase"
+      });
     }
+
+    const inscripcion = await prisma.claseEstudiante.create({
+      data: {
+        claseId,
+        estudianteId
+      },
+      include: {
+        estudiante: {
+          select: {
+            id: true,
+            nombre: true,
+            apellido: true,
+            grado: true,
+            seccion: true
+          }
+        }
+      }
     });
 
     res.status(200).json({
       mensaje: "Alumno agregado exitosamente",
-      data: newClass,
+      data: inscripcion.estudiante,
     });
   } catch (error) {
     res.status(500).json({
@@ -240,23 +320,31 @@ export const addAlumnoToClass = async (req: Request, res: Response) => {
   }
 };
 
-//eliminar alumno de clase
-export const removeAlumnoToClass = async (req: Request, res: Response) => {
-  const { id, estudianteId } = req.body;
+// 7. REMOVE ALUMNO FROM CLASS - Corregido
+export const removeAlumnoFromClass = async (req: Request, res: Response) => {
+  const { claseId, estudianteId } = req.body;
 
   try {
-    const newClass = await prisma.clase.update({
-      where: { id: id },
-    data: {
-      estudiantes: {
-        disconnect: { id: estudianteId }
+    // Eliminar las notas del estudiante en esta clase
+    await prisma.nota.deleteMany({
+      where: {
+        estudianteId,
+        claseId
       }
-    }
+    });
+
+    // Eliminar la inscripción
+    await prisma.claseEstudiante.delete({
+      where: {
+        claseId_estudianteId: {
+          claseId,
+          estudianteId
+        }
+      }
     });
 
     res.status(200).json({
-      mensaje: "Alumno eliminado exitosamente",
-      data: newClass,
+      mensaje: "Alumno eliminado exitosamente de la clase",
     });
   } catch (error) {
     res.status(500).json({

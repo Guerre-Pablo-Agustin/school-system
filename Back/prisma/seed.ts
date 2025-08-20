@@ -1,154 +1,278 @@
-import { prisma } from "../src/lib/prisma";
+// prisma/seed.ts
+import { PrismaClient, Rol, Ciclo } from '../src/generated/prisma';
+
+const prisma = new PrismaClient();
 
 async function main() {
-  // 1. Limpiar la base de datos (opcional, cuidado en producción)
-  await prisma.nota.deleteMany();
-  await prisma.estudiante.deleteMany();
-  await prisma.clase.deleteMany();
-  await prisma.materia.deleteMany();
-  await prisma.user.deleteMany();
-  await prisma.ponderacion.deleteMany();
+  console.log('🌱 Iniciando inserción de datos de prueba...');
 
-  // 2. Crear ponderaciones para ciclos
-  await prisma.ponderacion.createMany({
+  // 1. Crear Usuarios (Docentes y Admin)
+  const users = await prisma.user.createMany({
     data: [
       {
-        ciclo: 'PRIMARIA',
-        formula: '0.25,0.25,0.25,0.25' // 4 bimestres con igual peso
+        nombre: 'María González',
+        email: 'maria.gonzalez@escuela.edu',
+        password: '$2b$10$EXAMPLEHASHEDPASSWORD',
+        telefono: '+1234567890',
+        direccion: 'Av. Principal 123',
+        rol: Rol.DOCENTE,
       },
       {
-        ciclo: 'SECUNDARIA',
-        formula: '0.20,0.30,0.20,0.30' // Bimestres 2 y 4 pesan más
-      }
-    ]
+        nombre: 'Carlos Rodríguez',
+        email: 'carlos.rodriguez@escuela.edu',
+        password: '$2b$10$EXAMPLEHASHEDPASSWORD',
+        telefono: '+0987654321',
+        direccion: 'Calle Secundaria 456',
+        rol: Rol.DOCENTE,
+      },
+      {
+        nombre: 'Ana Martínez',
+        email: 'ana.martinez@escuela.edu',
+        password: '$2b$10$EXAMPLEHASHEDPASSWORD',
+        telefono: '+1122334455',
+        direccion: 'Jr. Educacion 789',
+        rol: Rol.DOCENTE,
+      },
+      {
+        nombre: 'Admin Sistema',
+        email: 'admin@escuela.edu',
+        password: '$2b$10$ADMINHASHEDPASSWORD',
+        telefono: '+5566778899',
+        direccion: 'Av. Administración 001',
+        rol: Rol.ADMIN,
+      },
+    ],
   });
 
-  // 3. Crear usuarios
-  const admin = await prisma.user.create({
-    data: {
-      nombre: 'Admin Principal',
-      email: 'admin@escuela.com',
-      password: '$2b$10$EjemploDeHashSeguro', // Usar bcrypt en producción
-      telefono: '123456789',
-      direccion: 'Av. Principal 123',
-      rol: 'ADMIN'
-    }
-  });
+  console.log(`✅ ${users.count} usuarios creados`);
 
-  const superadmin = await prisma.user.create({
-    data: {
-      nombre: 'Super Admin',
-      email: 'superadmin@escuela.com',
-      password: '$2b$10$EjemploDeHashSeguro',
-      telefono: '987654321',
-      direccion: 'Av. Secundaria 456',
-      rol: 'SUPERADMIN'
-    }
-  });
-
-  const docente = await prisma.user.create({
-    data: {
-      nombre: 'Profesor Juan Pérez',
-      email: 'juan@escuela.com',
-      password: '$2b$10$EjemploDeHashSeguro',
-      telefono: '555123456',
-      direccion: 'Calle Docente 789',
-      rol: 'DOCENTE'
-    }
-  });
-
-  // 4. Crear materias
-  const matematica = await prisma.materia.create({
-    data: {
-      nombre: 'Matemáticas',
-      ciclo: 'PRIMARIA',
-      codigo: 'MATH-001'
-    }
-  });
-
-  const ciencia = await prisma.materia.create({
-    data: {
-      nombre: 'Ciencias Naturales',
-      ciclo: 'SECUNDARIA',
-      codigo: 'SCI-001'
-    }
-  });
-
-  // 5. Asignar clases al docente
-  await prisma.clase.create({
-    data: {
-      docenteId: docente.id,
-      materiaId: matematica.id
-    }
-  });
-
-  // 6. Crear estudiantes
-  const estudiante1 = await prisma.estudiante.create({
-    data: {
-      nombre: 'Ana',
-      apellido: 'García',
-      dni: '12345678A',
-      telefono: '111222333',
-      direccion: 'Calle Estudiante 1',
-      grado: 5,
-      seccion: 'A'
-    }
-  });
-
-  const estudiante2 = await prisma.estudiante.create({
-    data: {
-      nombre: 'Luis',
-      apellido: 'Martínez',
-      dni: '87654321B',
-      telefono: '444555666',
-      direccion: 'Calle Estudiante 2',
-      grado: 5,
-      seccion: 'A'
-    }
-  });
-
-  const estudiante3 = await prisma.estudiante.create({
-    data: {
-      nombre: 'Marta',
-      apellido: 'Rodríguez',
-      dni: '56781234C',
-      telefono: '777888999',
-      direccion: 'Calle Estudiante 3',
-      grado: 6,
-      seccion: 'B'
-    }
-  });
-
-  // 7. Registrar notas (el docente califica a los estudiantes)
-  await prisma.nota.createMany({
+  // 2. Crear Materias
+  const materias = await prisma.materia.createMany({
     data: [
       {
-        estudianteId: estudiante1.id,
-        materiaId: matematica.id,
-        bimestre: 1,
-        nota: 15.5,
-        docenteId: docente.id
+        nombre: 'Matemáticas',
+        ciclo: Ciclo.PRIMARIA,
+        grado: 5,
+        codigo: 'MAT-5P',
       },
       {
-        estudianteId: estudiante2.id,
-        materiaId: matematica.id,
-        bimestre: 1,
-        nota: 18.0,
-        docenteId: docente.id
-      }
-    ]
+        nombre: 'Comunicación',
+        ciclo: Ciclo.PRIMARIA,
+        grado: 5,
+        codigo: 'COM-5P',
+      },
+      {
+        nombre: 'Ciencia y Ambiente',
+        ciclo: Ciclo.PRIMARIA,
+        grado: 5,
+        codigo: 'CIA-5P',
+      },
+      {
+        nombre: 'Álgebra',
+        ciclo: Ciclo.SECUNDARIA,
+        grado: 3,
+        codigo: 'ALG-3S',
+      },
+      {
+        nombre: 'Literatura',
+        ciclo: Ciclo.SECUNDARIA,
+        grado: 3,
+        codigo: 'LIT-3S',
+      },
+    ],
   });
 
-  console.log('✅ Datos de prueba creados correctamente:');
-  console.log('- 3 usuarios (admin, superadmin, docente)');
-  console.log('- 2 materias');
-  console.log('- 3 estudiantes');
-  console.log('- 2 notas registradas');
+  console.log(`✅ ${materias.count} materias creadas`);
+
+  // 3. Crear Estudiantes
+  const estudiantes = await prisma.estudiante.createMany({
+    data: [
+      {
+        nombre: 'Juan',
+        apellido: 'Pérez',
+        dni: '12345678',
+        telefono: '+111222333',
+        direccion: 'Calle Estudiantes 101',
+        grado: 5,
+        seccion: 'A',
+      },
+      {
+        nombre: 'María',
+        apellido: 'López',
+        dni: '87654321',
+        telefono: '+444555666',
+        direccion: 'Av. Aprendizaje 202',
+        grado: 5,
+        seccion: 'A',
+      },
+      {
+        nombre: 'Carlos',
+        apellido: 'García',
+        dni: '11223344',
+        telefono: '+777888999',
+        direccion: 'Jr. Conocimiento 303',
+        grado: 5,
+        seccion: 'A',
+      },
+      {
+        nombre: 'Laura',
+        apellido: 'Martínez',
+        dni: '44332211',
+        telefono: '+000111222',
+        direccion: 'Pasaje Saber 404',
+        grado: 3,
+        seccion: 'B',
+      },
+      {
+        nombre: 'Pedro',
+        apellido: 'Sánchez',
+        dni: '55667788',
+        telefono: '+333444555',
+        direccion: 'Av. Estudio 505',
+        grado: 3,
+        seccion: 'B',
+      },
+    ],
+  });
+
+  console.log(`✅ ${estudiantes.count} estudiantes creados`);
+
+  // 4. Crear Clases
+  const docentes = await prisma.user.findMany({
+    where: { rol: Rol.DOCENTE },
+  });
+
+  const materiasList = await prisma.materia.findMany();
+
+  const clases = await prisma.clase.createMany({
+    data: [
+      {
+        docenteId: docentes[0].id,
+        materiaId: materiasList[0].id,
+        anioLectivo: 2024,
+      },
+      {
+        docenteId: docentes[0].id,
+        materiaId: materiasList[2].id,
+        anioLectivo: 2024,
+      },
+      {
+        docenteId: docentes[1].id,
+        materiaId: materiasList[1].id,
+        anioLectivo: 2024,
+      },
+      {
+        docenteId: docentes[2].id,
+        materiaId: materiasList[3].id,
+        anioLectivo: 2024,
+      },
+      {
+        docenteId: docentes[2].id,
+        materiaId: materiasList[4].id,
+        anioLectivo: 2024,
+      },
+    ],
+  });
+
+  console.log(`✅ ${clases.count} clases creadas`);
+
+  // 5. Inscribir estudiantes a clases
+  const estudiantesList = await prisma.estudiante.findMany();
+  const clasesList = await prisma.clase.findMany();
+
+  // Estudiantes de 5to grado (primeros 3) en clases de primaria
+  const inscripcionesPrimaria = [];
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      inscripcionesPrimaria.push({
+        claseId: clasesList[j].id,
+        estudianteId: estudiantesList[i].id,
+      });
+    }
+  }
+
+  // Estudiantes de 3er grado (últimos 2) en clases de secundaria
+  const inscripcionesSecundaria = [];
+  for (let i = 3; i < 5; i++) {
+    for (let j = 3; j < 5; j++) {
+      inscripcionesSecundaria.push({
+        claseId: clasesList[j].id,
+        estudianteId: estudiantesList[i].id,
+      });
+    }
+  }
+
+  const todasInscripciones = [...inscripcionesPrimaria, ...inscripcionesSecundaria];
+  
+  const inscripciones = await prisma.claseEstudiante.createMany({
+    data: todasInscripciones,
+  });
+
+  console.log(`✅ ${inscripciones.count} inscripciones creadas`);
+
+  // 6. Crear Notas para los estudiantes - VERSIÓN CORREGIDA
+  const notasData = [];
+  
+  // Para cada inscripción, crear notas de los 4 bimestres
+  for (const inscripcion of todasInscripciones) {
+    const clase = await prisma.clase.findUnique({
+      where: { id: inscripcion.claseId },
+      include: { materia: true, docente: true }
+    });
+
+    // ✅ Verificación para evitar undefined
+    if (!clase) {
+      console.warn(`⚠️ Clase con ID ${inscripcion.claseId} no encontrada, saltando...`);
+      continue;
+    }
+
+    for (let bimestre = 1; bimestre <= 4; bimestre++) {
+      // Nota aleatoria entre 10 y 20 (sistema peruano)
+      const notaValor = Math.floor(Math.random() * 11) + 10;
+      
+      notasData.push({
+        estudianteId: inscripcion.estudianteId,
+        materiaId: clase.materiaId,
+        claseId: inscripcion.claseId,
+        docenteId: clase.docenteId,
+        bimestre: bimestre,
+        valor: notaValor,
+      });
+    }
+  }
+
+  const notas = await prisma.nota.createMany({
+    data: notasData,
+  });
+
+  console.log(`✅ ${notas.count} notas creadas`);
+
+  // 7. Crear Ponderaciones
+  const ponderaciones = await prisma.ponderacion.createMany({
+    data: [
+      {
+        ciclo: Ciclo.PRIMARIA,
+        formula: '0.3,0.3,0.2,0.2',
+        descripcion: 'Ponderación para educación primaria',
+        activo: true,
+      },
+      {
+        ciclo: Ciclo.SECUNDARIA,
+        formula: '0.25,0.25,0.25,0.25',
+        descripcion: 'Ponderación para educación secundaria',
+        activo: true,
+      },
+    ],
+  });
+
+  console.log(`✅ ${ponderaciones.count} ponderaciones creadas`);
+
+  console.log('🎉 ¡Datos de prueba insertados exitosamente!');
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error('❌ Error insertando datos:', e);
     process.exit(1);
   })
   .finally(async () => {

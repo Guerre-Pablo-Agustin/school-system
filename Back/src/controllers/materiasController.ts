@@ -83,10 +83,10 @@ export const getMateriaById = async (req: Request, res: Response) => {
 
 export const createMateria = async (req: Request, res: Response) => {
   try {
-    const { nombre, ciclo, codigo,  } = req.body;
+    const { nombre, ciclo, codigo, grado } = req.body;
 
     // Validaciones mejoradas
-    const requiredFields = ['nombre', 'ciclo', 'codigo'];
+    const requiredFields = ['nombre', 'ciclo', 'codigo', 'grado'];
     const missingFields = requiredFields.filter(field => !req.body[field]);
 
     if (missingFields.length > 0) {
@@ -103,6 +103,7 @@ export const createMateria = async (req: Request, res: Response) => {
         nombre,
         ciclo,
         codigo,
+        grado
       },
     });
 

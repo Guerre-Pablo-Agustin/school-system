@@ -16,84 +16,119 @@ datasource db {
 
 
 model User {
-  id         String   @id @default(uuid())
-  nombre     String
-  email      String   @unique
-  password   String
-  telefono   String
-  direccion  String
-  rol        Rol      // ADMIN o DOCENTE (quitamos ESTUDIANTE)
-  clases     Clase[]  @relation("DocenteClases")
-  createdAt  DateTime @default(now())
+  id          String      @id @default(uuid())
+  nombre      String
+  email       String      @unique
+  password    String
+  telefono    String?
+  direccion   String?
+  rol         Rol         @default(DOCENTE)
+  clases      Clase[]     @relation("DocenteClases")
+  notas       Nota[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("users")
 }
 
 model Estudiante {
-  id         String   @id @default(uuid())
-  nombre     String
-  apellido   String
-  dni        String?  @unique  // Opcional, para identificación
-  telefono   String
-  direccion  String
-  grado      String      // Ej: 1 (primero), 2 (segundo)...
-  seccion    String   // Ej: "A", "B"...
-  notas      Nota[]
-  clases     Clase[] 
-  createdAt  DateTime @default(now())
+  id          String          @id @default(uuid())
+  nombre      String
+  apellido    String
+  dni         String?         @unique
+  telefono    String?
+  direccion   String?
+  grado       Int
+  seccion     String
+  inscripciones ClaseEstudiante[]
+  notas       Nota[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@map("estudiantes")
 }
 
 model Nota {
-  id           String     @id @default(uuid())
-  estudiante   Estudiante @relation(fields: [estudianteId], references: [id])
-  estudianteId String
-  materia      Materia    @relation(fields: [materiaId], references: [id])
-  materiaId    String
-  bimestre     Int        // 1 al 4
-  nota         Float
-  docenteId    String     // ID del docente (sin FK para simplificar)
-  createdAt    DateTime   @default(now())
-  @@unique([estudianteId, materiaId, bimestre])
+  id            String      @id @default(uuid())
+  estudiante    Estudiante  @relation(fields: [estudianteId], references: [id], onDelete: Cascade)
+  estudianteId  String
+  materia       Materia     @relation(fields: [materiaId], references: [id])
+  materiaId     String
+  clase         Clase?      @relation(fields: [claseId], references: [id])
+  claseId       String?
+  bimestre      Int         // 1 a 4
+  valor         Float       // Renombrado de 'nota' para evitar confusión
+  docente       User        @relation(fields: [docenteId], references: [id])
+  docenteId     String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@unique([estudianteId, materiaId, bimestre, claseId])
+  @@map("notas")
 }
 
-
 model Materia {
-  id         String     @id @default(uuid())
-  nombre     String
-  ciclo      Ciclo
-  codigo     String     @unique
-  clases     Clase[]
-  notas      Nota[]
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  id          String      @id @default(uuid())
+  nombre      String
+  ciclo       Ciclo
+  grado       Int
+  codigo      String      @unique
+  clases      Clase[]
+  notas       Nota[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("materias")
 }
 
 model Clase {
-  id         String   @id @default(uuid())
-  docente    User     @relation("DocenteClases", fields: [docenteId], references: [id])
-  docenteId  String
-  materia    Materia  @relation(fields: [materiaId], references: [id])
-  materiaId  String
-  estudiantes Estudiante[]
-  @@unique([docenteId, materiaId]) // Evita duplicados
+  id           String              @id @default(uuid())
+  docente      User                @relation("DocenteClases", fields: [docenteId], references: [id])
+  docenteId    String
+  materia      Materia             @relation(fields: [materiaId], references: [id])
+  materiaId    String
+  anioLectivo  Int
+  estudiantes  ClaseEstudiante[]
+  notas        Nota[]
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  @@unique([docenteId, materiaId, anioLectivo])
+  @@map("clases")
 }
 
+// Tabla intermedia para relación muchos-a-muchos
+model ClaseEstudiante {
+  id           String      @id @default(uuid())
+  clase        Clase       @relation(fields: [claseId], references: [id])
+  claseId      String
+  estudiante   Estudiante  @relation(fields: [estudianteId], references: [id])
+  estudianteId String
+  createdAt    DateTime    @default(now())
+
+  @@unique([claseId, estudianteId])
+  @@map("clase_estudiante")
+}
 
 model Ponderacion {
-  id         String   @id @default(uuid())
-  ciclo      Ciclo    @unique // Solo 1 configuración por ciclo
-  formula    String   // Ej: "0.3,0.3,0.2,0.2" (suma=1)
-  createdAt  DateTime @default(now())
+  id          String      @id @default(uuid())
+  ciclo       Ciclo       @unique
+  formula     String      // Ej: "0.3,0.3,0.2,0.2"
+  descripcion String?
+  activo      Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("ponderaciones")
 }
 
-
-
-
 enum Rol {
- ADMIN
- DOCENTE
- SUPERADMIN
+  ADMIN
+  DOCENTE
+  SUPERADMIN
 }
 
 enum Ciclo {
- PRIMARIA
- SECUNDARIA
+  PRIMARIA
+  SECUNDARIA
 }

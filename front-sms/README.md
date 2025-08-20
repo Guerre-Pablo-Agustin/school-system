@@ -34,3 +34,39 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+## Contenido
+[✅] Login
+[✅] Roles
+[✅] Rgistro / Edicion de Usuarios
+[✅] Importacion / Exportacion de Usuarios por Excel
+[] verificacion de roles por token
+
+```Alumnos
+[✅] Listado de Alumnos
+[✅] Registro/ Edicion de Alumnos
+[✅] Exportacion de las notas del alumnos en Excel/Pdf
+[] Agregar alumno a clase
+
+```
+
+```Profesores
+[✅] Listado de Profesores
+[✅] Registro/Edicion de Profesores
+[] Agregar Profesor a clase
+```
+
+```Clases
+[✅] Listado de Clases
+[] Registro/Edicion de Clases
+[] Agregar Materia a clase
+[✅] Listado de Alumnos en Clase con sus notas
+[] Exportacion de las notas de los alumnos en Excel/Pdf
+```
+
+```Materias
+[✅] Listado de Materias
+[✅] Registro/Edicion de Materias
+[] asociar materias a grados
+```

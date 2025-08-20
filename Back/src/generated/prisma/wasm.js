@@ -20,12 +20,12 @@ exports.Prisma = Prisma
 exports.$Enums = {}
 
 /**
- * Prisma Client JS version: 6.13.0
- * Query Engine version: 361e86d0ea4987e9f53a565309b3eed797a6bcbd
+ * Prisma Client JS version: 6.14.0
+ * Query Engine version: 717184b7b35ea05dfa71a3236b7af656013e1e49
  */
 Prisma.prismaVersion = {
-  client: "6.13.0",
-  engine: "361e86d0ea4987e9f53a565309b3eed797a6bcbd"
+  client: "6.14.0",
+  engine: "717184b7b35ea05dfa71a3236b7af656013e1e49"
 }
 
 Prisma.PrismaClientKnownRequestError = () => {
@@ -128,7 +128,8 @@ exports.Prisma.UserScalarFieldEnum = {
   telefono: 'telefono',
   direccion: 'direccion',
   rol: 'rol',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.EstudianteScalarFieldEnum = {
@@ -140,23 +141,27 @@ exports.Prisma.EstudianteScalarFieldEnum = {
   direccion: 'direccion',
   grado: 'grado',
   seccion: 'seccion',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.NotaScalarFieldEnum = {
   id: 'id',
   estudianteId: 'estudianteId',
   materiaId: 'materiaId',
+  claseId: 'claseId',
   bimestre: 'bimestre',
-  nota: 'nota',
+  valor: 'valor',
   docenteId: 'docenteId',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.MateriaScalarFieldEnum = {
   id: 'id',
   nombre: 'nombre',
   ciclo: 'ciclo',
+  grado: 'grado',
   codigo: 'codigo',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -165,14 +170,27 @@ exports.Prisma.MateriaScalarFieldEnum = {
 exports.Prisma.ClaseScalarFieldEnum = {
   id: 'id',
   docenteId: 'docenteId',
-  materiaId: 'materiaId'
+  materiaId: 'materiaId',
+  anioLectivo: 'anioLectivo',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ClaseEstudianteScalarFieldEnum = {
+  id: 'id',
+  claseId: 'claseId',
+  estudianteId: 'estudianteId',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.PonderacionScalarFieldEnum = {
   id: 'id',
   ciclo: 'ciclo',
   formula: 'formula',
-  createdAt: 'createdAt'
+  descripcion: 'descripcion',
+  activo: 'activo',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -206,6 +224,7 @@ exports.Prisma.ModelName = {
   Nota: 'Nota',
   Materia: 'Materia',
   Clase: 'Clase',
+  ClaseEstudiante: 'ClaseEstudiante',
   Ponderacion: 'Ponderacion'
 };
 
