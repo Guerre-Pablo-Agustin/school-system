@@ -26,7 +26,7 @@ const Page = () => {
   const dataAlumno = data?.data;
   const dataNotas = dataAlumno?.notas;
 
-  if (!dataAlumno?.id) {
+  if (!dataAlumno?.id || !dataNotas) {
     return (
       <section className="container mx-auto py-10">
         <Loader2 className="mx-auto h-48 w-48 animate-spin" />

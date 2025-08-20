@@ -29,12 +29,14 @@ interface TablasAlumnosClasesProps {
     AlumnosClase: AlumnoClase[] | undefined;
     docenteId: string;
     materiaId: string;
+    claseId: string;
 }
 
 const TablasAlumnosClases = ({
     AlumnosClase,
     docenteId,
     materiaId,
+    claseId,
 }: TablasAlumnosClasesProps) => {
     const [createOrUpdateNota] = useCreateOrUpdateNotaMutation();
 
@@ -67,7 +69,7 @@ const TablasAlumnosClases = ({
         }));
     };
 
-
+    
 
     const handleGuardarFila = async (alumnoId: string) => {
         const notasDelAlumno = editNotas[alumnoId];
@@ -82,24 +84,25 @@ const TablasAlumnosClases = ({
                     estudianteId: alumnoId,
                     materiaId,
                     bimestre,
-                    nota: notaNum,
+                    valor: notaNum,
                     docenteId,
+                    claseId,
                 }).unwrap();
 
                 // 🔥 actualizar en memoria
-                setAlumnos((prev) =>
-                    prev.map((a) =>
-                        a.id === alumnoId
-                            ? {
-                                ...a,
-                                notas: [
-                                    ...a.notas.filter((n) => n.bimestre !== bimestre),
-                                    { bimestre, nota: notaNum }, // nueva nota
-                                ],
-                            }
-                            : a
-                    )
-                );
+               setAlumnos((prev) =>
+  prev.map((a) =>
+    a.id === alumnoId
+      ? {
+          ...a,
+          notas: [
+            ...a.notas.filter((n) => n.bimestre !== bimestre),
+            { bimestre, valor: notaNum },
+          ],
+        }
+      : a
+  )
+);
             }
 
             toast.success("Notas guardadas correctamente");
@@ -123,7 +126,6 @@ const TablasAlumnosClases = ({
                 <TableHeader>
                     <TableRow>
                         <TableHead>Nombre</TableHead>
-                        <TableHead>Apellido</TableHead>
                         <TableHead>Grado</TableHead>
                         <TableHead>Sección</TableHead>
                         <TableHead>1° Bimestre</TableHead>
@@ -140,8 +142,7 @@ const TablasAlumnosClases = ({
 
                         return (
                             <TableRow key={alumno.id}>
-                                <TableCell>{alumno.nombre}</TableCell>
-                                <TableCell>{alumno.apellido}</TableCell>
+                                <TableCell>{alumno.nombre} {alumno.apellido}</TableCell>
                                 <TableCell>{alumno.grado}</TableCell>
                                 <TableCell>{alumno.seccion}</TableCell>
                                 {[1, 2, 3, 4].map((bimestre) => {
@@ -162,14 +163,14 @@ const TablasAlumnosClases = ({
                                                     value={
                                                         valorLocal !== ""
                                                             ? valorLocal
-                                                            : notaExistente?.nota?.toString() ?? ""
+                                                            : notaExistente?.valor?.toString() ?? ""
                                                     }
                                                     onChange={(e) =>
                                                         handleNotaChange(alumno.id, bimestre, e.target.value)
                                                     }
                                                 />
                                             ) : (
-                                                <span>{notaExistente?.nota ?? "-"}</span>
+                                                <span>{notaExistente?.valor ?? "-"}</span>
                                             )}
                                         </TableCell>
                                     );

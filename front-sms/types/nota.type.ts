@@ -23,7 +23,7 @@ export interface Ponderacion {
 
 export interface NotaParcial {
   id?: string;
-  nota: number;
+  valor: number;
   bimestre: number;
   alumnoId?: string;
   materia?: Materia;
