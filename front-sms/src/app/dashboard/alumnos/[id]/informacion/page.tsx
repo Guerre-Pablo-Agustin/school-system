@@ -46,7 +46,7 @@ const Page = () => {
         <InformacionAlumno dataAlumno={dataAlumno} />
       </div>
 
-      <div className="container mx-auto py-10 px-5">
+      <div className="container md:w-200 mx-auto py-10 px-5">
           <TablasNotas
             alumnoId={dataAlumno.id}
             dataNotas={dataNotas}

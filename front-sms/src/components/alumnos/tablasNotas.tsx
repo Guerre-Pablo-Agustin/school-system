@@ -7,6 +7,10 @@ import { toast } from "sonner";
 import { useCreateOrUpdateNotaMutation } from "@/redux/services/notasApi";
 import { useSelector } from "react-redux";
 import { selectUserLogin } from "@/redux/features/userSlice";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
+import * as XLSX from "xlsx";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 interface TablasNotasProps {
   alumnoId: string;
@@ -25,14 +29,12 @@ interface FilaTabla {
   bimestre2: string | number;
   bimestre3: string | number;
   bimestre4: string | number;
+  promedio: number | string;
 }
 
 const TablasNotas = ({ alumnoId, dataNotas = [], onSaved }: TablasNotasProps) => {
   const userLogin = useSelector(selectUserLogin);
   const [createOrUpdateNota, { isLoading: saving }] = useCreateOrUpdateNotaMutation();
-
-
-  console.log("dataNotas", dataNotas)
 
   // 1) PIVOT inicial desde props
   const materiasPivot = useMemo(() => {
@@ -49,17 +51,32 @@ const TablasNotas = ({ alumnoId, dataNotas = [], onSaved }: TablasNotasProps) =>
           bimestre2: "",
           bimestre3: "",
           bimestre4: "",
+          promedio: "",
         });
       }
       const row = map.get(key)!;
       (row)[`bimestre${n.bimestre}`] = n.nota; // número
     });
+    
+    // Calcular promedios
+    Array.from(map.values()).forEach(row => {
+      const notas = [];
+      if (typeof row.bimestre1 === 'number') notas.push(row.bimestre1);
+      if (typeof row.bimestre2 === 'number') notas.push(row.bimestre2);
+      if (typeof row.bimestre3 === 'number') notas.push(row.bimestre3);
+      if (typeof row.bimestre4 === 'number') notas.push(row.bimestre4);
+      
+      if (notas.length > 0) {
+        const sum = notas.reduce((a, b) => a + b, 0);
+        row.promedio = (sum / notas.length).toFixed(2);
+      } else {
+        row.promedio = "-";
+      }
+    });
+    
     return Array.from(map.values()).sort((a, b) => a.materia.localeCompare(b.materia));
-    
-    
   }, [dataNotas]);
-  
-  console.log("materiasPivot", materiasPivot)
+
   // 2) Estado local de filas (para reflejar cambios sin recargar)
   const [rows, setRows] = useState<FilaTabla[]>([]);
   useEffect(() => setRows(materiasPivot), [materiasPivot]);
@@ -144,6 +161,12 @@ const TablasNotas = ({ alumnoId, dataNotas = [], onSaved }: TablasNotasProps) =>
               bimestre2: draft[2] === "" ? r.bimestre2 : parseFloat(draft[2]),
               bimestre3: draft[3] === "" ? r.bimestre3 : parseFloat(draft[3]),
               bimestre4: draft[4] === "" ? r.bimestre4 : parseFloat(draft[4]),
+              promedio: calcularPromedio(
+                draft[1] === "" ? r.bimestre1 : parseFloat(draft[1]),
+                draft[2] === "" ? r.bimestre2 : parseFloat(draft[2]),
+                draft[3] === "" ? r.bimestre3 : parseFloat(draft[3]),
+                draft[4] === "" ? r.bimestre4 : parseFloat(draft[4])
+              )
             }
             : r
         )
@@ -158,29 +181,169 @@ const TablasNotas = ({ alumnoId, dataNotas = [], onSaved }: TablasNotasProps) =>
     }
   };
 
+  // Función para calcular promedio
+  const calcularPromedio = (b1: string | number, b2: string | number, b3: string | number, b4: string | number): string => {
+    const notas = [];
+    if (typeof b1 === 'number') notas.push(b1);
+    if (typeof b2 === 'number') notas.push(b2);
+    if (typeof b3 === 'number') notas.push(b3);
+    if (typeof b4 === 'number') notas.push(b4);
+    
+    if (notas.length > 0) {
+      const sum = notas.reduce((a, b) => a + b, 0);
+      return (sum / notas.length).toFixed(2);
+    }
+    return "-";
+  };
+
+  // 🔥 exportar lista de notas a Excel
+  const exportarListaNotasExcel = () => {
+    try {
+      // Encabezados
+      const headers = [
+        "Materia",
+        "Código",
+        "Ciclo",
+        "Bimestre 1",
+        "Bimestre 2",
+        "Bimestre 3",
+        "Bimestre 4",
+        "Promedio"
+      ];
+
+      // Datos formateados usando las filas actuales
+      const dataToExport = rows.map((fila) => [
+        fila.materia,
+        fila.codigo,
+        fila.ciclo,
+        fila.bimestre1 === "" ? "-" : fila.bimestre1,
+        fila.bimestre2 === "" ? "-" : fila.bimestre2,
+        fila.bimestre3 === "" ? "-" : fila.bimestre3,
+        fila.bimestre4 === "" ? "-" : fila.bimestre4,
+        fila.promedio
+      ]);
+
+      // Crear hoja de trabajo
+      const worksheet = XLSX.utils.aoa_to_sheet([headers, ...dataToExport]);
+      
+      // Ajustar anchos de columna
+      const columnWidths = [
+        { width: 30 }, // Materia
+        { width: 15 }, // Código
+        { width: 10 }, // Ciclo
+        { width: 12 }, // Bimestre 1
+        { width: 12 }, // Bimestre 2
+        { width: 12 }, // Bimestre 3
+        { width: 12 }, // Bimestre 4
+        { width: 12 }, // Promedio
+      ];
+      worksheet['!cols'] = columnWidths;
+
+      // Crear libro y guardar
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Notas");
+      
+      // Generar nombre de archivo con fecha
+      const fecha = new Date().toISOString().slice(0, 10);
+      XLSX.writeFile(workbook, `Notas_Alumno_${alumnoId}_${fecha}.xlsx`);
+      
+      toast.success("Archivo Excel exportado correctamente");
+      console.log(`Exportación exitosa: ${rows.length} materias exportadas`);
+    } catch (error) {
+      console.error("Error en exportación a Excel:", error);
+      toast.error("Error al exportar el archivo Excel");
+    }
+  };
+
+  // 🔥 exportar lista de notas a PDF
+  const exportarListaNotasPDF = () => {
+    try {
+      // Crear nuevo documento PDF
+      const doc = new jsPDF();
+      
+      // Título del documento
+      doc.setFontSize(18);
+      doc.text("Reporte de Notas", 14, 15);
+      doc.setFontSize(12);
+      doc.text(`Alumno ID: ${alumnoId} - Fecha: ${new Date().toLocaleDateString()}`, 14, 22);
+      
+      // Preparar datos para la tabla
+      const headers = [
+        ["Materia", "Código", "Ciclo", "Bim. 1", "Bim. 2", "Bim. 3", "Bim. 4", "Promedio"]
+      ];
+      
+      const data = rows.map((fila) => [
+        fila.materia,
+        fila.codigo,
+        fila.ciclo,
+        fila.bimestre1 === "" ? "-" : String(fila.bimestre1),
+        fila.bimestre2 === "" ? "-" : String(fila.bimestre2),
+        fila.bimestre3 === "" ? "-" : String(fila.bimestre3),
+        fila.bimestre4 === "" ? "-" : String(fila.bimestre4),
+        String(fila.promedio)
+      ]);
+      
+      // Generar tabla
+      autoTable(doc, {
+        head: headers,
+        body: data,
+        startY: 30,
+        styles: { fontSize: 9 },
+        headStyles: { fillColor: [66, 135, 245] },
+        alternateRowStyles: { fillColor: [240, 240, 240] },
+        margin: { top: 30 }
+      });
+      
+      // Guardar PDF
+      const fecha = new Date().toISOString().slice(0, 10);
+      doc.save(`Notas_Alumno_${alumnoId}_${fecha}.pdf`);
+      
+      toast.success("Archivo PDF exportado correctamente");
+    } catch (error) {
+      console.error("Error en exportación a PDF:", error);
+      toast.error("Error al exportar el archivo PDF");
+    }
+  };
+
   return (
-    <div className="overflow-x-auto border rounded-lg">
-      <table className="min-w-full border-collapse">
-        <thead>
-          <tr>
-            <th className="border px-4 py-2 text-left font-semibold">Materia</th>
-            <th className="border px-4 py-2 text-center font-semibold">1° Bimestre</th>
-            <th className="border px-4 py-2 text-center font-semibold">2° Bimestre</th>
-            <th className="border px-4 py-2 text-center font-semibold">3° Bimestre</th>
-            <th className="border px-4 py-2 text-center font-semibold">4° Bimestre</th>
-            <th className="border px-4 py-2 text-center font-semibold">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
+    <div className="p-4 rounded-xl shadow-md">
+      <div className="mb-4 flex gap-2">
+        <Button 
+          className="cursor-pointer bg-green-600 hover:bg-green-700"
+          onClick={exportarListaNotasExcel}
+        >
+          Exportar a Excel
+        </Button>
+        <Button 
+          className="cursor-pointer bg-red-600 hover:bg-red-700"
+          onClick={exportarListaNotasPDF}
+        >
+          Exportar a PDF
+        </Button>
+      </div>
+      <Table>
+        <TableCaption>Notas del Alumno</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Materia</TableHead>
+            <TableHead>1° Bimestre</TableHead>
+            <TableHead>2° Bimestre</TableHead>
+            <TableHead>3° Bimestre</TableHead>
+            <TableHead>4° Bimestre</TableHead>
+            <TableHead className="font-bold">Promedio</TableHead>
+            <TableHead>Acciones</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {rows.map((fila) => {
             const editing = editandoMateriaId === fila.materiaId;
 
             return (
-              <tr key={fila.materiaId}>
-                <td className="border px-4 py-2 font-medium">{fila.materia}</td>
+              <TableRow key={fila.materiaId}>
+                <TableCell>{fila.materia}</TableCell>
 
                 {([1, 2, 3, 4] as Bim[]).map((b) => (
-                   <td key={`${fila.materiaId}-${b}`} className="border px-4 py-2 text-center">
+                   <TableCell key={`${fila.materiaId}-${b}`}>
                     {editing ? (
                       <Input
                         type="number"
@@ -196,10 +359,14 @@ const TablasNotas = ({ alumnoId, dataNotas = [], onSaved }: TablasNotasProps) =>
                         {toStr(fila[`bimestre${b}`]) === "" ? "-" : fila[`bimestre${b}`]}
                       </span>
                     )}
-                  </td>
+                  </TableCell>
                 ))}
 
-                <td className="border px-4 py-2 text-center">
+                <TableCell className="font-bold">
+                  {fila.promedio}
+                </TableCell>
+
+                <TableCell>
                   {editing ? (
                     <div className="flex gap-2 justify-center">
                       <Button
@@ -231,12 +398,12 @@ const TablasNotas = ({ alumnoId, dataNotas = [], onSaved }: TablasNotasProps) =>
                       Editar
                     </Button>
                   )}
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             );
           })}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
 
       {rows.length === 0 && (
         <div className="p-8 text-center text-gray-500">

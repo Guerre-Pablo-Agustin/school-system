@@ -13,16 +13,16 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useCreateOrUpdateNotaMutation } from "@/redux/services/notasApi";
-import {  NotaParcial } from "../../../types/nota.type";
+import { NotaParcial } from "../../../types/nota.type";
 
 interface AlumnoClase {
-  id: string;
-  nombre: string;
-  apellido: string;
-  grado: string;
-  seccion: string;
-  notas: NotaParcial[];
-  promedio: number | null;
+    id: string;
+    nombre: string;
+    apellido: string;
+    grado: string;
+    seccion: string;
+    notas: NotaParcial[];
+    promedio: number | null;
 }
 
 interface TablasAlumnosClasesProps {
@@ -116,7 +116,7 @@ const TablasAlumnosClases = ({
     };
 
     return (
-        <div className="p-4 border rounded-xl shadow-md">
+        <div className="p-4  rounded-xl shadow-md">
             <h2 className="text-lg font-semibold mb-4">Lista de Alumnos</h2>
             <Table>
                 <TableCaption>Notas de los alumnos de la clase</TableCaption>
