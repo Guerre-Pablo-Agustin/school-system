@@ -69,7 +69,7 @@ const TablasAlumnosClases = ({
         }));
     };
 
-    
+
 
     const handleGuardarFila = async (alumnoId: string) => {
         const notasDelAlumno = editNotas[alumnoId];
@@ -90,19 +90,19 @@ const TablasAlumnosClases = ({
                 }).unwrap();
 
                 // 🔥 actualizar en memoria
-               setAlumnos((prev) =>
-  prev.map((a) =>
-    a.id === alumnoId
-      ? {
-          ...a,
-          notas: [
-            ...a.notas.filter((n) => n.bimestre !== bimestre),
-            { bimestre, valor: notaNum },
-          ],
-        }
-      : a
-  )
-);
+                setAlumnos((prev) =>
+                    prev.map((a) =>
+                        a.id === alumnoId
+                            ? {
+                                ...a,
+                                notas: [
+                                    ...a.notas.filter((n) => n.bimestre !== bimestre),
+                                    { bimestre, valor: notaNum },
+                                ],
+                            }
+                            : a
+                    )
+                );
             }
 
             toast.success("Notas guardadas correctamente");

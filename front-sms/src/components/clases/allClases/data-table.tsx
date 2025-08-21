@@ -42,6 +42,7 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
    const [rowSelection, setRowSelection] = React.useState({})
+   const [globalFilter, setGlobalFilter] = React.useState("")
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
@@ -59,7 +60,9 @@ export function DataTable<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    onGlobalFilterChange: setGlobalFilter,
     state: {
+      globalFilter,
       sorting,
       columnFilters,
       columnVisibility,
@@ -72,17 +75,15 @@ export function DataTable<TData, TValue>({
     <div>
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filtrar por nombre..."
-          value={(table.getColumn("id")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("id")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
+  placeholder="Filtrar por cualquier dato..."
+  value={(table.getState().globalFilter as string) ?? ""}
+  onChange={(event) => table.setGlobalFilter(event.target.value)}
+  className="max-w-sm"
+/>
          <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
-              Columns
+              Columnas
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -107,8 +108,8 @@ export function DataTable<TData, TValue>({
               })}
           </DropdownMenuContent>
         </DropdownMenu>
-        <Link href="/dashboard/productos/nuevo">
-          <Button variant="outline" className="ml-4">
+        <Link href="/dashboard/clases/nueva">
+          <Button variant="outline" className="ml-4 cursor-pointer">
             Nuevo 
           </Button>
         </Link>
@@ -159,7 +160,7 @@ export function DataTable<TData, TValue>({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                 Sin datos
                 </TableCell>
               </TableRow>
             )}

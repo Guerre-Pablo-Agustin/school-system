@@ -43,6 +43,30 @@ export const clasesApi = createApi({
     getClasesByAlumno: builder.query<Clase[], string>({
       query: (alumnoId) => `/clases/alumno/${alumnoId}`,
     }),
+
+    //crear nueva clase
+    createClase: builder.mutation<Clase, Partial<Clase>>({
+      query: (clase) => {
+        console.log("🛠️ Enviando clase desde mutation:", clase);
+        return {
+          url: "clases",
+          method: "POST",
+          body: clase,
+        };
+      }
+    }),
+
+    //actualizar clase
+    updateClase: builder.mutation<Clase, { id: string; data: Partial<Clase> }>({
+      query: ({id , data}) => {
+        console.log("🛠️ Enviando Clase desde mutation:", data);
+        return {
+          url: `/clases/${id}`,
+          method: "PUT",
+          body: data,
+        };
+      },
+    }),
   }),
 });
 
@@ -53,6 +77,8 @@ export const {
   useGetClasesByMateriaQuery,
   useGetClasesByAlumnoQuery,
   useGetClasesbyIdQuery,
+  useCreateClaseMutation,
+  useUpdateClaseMutation,
 } = clasesApi;
 
 

@@ -54,13 +54,13 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ```Profesores
 [✅] Listado de Profesores
 [✅] Registro/Edicion de Profesores
-[] Agregar Profesor a clase
+[✅] Agregar Profesor a clase
 ```
 
 ```Clases
 [✅] Listado de Clases
 [] Registro/Edicion de Clases
-[] Agregar Materia a clase
+[✅] Agregar Materia a clase
 [✅] Listado de Alumnos en Clase con sus notas
 [] Exportacion de las notas de los alumnos en Excel/Pdf
 ```
@@ -68,5 +68,5 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ```Materias
 [✅] Listado de Materias
 [✅] Registro/Edicion de Materias
-[] asociar materias a grados
+[✅] asociar materias a grados
 ```

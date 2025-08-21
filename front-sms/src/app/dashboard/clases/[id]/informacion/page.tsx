@@ -49,7 +49,7 @@ const Page = () => {
 
   return (
     <main className="container mx-auto py-10 px-5">
-      <BreadcrumbWithCustomSeparator href="/dashboard/clases" label="clases" page="Informacion" />
+      <BreadcrumbWithCustomSeparator href="/dashboard/clases" label="Clases" page="Informacion" />
       <section className="container mx-auto py-10 px-5">
         <InformacionDocente docente={docente} />
       </section>

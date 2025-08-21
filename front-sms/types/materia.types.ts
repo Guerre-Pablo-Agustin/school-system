@@ -4,4 +4,5 @@ export interface Materia {
   ciclo: 'PRIMARIA' | 'SECUNDARIA';
   docenteId: string;
   codigo : string;
+  grado: string;
 }

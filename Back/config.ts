@@ -11,4 +11,3 @@ export const config = {
 };
 
 
-console.log("Config loaded:", config);

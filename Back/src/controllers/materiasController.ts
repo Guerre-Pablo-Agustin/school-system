@@ -10,6 +10,7 @@ export const getMaterias = async (req: Request, res: Response) => {
         nombre: true,
         ciclo: true,
         codigo: true,
+        grado: true,
       },
     });
 

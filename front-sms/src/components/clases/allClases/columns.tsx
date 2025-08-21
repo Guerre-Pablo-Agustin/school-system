@@ -1,10 +1,6 @@
 "use client";
-
-
 import { ColumnDef } from "@tanstack/react-table";
-
 import { List, MoreHorizontal, ArrowUpDown } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,14 +10,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
 import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
 import { Clase } from "../../../../types/Usuario.type";
 
-// Función para generar las columnas con las acciones
-export const getColumns = (
-): ColumnDef<Clase>[] => [
+export const getColumns = (): ColumnDef<Clase>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -43,6 +36,7 @@ export const getColumns = (
     ),
     enableSorting: false,
     enableHiding: false,
+    enableGlobalFilter: false, // No buscar en esta columna
   },
   {
     accessorKey: "id",
@@ -57,38 +51,60 @@ export const getColumns = (
         </Button>
       );
     },
+    enableGlobalFilter: true, // ✅ Hacer buscable
+  },
+  { 
+    id: "anioLectivo",
+    accessorKey: "anioLectivo", // ✅ Agregar accessorKey
+    header: "Año Lectivo",
+    enableGlobalFilter: true, // ✅ Hacer buscable
+    cell: ({ row }) => (
+      <span className="text-center flex items-center justify-center">
+        {row.original.anioLectivo}
+      </span>
+    ),
   },
   {
-    id:"docenteNombre",
+    id: "docenteNombre",
+    accessorFn: (row) => row.docente?.nombre ?? "", // ✅ Usar accessorFn
     header: "Docente",
+    enableGlobalFilter: true, // ✅ Hacer buscable
     cell: ({ row }) => (
       <span>{row.original.docente?.nombre ?? "-"}</span>
     ),
   },
   {
     id: "docenteEmail",
+    accessorFn: (row) => row.docente?.email ?? "", // ✅ Usar accessorFn
     header: "Email",
+    enableGlobalFilter: true, // ✅ Hacer buscable
     cell: ({ row }) => (
       <span>{row.original.docente?.email ?? "-"}</span>
     ),
   },
   {
     id: "materiaNombre",
+    accessorFn: (row) => row.materia?.nombre ?? "", // ✅ Usar accessorFn
     header: "Materia",
+    enableGlobalFilter: true, // ✅ Hacer buscable
     cell: ({ row }) => (
       <span>{row.original.materia?.nombre ?? "-"}</span>
     ),
   },
   {
     id: "materiaCiclo",
+    accessorFn: (row) => row.materia?.ciclo ?? "", // ✅ Usar accessorFn
     header: "Ciclo",
+    enableGlobalFilter: true, // ✅ Hacer buscable
     cell: ({ row }) => (
       <span>{row.original.materia?.ciclo ?? "-"}</span>
     ),
   },
   {
     id: "materiaCodigo",
+    accessorFn: (row) => row.materia?.codigo ?? "", // ✅ Usar accessorFn
     header: "Código",
+    enableGlobalFilter: true, // ✅ Hacer buscable
     cell: ({ row }) => (
       <span>{row.original.materia?.codigo ?? "-"}</span>
     ),
@@ -97,13 +113,12 @@ export const getColumns = (
     id: "actions",
     cell: ({ row }) => {
       const clase = row.original;
-
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
               <span className="sr-only">Menu</span>
-                <MoreHorizontal className="h-4 w-4" />
+              <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -115,14 +130,14 @@ export const getColumns = (
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <Link href={`/dashboard/clases/${clase.id}/edit`}>
-            <DropdownMenuItem>
-              Editar <List className="ml-1 h-4 w-4" />
-            </DropdownMenuItem>
+              <DropdownMenuItem>
+                Editar <List className="ml-1 h-4 w-4" />
+              </DropdownMenuItem>
             </Link>
           </DropdownMenuContent>
         </DropdownMenu>
       );
     },
+    enableGlobalFilter: false, // No buscar en acciones
   },
 ];
-

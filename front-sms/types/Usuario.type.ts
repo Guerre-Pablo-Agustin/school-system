@@ -34,6 +34,7 @@ export interface Clase {
   materia: Materia;
   docente: User;
   estudiantes: AlumnoClase[];
+  anioLectivo: number;
 }
 
 export interface FilterUser {

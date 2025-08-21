@@ -64,6 +64,7 @@ export const materiasApi = createApi({
 export const {
   useGetMateriasQuery,
   useGetMateriaByIdQuery,
+  useGetMateriasByCodigoQuery,
   useCreateMateriaMutation,
   useUpdateMateriaMutation,
 } = materiasApi

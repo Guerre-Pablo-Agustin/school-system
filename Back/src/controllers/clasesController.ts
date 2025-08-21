@@ -159,6 +159,8 @@ export const getByDocente = async (req: Request, res: Response) => {
 export const createClass = async (req: Request, res: Response) => {
   const { docenteId, materiaId, anioLectivo } = req.body;
   
+  console.log("Datos recibidos para crear clase:", req.body);
+
   try {
     // Verificar si ya existe la clase para evitar duplicados
     const claseExistente = await prisma.clase.findFirst({
