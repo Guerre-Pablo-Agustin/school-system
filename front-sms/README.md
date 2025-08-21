@@ -59,7 +59,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ```Clases
 [✅] Listado de Clases
-[] Registro/Edicion de Clases
+[✅] Registro/Edicion de Clases
 [✅] Agregar Materia a clase
 [✅] Listado de Alumnos en Clase con sus notas
 [] Exportacion de las notas de los alumnos en Excel/Pdf

@@ -1,5 +1,6 @@
 "use client"
 import { BreadcrumbWithCustomSeparator } from '@/components/ui/breadcrumbSeparator'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import FormEditUsuario from '@/components/usuarios/formEditUsuario'
 import { useGetUserByIdQuery } from '@/redux/services/authApi'
 import { Loader2 } from 'lucide-react'
@@ -46,7 +47,16 @@ const Page = () => {
         label="usuarios"
         page="Editar usuarios"
       />
+      <section className="container mx-auto py-10 px-5">
+      <Card>
+        <CardHeader>
+          <CardTitle>Datos usuario</CardTitle>
+        </CardHeader>
+        <CardContent>
       <FormEditUsuario dataUser={dataUser} />
+        </CardContent>
+        </Card>
+      </section>
     </section>
   );
 }

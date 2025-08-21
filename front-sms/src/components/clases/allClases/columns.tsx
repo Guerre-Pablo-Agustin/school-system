@@ -129,9 +129,9 @@ export const getColumns = (): ColumnDef<Clase>[] => [
               Copiar ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/clases/${clase.id}/edit`}>
+            <Link href={`/dashboard/clases/${clase.id}/informacion`}>
               <DropdownMenuItem>
-                Editar <List className="ml-1 h-4 w-4" />
+                Informacion <List className="ml-1 h-4 w-4" />
               </DropdownMenuItem>
             </Link>
           </DropdownMenuContent>

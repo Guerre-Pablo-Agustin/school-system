@@ -6,6 +6,8 @@ import { useGetAlumnobyIdQuery } from '@/redux/services/alumnosApi';
 import { Loader2 } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+
 
 const Page = () => {
 
@@ -43,7 +45,14 @@ const Page = () => {
       />
 
       <div className="container mx-auto py-10 px-5">
-        <InformacionAlumno dataAlumno={dataAlumno} />
+        <Card>
+          <CardHeader>
+            <CardTitle>Información del alumno</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <InformacionAlumno dataAlumno={dataAlumno} />
+          </CardContent>
+        </Card>
       </div>
 
       <div className="container md:w-200 mx-auto py-10 px-5">

@@ -14,7 +14,7 @@ const Page = () => {
 
   console.log("id", id)
 
-  const { data, isLoading, isError } = useGetClasesbyIdQuery(id)
+  const { data, isLoading, isError, refetch } = useGetClasesbyIdQuery(id)
 
   if (!id) {
     return (
@@ -32,7 +32,7 @@ const Page = () => {
   if (isError) return <div>Usuario no encontrado</div>;
 
   console.log("data detalle clase", data)
-  console.log("data detalle clase id", data?.data?.id)
+  console.log("data detalle clase AÑO LECTIVO", data?.data?.anioLectivo)
 
   const claseData = data?.data
   const AlumnosClase = claseData?.estudiantes
@@ -40,18 +40,24 @@ const Page = () => {
   const docenteId = claseData?.docenteId
   const materiaId = claseData?.materiaId
   const claseId = data?.data?.id
+  const anioLectivo = data?.data?.anioLectivo
 
   if (!docente) return <div>No se encontro el docente</div>
-
+  if (!anioLectivo) return <div>No se encontro el anio lectivo</div>
   if (!docenteId) return <div className='text-red-500 container mx-auto py-10 px-5'>No se encontro datos del docente</div>
   if (!materiaId) return <div className='text-red-500 container mx-auto py-10 px-5'>No se encontro datos de la materia</div>
   if (!claseId) return <div className='text-red-500 container mx-auto py-10 px-5'>No se encontro datos de la clase</div>
+
+  const handleDocenteUpdated = () => {
+  console.log("✅ Docente actualizado, recargando datos...")
+  refetch()
+}
 
   return (
     <main className="container mx-auto py-10 px-5">
       <BreadcrumbWithCustomSeparator href="/dashboard/clases" label="Clases" page="Informacion" />
       <section className="container mx-auto py-10 px-5">
-        <InformacionDocente docente={docente} />
+        <InformacionDocente docente={docente} anioLectivo={anioLectivo} claseId={claseId} onDocenteUpdated={handleDocenteUpdated} docenteId={docenteId} />
       </section>
       <section className="container mx-auto py-10 px-5">
         <TablasAlumnosClases AlumnosClase={AlumnosClase} docenteId={docenteId} materiaId={materiaId} claseId={claseId} />
