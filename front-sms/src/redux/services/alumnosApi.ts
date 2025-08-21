@@ -14,6 +14,11 @@ interface AlumnoResponse {
   message: string;
   data: Alumno;
   error?: string;
+  success?: boolean;
+  enrollment?: {
+    totalClases: number;
+    inscripcionesCreadas: number;
+  };
 }
 
 export const alumnosApi = createApi({

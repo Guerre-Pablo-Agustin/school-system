@@ -17,29 +17,34 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, BookOpen } from "lucide-react";
 
 const formAlumnoSchema = z.object({
   nombre: z.string().min(3, { message: "El nombre es requerido" }),
   apellido: z.string().min(3, { message: "El apellido es requerido" }),
   dni: z.string().min(8, { message: "El dni es requerido" }),
-  grado: z.string().min(1, { message: "El grado es requerido" }).max(2, { message: "El grado es requerido" }),
-  seccion: z.string().min(1, { message: "El seccion es requerido" }).max(2, { message: "El seccion es requerido" }),
+  grado: z.number().min(1, { message: "El grado es requerido" }).max(6, { message: "El grado máximo es 6" }),
+  seccion: z.string().min(1, { message: "La sección es requerida" }).max(2, { message: "La sección debe tener máximo 2 caracteres" }),
   telefono: z
   .string()
   .trim()
   .regex(/^\+?[0-9\s\-()]{7,20}$/, {
     message: "Número de teléfono inválido",
   }),
-  direccion: z.string().min(3, { message: "La direccion es requerida" }),
+  direccion: z.string().min(3, { message: "La dirección es requerida" }),
+  anioLectivo: z.number().min(2000, { message: "El año lectivo debe ser mayor a 2000" }).max(2100, { message: "Año lectivo no válido" }),
 });
 
+interface EnrollmentInfo {
+  totalClases: number;
+  inscripcionesCreadas: number;
+}
 
 const FormNuevoAlumno = () => {
-
     const router = useRouter();
     const [mensaje, setMensaje] = useState("");
     const [error, setError] = useState("");
+    const [enrollmentInfo, setEnrollmentInfo] = useState<EnrollmentInfo | null>(null);
     const [createAlumno, { isLoading }] = useCreateAlumnoMutation();
 
     const form = useForm<z.infer<typeof formAlumnoSchema>>({
@@ -48,22 +53,37 @@ const FormNuevoAlumno = () => {
             nombre: "",
             apellido: "",
             dni: "",
-            grado: "",
+            grado: 0,
             seccion: "",
             telefono: "",
             direccion: "",
+            anioLectivo: new Date().getFullYear(),
         },
     });
 
-
     const handleSubmit = async (data: z.infer<typeof formAlumnoSchema>) => {
+        // Limpiar mensajes previos
+        setError("");
+        setMensaje("");
+        setEnrollmentInfo(null);
+
         try {
             const response = await createAlumno(data).unwrap();
-            if (response) {
-                setMensaje("Alumno creado correctamente");
-                router.push("/dashboard/alumnos");
+            
+            if (response.success) {
+                setMensaje(response.message || "Alumno creado correctamente");
+                
+                // Mostrar información de las inscripciones automáticas
+                if (response.enrollment) {
+                    setEnrollmentInfo(response.enrollment);
+                }
+                
+                // Redirigir después de 3 segundos para que el usuario vea el mensaje
+                setTimeout(() => {
+                    router.push("/dashboard/alumnos");
+                }, 9000);
             } else {
-                setMensaje("Error al crear el alumno");
+                setError(response.message || "Error al crear el alumno");
             }
         } catch (error) {
             console.error("Error al crear alumno:", error);
@@ -127,9 +147,14 @@ const FormNuevoAlumno = () => {
               <FormItem>
                 <FormLabel>Grado</FormLabel>
                 <FormControl>
-                  <Input placeholder="Grado" {...field} />
+                  <Input 
+                    type="number" 
+                    placeholder="Grado (1-6)" 
+                    {...field} 
+                    onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                  />
                 </FormControl>
-                <FormDescription>Grado del alumno.</FormDescription>
+                <FormDescription>Grado del alumno (se asociará automáticamente a las materias de este grado).</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -141,7 +166,7 @@ const FormNuevoAlumno = () => {
               <FormItem>
                 <FormLabel>Sección</FormLabel>
                 <FormControl>
-                  <Input placeholder="Sección" {...field} />
+                  <Input placeholder="Sección (ej: A, B)" {...field} />
                 </FormControl>
                 <FormDescription>Sección del alumno.</FormDescription>
                 <FormMessage />
@@ -155,11 +180,11 @@ const FormNuevoAlumno = () => {
             name="telefono"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Telefono</FormLabel>
+                <FormLabel>Teléfono</FormLabel>
                 <FormControl>
-                  <Input placeholder="Telefono" {...field} />
+                  <Input placeholder="Teléfono" {...field} />
                 </FormControl>
-                <FormDescription>Telefono del alumno.</FormDescription>
+                <FormDescription>Teléfono del alumno.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -169,17 +194,36 @@ const FormNuevoAlumno = () => {
             name="direccion"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Direccion</FormLabel>
+                <FormLabel>Dirección</FormLabel>
                 <FormControl>
-                  <Input placeholder="Direccion" {...field} />
+                  <Input placeholder="Dirección" {...field} />
                 </FormControl>
-                <FormDescription>Direccion del alumno.</FormDescription>
+                <FormDescription>Dirección del alumno.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="anioLectivo"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Año lectivo</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="number"
+                    placeholder="Año lectivo" 
+                    {...field} 
+                    onChange={(e) => field.onChange(parseInt(e.target.value) || new Date().getFullYear())}
+                  />
+                </FormControl>
+                <FormDescription>Año lectivo para las asignaciones automáticas.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
-
 
         <div className="flex gap-4">
           <Button type="submit" disabled={isLoading} className="cursor-pointer">
@@ -205,10 +249,31 @@ const FormNuevoAlumno = () => {
         )}
 
         {mensaje && (
-          <Alert className="border-green-200 ">
+          <Alert className="">
             <CheckCircle2 className="h-4 w-4 text-green-600" />
             <AlertDescription className="text-green-700">
-              {mensaje}
+              <div className="space-y-2">
+                <p className="font-semibold">{mensaje}</p>
+                {enrollmentInfo && (
+                  <div className="mt-2 p-2 rounded-md">
+                    <div className="flex items-center gap-2 text-green-800">
+                      <BookOpen className="h-4 w-4" />
+                      <span className="font-medium">Inscripciones Automáticas:</span>
+                    </div>
+                    <p className="text-sm text-green-700 mt-1">
+                      El alumno fue inscrito automáticamente en {enrollmentInfo.inscripcionesCreadas} de {enrollmentInfo.totalClases} materias del {form.watch('grado')}° grado.
+                    </p>
+                    {enrollmentInfo.inscripcionesCreadas < enrollmentInfo.totalClases && (
+                      <p className="text-xs text-amber-700 mt-1">
+                        ⚠️ Algunas materias no tienen clases creadas para el año lectivo {form.watch('anioLectivo')}.
+                      </p>
+                    )}
+                  </div>
+                )}
+                <p className="text-xs text-green-600 mt-2">
+                  Redirigiendo a la lista de alumnos en 3 segundos...
+                </p>
+              </div>
             </AlertDescription>
           </Alert>
         )}

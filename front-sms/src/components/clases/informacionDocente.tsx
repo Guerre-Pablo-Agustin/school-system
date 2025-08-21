@@ -130,7 +130,7 @@ const InformacionDocente = ({ docenteId, docente, anioLectivo, claseId, onDocent
   return (
     <div className="space-y-4">
       {/* Card de información actual del docente */}
-      <Card>
+      <Card className="w-150">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Información del Docente Actual</CardTitle>
           <div className='flex gap-2'>

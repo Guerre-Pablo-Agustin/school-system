@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma";
+import { AutoEnrollmentService } from "../utils/autoEnrollmentService";
 
 export const getAlumnos = async (req: Request, res: Response) => {
   try {
@@ -218,10 +219,11 @@ export const createAlumno = async (req: Request, res: Response) => {
       telefono,
       direccion,
       seccion,
+      anioLectivo
     } = req.body;
 
     // Validaciones mejoradas
-    const requiredFields = ["nombre", "apellido", "dni", "grado", "telefono", "direccion", "seccion"];
+    const requiredFields = ["nombre", "apellido", "dni", "grado", "telefono", "direccion", "seccion", "anioLectivo"];
     const missingFields = requiredFields.filter((field) => !req.body[field]);
 
     if (missingFields.length > 0) {
@@ -244,6 +246,8 @@ export const createAlumno = async (req: Request, res: Response) => {
       }
     }
 
+    
+
     // Creación del alumno
     const newAlumno = await prisma.estudiante.create({
       data: {
@@ -257,10 +261,17 @@ export const createAlumno = async (req: Request, res: Response) => {
       },
     });
 
+    const enrollmentResult = await AutoEnrollmentService.enrollStudentInGradeClasses(
+      newAlumno.id, 
+      parseInt(grado), 
+      anioLectivo
+    );
+
     return res.status(201).json({
       success: true,
       message: "Alumno creado exitosamente",
       data: newAlumno,
+      enrollment: enrollmentResult
     });
   } catch (error) {
     console.error("Error en createAlumno:", error);
@@ -299,6 +310,19 @@ export const updateAlumno = async (req: Request, res: Response) => {
       }
     }
 
+    if (grado && parseInt(grado) !== alumnoExistente.grado) {
+      // 1. Eliminar inscripciones antiguas
+      await prisma.claseEstudiante.deleteMany({
+        where: { estudianteId: id }
+      });
+
+      // 2. Crear nuevas inscripciones
+      await AutoEnrollmentService.enrollStudentInGradeClasses(
+        id,
+        parseInt(grado),
+        new Date().getFullYear()
+      );
+    }
     
     const alumno = await prisma.estudiante.update({
       where: { id },

@@ -47,7 +47,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 [✅] Listado de Alumnos
 [✅] Registro/ Edicion de Alumnos
 [✅] Exportacion de las notas del alumnos en Excel/Pdf
-[] Agregar alumno a clase
+[✅] Agregar alumno a clase
 
 ```
 
