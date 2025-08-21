@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getAlumnos, getAlumno, createAlumno, updateAlumno, deleteAlumno } from "../controllers/alumnosController";
+import { getAlumnos, getAlumno, createAlumno, updateAlumno, deleteAlumno, getNotasAlumnoPorAnio } from "../controllers/alumnosController";
 
 const router = Router();
 
@@ -8,5 +8,5 @@ router.get("/:id", getAlumno);
 router.post("/", createAlumno);
 router.put("/:id", updateAlumno);
 router.delete("/:id", deleteAlumno);    
-
+router.get("/:id/notas/:anioLectivo", getNotasAlumnoPorAnio);
 export default router;

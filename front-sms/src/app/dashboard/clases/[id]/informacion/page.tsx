@@ -60,7 +60,7 @@ const Page = () => {
         <InformacionDocente docente={docente} anioLectivo={anioLectivo} claseId={claseId} onDocenteUpdated={handleDocenteUpdated} docenteId={docenteId} />
       </section>
       <section className="container mx-auto py-10 px-5">
-        <TablasAlumnosClases AlumnosClase={AlumnosClase} docenteId={docenteId} materiaId={materiaId} claseId={claseId} />
+        <TablasAlumnosClases AlumnosClase={AlumnosClase} docenteId={docenteId} materiaId={materiaId} claseId={claseId} refetch={refetch} />
       </section>
     </main>
   )

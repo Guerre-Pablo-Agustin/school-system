@@ -287,44 +287,20 @@ export const createAlumno = async (req: Request, res: Response) => {
 
 export const updateAlumno = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { nombre, apellido, dni, grado, telefono, direccion, seccion } = req.body;
+  const { nombre, apellido, dni, grado, telefono, direccion, seccion, anioLectivo } = req.body;
 
   try {
-    // Verificar si el alumno existe
-    const alumnoExistente = await prisma.estudiante.findUnique({ where: { id } });
+    const alumnoExistente = await prisma.estudiante.findUnique({ 
+      where: { id },
+      include: { inscripciones: true }
+    });
+
     if (!alumnoExistente) {
-      return res.status(404).json({
-        mensaje: "Alumno no encontrado",
-      });
+      return res.status(404).json({ mensaje: "Alumno no encontrado" });
     }
 
-    // Verificar si el DNI ya existe (excluyendo el alumno actual)
-    if (dni && dni !== alumnoExistente.dni) {
-      const dniExistente = await prisma.estudiante.findUnique({
-        where: { dni },
-      });
-      if (dniExistente) {
-        return res.status(400).json({
-          mensaje: "El DNI ya está en uso por otro alumno",
-        });
-      }
-    }
-
-    if (grado && parseInt(grado) !== alumnoExistente.grado) {
-      // 1. Eliminar inscripciones antiguas
-      await prisma.claseEstudiante.deleteMany({
-        where: { estudianteId: id }
-      });
-
-      // 2. Crear nuevas inscripciones
-      await AutoEnrollmentService.enrollStudentInGradeClasses(
-        id,
-        parseInt(grado),
-        new Date().getFullYear()
-      );
-    }
-    
-    const alumno = await prisma.estudiante.update({
+    // 1. Actualizar datos básicos del alumno
+    const alumnoActualizado = await prisma.estudiante.update({
       where: { id },
       data: {
         nombre,
@@ -337,9 +313,23 @@ export const updateAlumno = async (req: Request, res: Response) => {
       },
     });
 
+    // 2. Si cambió el grado Y se proporcionó año lectivo, crear NUEVAS inscripciones
+    if (grado && parseInt(grado) !== alumnoExistente.grado && anioLectivo) {
+      const nuevoGrado = parseInt(grado);
+      const nuevoAnioLectivo = parseInt(anioLectivo);
+
+      // ✅ NO eliminar inscripciones antiguas - se mantienen como histórico
+      // ✅ Crear NUEVAS inscripciones para el nuevo grado/año
+      await AutoEnrollmentService.enrollStudentInGradeClasses(
+        id,
+        nuevoGrado,
+        nuevoAnioLectivo
+      );
+    }
+
     res.status(200).json({
       mensaje: "Alumno actualizado exitosamente",
-      data: alumno,
+      data: alumnoActualizado,
     });
   } catch (error) {
     res.status(500).json({
@@ -391,6 +381,75 @@ export const deleteAlumno = async (req: Request, res: Response) => {
     res.status(500).json({
       mensaje: "Error al eliminar alumno",
       error: error instanceof Error ? error.message : error,
+    });
+  }
+};
+
+
+export const getNotasAlumnoPorAnio = async (req: Request, res: Response) => {
+  const { id, anioLectivo } = req.params;
+
+  try {
+    const notas = await prisma.nota.findMany({
+      where: {
+        estudianteId: id,
+        clase: {
+          anioLectivo: parseInt(anioLectivo)
+        }
+      },
+      include: {
+        materia: true,
+        clase: {
+          select: {
+            anioLectivo: true,
+            docente: {
+              select: {
+                nombre: true
+              }
+            }
+          }
+        }
+      },
+      orderBy: [
+        { materia: { nombre: "asc" } },
+        { bimestre: "asc" }
+      ]
+    });
+
+    // Agrupar por materia
+    const notasPorMateria = notas.reduce((acc: Record<string, { materia: typeof nota.materia, notas: typeof notas, promedio: number }>, nota) => {
+      const materiaKey = nota.materia.nombre;
+      if (!acc[materiaKey]) {
+        acc[materiaKey] = {
+          materia: nota.materia,
+          notas: [],
+          promedio: 0
+        };
+      }
+      acc[materiaKey].notas.push(nota);
+      return acc;
+    }, {} as Record<string, { materia: typeof notas[0]['materia'], notas: typeof notas, promedio: number }>);
+
+    // Calcular promedios
+    Object.values(notasPorMateria).forEach((materia: any) => {
+      const valores = materia.notas.map((n: any) => n.valor);
+      materia.promedio = valores.length > 0 
+        ? valores.reduce((sum: number, val: number) => sum + val, 0) / valores.length 
+        : 0;
+    });
+
+    res.status(200).json({
+      mensaje: `Notas del año lectivo ${anioLectivo}`,
+      data: {
+        anioLectivo: parseInt(anioLectivo),
+        notasPorMateria: Object.values(notasPorMateria),
+        totalNotas: notas.length
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      mensaje: "Error al obtener notas",
+      error: error instanceof Error ? error.message : error
     });
   }
 };

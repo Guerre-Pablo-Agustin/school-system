@@ -1,6 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithReauth } from "./authApi";
 import { Alumno } from "../../../types/alumnos.types";
+import { Clase } from "../../../types/Usuario.type";
 
 
 
@@ -59,6 +60,18 @@ export const alumnosApi = createApi({
         };
       },
     }),
+
+    //traer notas por año
+    getNotasPorAnio: builder.query<{
+      message: string;
+      data: {
+        anioLectivo: number;
+        notasPorMateria: Clase[];
+        totalNotas: number;
+      };
+    }, { id: string; anio: number }>({
+      query: ({ id, anio }) => `/alumnos/${id}/notas/${anio}`,
+    }),
   }),
 });
 
@@ -68,6 +81,7 @@ export const {
   useCreateAlumnoMutation,
   useUpdateAlumnoMutation,
   useGetAlumnobyIdQuery,
+  useGetNotasPorAnioQuery,
 } = alumnosApi
 
 

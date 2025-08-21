@@ -15,8 +15,10 @@ import autoTable from "jspdf-autotable";
 interface TablasNotasProps {
   alumnoId: string;
   dataNotas: Nota[];
-  onSaved?: () => void; // opcional: para refetch externo
+  onSaved?: () => void;
   alumnoNombre: string;
+  anioLectivo: number;
+  clasesDelAnio: Nota[];
 }
 
 type Bim = 1 | 2 | 3 | 4;
@@ -33,7 +35,7 @@ interface FilaTabla {
   promedio: number | string;
 }
 
-const TablasNotas = ({ alumnoId, dataNotas = [], onSaved, alumnoNombre }: TablasNotasProps) => {
+const TablasNotas = ({ alumnoId, dataNotas = [], onSaved, alumnoNombre, anioLectivo, clasesDelAnio = [] }: TablasNotasProps) => {
   const userLogin = useSelector(selectUserLogin);
   const [createOrUpdateNota, { isLoading: saving }] = useCreateOrUpdateNotaMutation();
 
@@ -117,6 +119,24 @@ const TablasNotas = ({ alumnoId, dataNotas = [], onSaved, alumnoNombre }: Tablas
     (toStr(fila.bimestre3) !== draft[3]) ||
     (toStr(fila.bimestre4) !== draft[4]);
 
+const getClaseIdPorMateria = (materiaId: string): string | null => {
+    // Primero buscar en notas existentes que tengan claseId válido
+    const notaConClase = dataNotas.find(n => 
+      n.materia.id === materiaId && n.clase?.id
+    );
+    if (notaConClase?.clase?.id) {
+      return notaConClase.clase.id;
+    }
+    
+    // Si no existe, buscar en las inscripciones del año
+    const inscripcion = clasesDelAnio.find(
+      insc => insc.clase.materiaId === materiaId
+    );
+    return inscripcion?.clase.id || null;
+  };
+
+
+  // Función para guardar una fila de la tabla
   const saveRow = async (fila: FilaTabla) => {
     if (!userLogin?.id) {
       toast.error("Usuario no autenticado");
@@ -126,12 +146,11 @@ const TablasNotas = ({ alumnoId, dataNotas = [], onSaved, alumnoNombre }: Tablas
     const ops: Array<{ b: Bim; val: number }> = [];
     ([1, 2, 3, 4] as Bim[]).forEach((b) => {
       const raw = draft[b].trim();
-      if (raw === "") return; // vacío: no enviar nada
+      if (raw === "") return;
       const num = parseFloat(raw);
       if (isNaN(num) || num < 1 || num > 10) {
         return toast.error(`Nota inválida en ${b}° bimestre (1 a 10)`);
       }
-      // Si no cambió, no lo mandamos
       const original = toStr((fila)[`bimestre${b}`]);
       if (original === raw) return;
       ops.push({ b, val: num });
@@ -143,29 +162,31 @@ const TablasNotas = ({ alumnoId, dataNotas = [], onSaved, alumnoNombre }: Tablas
       return;
     }
 
+    // ✅ SOLUCIÓN: Obtener claseId correcto
+    const claseId = getClaseIdPorMateria(fila.materiaId);
+    
+    if (!claseId) {
+      toast.error(`No se encontró la clase para la materia ${fila.materia}`);
+      console.error(`Debug - Materia: ${fila.materia} (ID: ${fila.materiaId})`);
+      console.error('Clases disponibles:', clasesDelAnio);
+      return;
+    }
+
+    console.log(`✅ Usando claseId: ${claseId} para materia: ${fila.materia}`);
+
     try {
-     for (const { b, val } of ops) {
-  // Buscar la nota más reciente para esta materia y bimestre
-  const notasDeMateriaYBimestre = dataNotas
-    .filter(n => n.materia.id === fila.materiaId && n.bimestre === b)
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  
-  // Tomar la claseId de la nota más reciente, o null si no existe
-  const claseIdMasReciente = notasDeMateriaYBimestre.length > 0 
-    ? notasDeMateriaYBimestre[0].clase?.id || null 
-    : null;
+      for (const { b, val } of ops) {
+        await createOrUpdateNota({
+          estudianteId: alumnoId,
+          materiaId: fila.materiaId,
+          claseId: claseId, // ✅ Ahora tenemos el claseId correcto
+          bimestre: b,
+          valor: val,
+          docenteId: userLogin.id,
+        }).unwrap();
+      }
 
-  await createOrUpdateNota({
-    estudianteId: alumnoId,
-    materiaId: fila.materiaId,
-    claseId: claseIdMasReciente,
-    bimestre: b,
-    valor: val,
-    docenteId: userLogin.id,
-  }).unwrap();
-}
-
-      // Actualizar fila local
+      // Actualizar estado local
       setRows((prev) =>
         prev.map((r) =>
           r.materiaId === fila.materiaId
@@ -185,15 +206,16 @@ const TablasNotas = ({ alumnoId, dataNotas = [], onSaved, alumnoNombre }: Tablas
             : r
         )
       );
-
+      
       toast.success("Notas guardadas");
       cancelEdit();
-      onSaved?.(); // opcional: refresca datos del server
+      onSaved?.();
     } catch (e) {
-      console.error(e);
+      console.error('Error al guardar notas:', e);
       toast.error("Error al guardar notas");
     }
   };
+
 
   // Función para calcular promedio
   const calcularPromedio = (b1: string | number, b2: string | number, b3: string | number, b4: string | number): string => {
@@ -259,7 +281,7 @@ const TablasNotas = ({ alumnoId, dataNotas = [], onSaved, alumnoNombre }: Tablas
       
       // Generar nombre de archivo con fecha
       const fecha = new Date().toISOString().slice(0, 10);
-      XLSX.writeFile(workbook, `Notas_Alumno_${alumnoId}_${fecha}.xlsx`);
+      XLSX.writeFile(workbook, `Notas_${alumnoNombre}_${anioLectivo}_${fecha}.xlsx`);
       
       toast.success("Archivo Excel exportado correctamente");
       console.log(`Exportación exitosa: ${rows.length} materias exportadas`);
@@ -269,71 +291,75 @@ const TablasNotas = ({ alumnoId, dataNotas = [], onSaved, alumnoNombre }: Tablas
     }
   };
 
-  // 🔥 exportar lista de notas a PDF
-  const exportarListaNotasPDF = () => {
-    try {
-      // Crear nuevo documento PDF
-      const doc = new jsPDF();
-      
-      // Título del documento
-      doc.setFontSize(18);
-      doc.text("Reporte de Notas", 14, 15);
-      doc.setFontSize(12);
-      doc.text(`Alumno : ${alumnoNombre} - Fecha: ${new Date().toLocaleDateString()}`, 14, 22);
-      
-      // Preparar datos para la tabla
-      const headers = [
-        ["Materia", "Código", "Ciclo", "Bim. 1", "Bim. 2", "Bim. 3", "Bim. 4", "Promedio"]
-      ];
-      
-      const data = rows.map((fila) => [
-        fila.materia,
-        fila.codigo,
-        fila.ciclo,
-        fila.bimestre1 === "" ? "-" : String(fila.bimestre1),
-        fila.bimestre2 === "" ? "-" : String(fila.bimestre2),
-        fila.bimestre3 === "" ? "-" : String(fila.bimestre3),
-        fila.bimestre4 === "" ? "-" : String(fila.bimestre4),
-        String(fila.promedio)
-      ]);
-      
-      // Generar tabla
-      autoTable(doc, {
-        head: headers,
-        body: data,
-        startY: 30,
-        styles: { fontSize: 9 },
-        headStyles: { fillColor: [66, 135, 245] },
-        alternateRowStyles: { fillColor: [240, 240, 240] },
-        margin: { top: 30 }
-      });
-      
-      // Guardar PDF
-      const fecha = new Date().toISOString().slice(0, 10);
-      doc.save(`Notas_Alumno_${alumnoId}_${fecha}.pdf`);
-      
-      toast.success("Archivo PDF exportado correctamente");
-    } catch (error) {
-      console.error("Error en exportación a PDF:", error);
-      toast.error("Error al exportar el archivo PDF");
-    }
-  };
+  // 🔥 exportar lista de notas a PDF - VERSIÓN CORREGIDA
+const exportarListaNotasPDF = () => {
+  try {
+    // Crear nuevo documento PDF
+    const doc = new jsPDF();
+    
+    // Título del documento
+    doc.setFontSize(18);
+    doc.text("Reporte de Notas", 14, 15);
+    doc.setFontSize(12);
+    doc.text(`Alumno: ${alumnoNombre} - Año: ${anioLectivo} - Fecha: ${new Date().toLocaleDateString()}`, 14, 22);
+    
+    // Preparar datos para la tabla
+    const headers = [
+      ["Materia", "Código", "Ciclo", "Bim. 1", "Bim. 2", "Bim. 3", "Bim. 4", "Promedio"]
+    ];
+    
+    const data = rows.map((fila) => [
+      fila.materia,
+      fila.codigo,
+      fila.ciclo,
+      fila.bimestre1 === "" ? "-" : String(fila.bimestre1),
+      fila.bimestre2 === "" ? "-" : String(fila.bimestre2),
+      fila.bimestre3 === "" ? "-" : String(fila.bimestre3),
+      fila.bimestre4 === "" ? "-" : String(fila.bimestre4),
+      String(fila.promedio)
+    ]);
+    
+    // Generar tabla
+    autoTable(doc, {
+      head: headers,
+      body: data,
+      startY: 35, // ✅ Ajustado porque añadimos más texto arriba
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [66, 135, 245] },
+      alternateRowStyles: { fillColor: [240, 240, 240] },
+      margin: { top: 35 }
+    });
+    
+    // Guardar PDF
+    const fecha = new Date().toISOString().slice(0, 10);
+    doc.save(`Notas_${alumnoNombre}_${anioLectivo}_${fecha}.pdf`);
+    
+    toast.success("Archivo PDF exportado correctamente");
+  } catch (error) {
+    console.error("Error en exportación a PDF:", error);
+    toast.error("Error al exportar el archivo PDF");
+  }
+};
 
   return (
     <div className="p-4 rounded-xl shadow-md">
-      <div className="mb-4 flex gap-2">
-        <Button 
-          className="cursor-pointer bg-green-600 hover:bg-green-700"
-          onClick={exportarListaNotasExcel}
-        >
-          Exportar a Excel
-        </Button>
-        <Button 
-          className="cursor-pointer bg-red-600 hover:bg-red-700"
-          onClick={exportarListaNotasPDF}
-        >
-          Exportar a PDF
-        </Button>
+      {/* Agregar indicador del año */}
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-lg font-semibold">Notas del Año {anioLectivo}</h3>
+        <div className="flex gap-2">
+          <Button 
+            className="cursor-pointer bg-green-600 hover:bg-green-700"
+            onClick={exportarListaNotasExcel}
+          >
+            Exportar a Excel
+          </Button>
+          <Button 
+            className="cursor-pointer bg-red-600 hover:bg-red-700"
+            onClick={exportarListaNotasPDF}
+          >
+            Exportar a PDF
+          </Button>
+        </div>
       </div>
       <Table>
         <TableCaption>Notas del Alumno</TableCaption>

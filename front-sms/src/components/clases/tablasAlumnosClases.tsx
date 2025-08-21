@@ -30,6 +30,7 @@ interface TablasAlumnosClasesProps {
     docenteId: string;
     materiaId: string;
     claseId: string;
+    refetch: () => void;
 }
 
 const TablasAlumnosClases = ({
@@ -37,6 +38,7 @@ const TablasAlumnosClases = ({
     docenteId,
     materiaId,
     claseId,
+    refetch,
 }: TablasAlumnosClasesProps) => {
     const [createOrUpdateNota] = useCreateOrUpdateNotaMutation();
 
@@ -112,6 +114,7 @@ const TablasAlumnosClases = ({
                 delete nuevo[alumnoId];
                 return nuevo;
             });
+            refetch();
         } catch (error) {
             console.error(error);
             toast.error("Error al guardar las notas");
