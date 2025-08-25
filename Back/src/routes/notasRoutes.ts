@@ -1,12 +1,13 @@
 import { Router } from "express";
 import { getNotaById, createOrUpdateNota, updateNota, deleteNota } from "../controllers/notasController";
+import { verifyToken } from "../middleware/auth.middleware";
 
 const notasRouter = Router();
 
-notasRouter.get("/:id", getNotaById);
-notasRouter.post("/", createOrUpdateNota);
-notasRouter.put("/:id", updateNota);
-notasRouter.delete("/:id", deleteNota);
+notasRouter.get("/:id", verifyToken, getNotaById);
+notasRouter.post("/", verifyToken, createOrUpdateNota);
+notasRouter.put("/:id", verifyToken, updateNota);
+notasRouter.delete("/:id", verifyToken, deleteNota);
 
 
 
