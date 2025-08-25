@@ -14,6 +14,9 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useCreateOrUpdateNotaMutation } from "@/redux/services/notasApi";
 import { NotaParcial } from "../../../types/nota.type";
+import * as XLSX from "xlsx";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 interface AlumnoClase {
     id: string;
@@ -31,6 +34,8 @@ interface TablasAlumnosClasesProps {
     materiaId: string;
     claseId: string;
     refetch: () => void;
+    anioLectivo: number;
+    materiaNombre: string;
 }
 
 const TablasAlumnosClases = ({
@@ -38,6 +43,8 @@ const TablasAlumnosClases = ({
     docenteId,
     materiaId,
     claseId,
+    anioLectivo,
+    materiaNombre,
     refetch,
 }: TablasAlumnosClasesProps) => {
     const [createOrUpdateNota] = useCreateOrUpdateNotaMutation();
@@ -121,8 +128,130 @@ const TablasAlumnosClases = ({
         }
     };
 
+    // 🔥 exportar lista de notas a Excel
+    const exportarListaNotasExcel = () => {
+        try {
+            // Encabezados
+            const headers = [
+                "Nombre",
+                "Grado",
+                "Sección",
+                "1° Bimestre",
+                "2° Bimestre",
+                "3° Bimestre",
+                "4° Bimestre",
+                "Promedio"
+            ];
+
+            // Datos formateados usando las filas actuales
+            const dataToExport = alumnos.map((alumno) => [
+                alumno.nombre,
+                alumno.grado,
+                alumno.seccion,
+                ...alumno.notas.map(nota => nota.valor),
+                alumno.promedio
+            ]);
+
+            // Crear hoja de trabajo
+            const worksheet = XLSX.utils.aoa_to_sheet([headers, ...dataToExport]);
+            
+            // Ajustar anchos de columna
+            const columnWidths = [
+                { width: 30 }, // Nombre
+                { width: 15 }, // Grado
+                { width: 10 }, // Sección
+                { width: 12 }, // Bimestre 1
+                { width: 12 }, // Bimestre 2
+                { width: 12 }, // Bimestre 3
+                { width: 12 }, // Bimestre 4
+                { width: 12 }, // Promedio
+            ];
+            worksheet['!cols'] = columnWidths;
+
+            // Crear libro y guardar
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Notas");
+            
+            // Generar nombre de archivo con fecha
+            const fecha = new Date().toISOString().slice(0, 10);
+            XLSX.writeFile(workbook, `Notas_${materiaNombre}_${anioLectivo}_${fecha}.xlsx`);
+            
+            toast.success("Archivo Excel exportado correctamente");
+            console.log(`Exportación exitosa: ${alumnos.length} alumnos exportadas`);
+        } catch (error) {
+            console.error("Error en exportación a Excel:", error);
+            toast.error("Error al exportar el archivo Excel");
+        }
+    };
+
+    // 🔥 exportar lista de notas a PDF - VERSIÓN CORREGIDA
+    const exportarListaNotasPDF = () => {
+        try {
+            // Crear nuevo documento PDF
+            const doc = new jsPDF();
+            
+            // Título del documento
+            doc.setFontSize(18);
+            doc.text("Reporte de Notas", 14, 15);
+            doc.setFontSize(12);
+            doc.text(`Alumno: - Fecha: ${new Date().toLocaleDateString()}`, 14, 22);
+            
+            // Preparar datos para la tabla
+            const headers = [
+                ["Nombre", "Grado", "Sección", "1° Bimestre", "2° Bimestre", "3° Bimestre", "4° Bimestre", "Promedio"]
+            ];
+            
+            const data = alumnos.map((alumno) => [
+                alumno.nombre,
+                alumno.grado,
+                alumno.seccion,
+                ...alumno.notas.map(nota => nota.valor),
+                alumno.promedio
+            ]);
+            
+            // Generar tabla
+            autoTable(doc, {
+                head: headers,
+                body: data,
+                startY: 35, // ✅ Ajustado porque añadimos más texto arriba
+                styles: { fontSize: 9 },
+                headStyles: { fillColor: [66, 135, 245] },
+                alternateRowStyles: { fillColor: [240, 240, 240] },
+                margin: { top: 35 }
+            });
+            
+            // Guardar PDF
+            const fecha = new Date().toISOString().slice(0, 10);
+            doc.save(`Notas_${materiaNombre}_${anioLectivo}_${fecha}.pdf`);
+            
+            toast.success("Archivo PDF exportado correctamente");
+        } catch (error) {
+            console.error("Error en exportación a PDF:", error);
+            toast.error("Error al exportar el archivo PDF");
+        }
+    };
+
+
+
     return (
         <div className="p-4  rounded-xl shadow-md">
+              <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-lg font-semibold">Notas del Año {anioLectivo} - Clase</h3>
+        <div className="flex gap-2">
+          <Button 
+            className="cursor-pointer bg-green-600 hover:bg-green-700"
+            onClick={exportarListaNotasExcel}
+          >
+            Exportar a Excel
+          </Button>
+          <Button 
+            className="cursor-pointer bg-red-600 hover:bg-red-700"
+            onClick={exportarListaNotasPDF}
+          >
+            Exportar a PDF
+          </Button>
+        </div>
+      </div>
             <h2 className="text-lg font-semibold mb-4">Lista de Alumnos</h2>
             <Table>
                 <TableCaption>Notas de los alumnos de la clase</TableCaption>
