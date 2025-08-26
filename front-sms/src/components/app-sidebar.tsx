@@ -153,7 +153,7 @@ const fullNav: NavSection[] = [
     title: "Profile",
     url: "/dashboard/profile",
     icon: User,
-    items: [{ title: "Mi perfil", url: "/dashboard/profile" }],
+    items: [{ title: "Mi perfil", url: `/dashboard/usuarios/${userLogin?.id}/edit` }],
   },
 ];
 

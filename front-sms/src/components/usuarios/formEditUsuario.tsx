@@ -41,9 +41,10 @@ const formUserSchema = z.object({
 
 interface Props {
   dataUser: User | undefined
+  userPerfil: string | undefined
 }
 
-const FormEditUsuario = ({ dataUser }: Props) => {
+const FormEditUsuario = ({ dataUser, userPerfil }: Props) => {
     const router = useRouter();
     const [updateProductApi, { isLoading }] = useUpdateUserMutation();
     const [mensaje, setMensaje] = useState("");
@@ -214,7 +215,8 @@ const FormEditUsuario = ({ dataUser }: Props) => {
                                 </FormItem>
                             )}
                         />
-                        <FormField
+                       {userPerfil === "ADMIN" && (
+                         <FormField
                             control={form.control}
                             name="rol"
                             render={({ field }) => (
@@ -240,6 +242,7 @@ const FormEditUsuario = ({ dataUser }: Props) => {
                                 </FormItem>
                             )}
                         />
+                        )}
                     </div>
                     <div className="flex gap-4">
                         <Button type="submit" disabled={isLoading} className="cursor-pointer">

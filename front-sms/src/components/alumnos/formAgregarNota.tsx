@@ -35,10 +35,10 @@ const FormAgregarNota = ({ alumnoId, onNotaAgregada, onCancelar }: FormAgregarNo
   const [mensaje, setMensaje] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [notaExistente, setNotaExistente] = useState<{
-    id: string;
-    notaActual: number;
-  } | null>(null);
+  // const [notaExistente, _setNotaExistente] = useState<{
+  //   id: string;
+  //   notaActual: number;
+  // } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,7 +73,7 @@ const FormAgregarNota = ({ alumnoId, onNotaAgregada, onCancelar }: FormAgregarNo
         estudianteId: alumnoId,
         materiaId,
         bimestre: parseInt(bimestre),
-        nota: notaNum,
+        valor: notaNum,
         docenteId: userLogin.id
       }).unwrap();
 
@@ -188,7 +188,7 @@ const FormAgregarNota = ({ alumnoId, onNotaAgregada, onCancelar }: FormAgregarNo
         </div>
 
         <div className="flex gap-3 pt-4">
-          <Button
+          {/* <Button
             type="submit"
             disabled={isLoading}
             className="flex-1"
@@ -203,6 +203,20 @@ const FormAgregarNota = ({ alumnoId, onNotaAgregada, onCancelar }: FormAgregarNo
             ) : (
               "Agregar Nota"
             )}
+          </Button> */}
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="flex-1"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Procesando...
+              </>
+            ) : (
+              "Guardar Nota"  // Texto constante
+            )}
           </Button>
           <Button
             type="button"
@@ -215,7 +229,7 @@ const FormAgregarNota = ({ alumnoId, onNotaAgregada, onCancelar }: FormAgregarNo
         </div>
       </form>
 
-       {/* Alertas de estado */}
+      {/* Alertas de estado */}
       <div className="mt-5 space-y-3">
         {error && (
           <Alert variant="destructive">
