@@ -1,12 +1,12 @@
 "use client"
 
 import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  CreditCard,
+  // BadgeCheck,
+  // Bell,
+  // CreditCard,
+  // Sparkles,
   LogOut,
-  Sparkles,
+  ChevronsUpDown,
 } from "lucide-react"
 
 import {
@@ -17,7 +17,7 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
+  // DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,

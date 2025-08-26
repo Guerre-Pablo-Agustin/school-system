@@ -145,8 +145,8 @@ const Page = () => {
               refetchNotas();
               refetchAlumno();
             }}
-            alumnoNombre={dataAlumno.nombre}
             anioLectivo={anioSeleccionado}
+            dataAlumno={dataAlumno}
           />
         )}
       </div>
