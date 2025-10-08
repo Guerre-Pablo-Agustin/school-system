@@ -236,7 +236,7 @@ const TablasAlumnosClases = ({
     return (
         <div className="p-4  rounded-xl shadow-md">
               <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Notas del Año {anioLectivo} - Clase</h3>
+        <h3 className="text-lg font-semibold">Notas de {materiaNombre} - {anioLectivo}</h3>
         <div className="flex gap-2">
           <Button 
             className="cursor-pointer bg-green-600 hover:bg-green-700"
