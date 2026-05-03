@@ -27,7 +27,7 @@ import { useSelector } from "react-redux"
 import { selectUserLogin } from "@/redux/features/userSlice"
 import { LucideIcon } from "lucide-react"
 
-type UserRole = 'ADMIN' | 'DOCENTE' | 'SUPERADMIN';
+type UserRole = 'ADMIN' | 'DOCENTE' | 'DIRECTIVO';
 
 interface NavItem {
   title: string;
@@ -64,22 +64,22 @@ const fullNav: NavSection[] = [
     title: "Clases",
     url: "/dashboard/clases",
     icon: BookOpen,
-    rol: ["ADMIN", "SUPERADMIN", "DOCENTE"],
+    rol: ["ADMIN", "DIRECTIVO", "DOCENTE"],
     items: [
       { 
         title: "Listado de clases", 
         url: "/dashboard/clases",
-        rol: ["ADMIN", "SUPERADMIN"],
+        rol: ["ADMIN", "DIRECTIVO"],
       },
       { 
         title: "Mis Clases", 
         url: "/dashboard/clases/mis-clases",
-        rol: ["ADMIN", "SUPERADMIN", "DOCENTE"],
+        rol: ["ADMIN", "DIRECTIVO", "DOCENTE"],
       },
       { 
         title: "Nueva clase", 
         url: "/dashboard/clases/nueva",
-        rol: ["ADMIN", "SUPERADMIN"],
+        rol: ["ADMIN", "DIRECTIVO"],
       }
     ],
   },
@@ -87,21 +87,21 @@ const fullNav: NavSection[] = [
     title: "Materias",
     url: "/dashboard/materias",
     icon: ClipboardList,
-    rol: ["ADMIN", "SUPERADMIN", "DOCENTE"],
+    rol: ["ADMIN", "DIRECTIVO", "DOCENTE"],
     items: [
       { title: "Listado de materias", 
         url: "/dashboard/materias",
-        rol: ["ADMIN", "SUPERADMIN"],
+        rol: ["ADMIN", "DIRECTIVO"],
       },
       {
         title: "Mis materias",
         url: "/dashboard/materias/mis-materias",
-        rol: ["ADMIN", "SUPERADMIN", "DOCENTE"],
+        rol: ["ADMIN", "DIRECTIVO", "DOCENTE"],
       },
       {
         title: "Nueva materia",
         url: "/dashboard/materias/nueva",
-        rol: ["ADMIN", "SUPERADMIN"],
+        rol: ["ADMIN", "DIRECTIVO"],
       }
       ],
   },
@@ -109,7 +109,7 @@ const fullNav: NavSection[] = [
     title: "Usuarios",
     url: "/dashboard/usuarios",
     icon: Users,
-    rol: ["ADMIN", "SUPERADMIN"],
+    rol: ["ADMIN", "DIRECTIVO"],
     items: [{ 
       title: "Listado de usuarios", 
       url: "/dashboard/usuarios" },
@@ -126,7 +126,7 @@ const fullNav: NavSection[] = [
     title: "Alumnos",
     url: "/dashboard/alumnos",
     icon: GraduationCap,
-    rol: ["ADMIN", "SUPERADMIN", "DOCENTE"],
+    rol: ["ADMIN", "DIRECTIVO", "DOCENTE"],
     items: [{ 
       title: "Listado de alumnos", 
       url: "/dashboard/alumnos" },
@@ -139,14 +139,14 @@ const fullNav: NavSection[] = [
     title: "Notices",
     url: "/dashboard/notices",
     icon: FileText,
-    rol: ["ADMIN", "SUPERADMIN", "DOCENTE"],
+    rol: ["ADMIN", "DIRECTIVO", "DOCENTE"],
     items: [{ title: "Comunicados", url: "/dashboard/notices" }],
   },
   {
     title: "Complains",
     url: "/dashboard/complains",
     icon: AlertCircle,
-    rol: ["ADMIN", "SUPERADMIN"],
+    rol: ["ADMIN", "DIRECTIVO"],
     items: [{ title: "Reclamos", url: "/dashboard/complains" }],
   },
   {

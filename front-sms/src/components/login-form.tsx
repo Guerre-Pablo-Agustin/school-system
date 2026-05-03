@@ -36,16 +36,23 @@ export function LoginForm({
       if (email && password) {
         const response = await login({ email, password }).unwrap(); // <-- importante
 
-        const { accessToken, user } = response;
-        dispatch(loginSlice({ userLogin: user, accessToken }));
-      toast("Bienvenido " + user.nombre, {
-        position: "top-center",
-          action: {
-            label: "Ir al dashboard",
-            onClick: () => router.push("/dashboard"),
-          },
-        })
-        setErrorMessage("");
+        // La API devuelve: { data: { success, message, data: [users] } }
+        const user = response?.data?.[0] || response?.user;
+        const accessToken = response?.accessToken;
+        
+        if (user) {
+          dispatch(loginSlice({ userLogin: user, accessToken }));
+          toast("Bienvenido " + user.nombre, {
+            position: "top-center",
+            action: {
+              label: "Ir al dashboard",
+              onClick: () => router.push("/dashboard"),
+            },
+          });
+          setErrorMessage("");
+        } else {
+          setErrorMessage("No se pudo obtener la información del usuario");
+        }
       } else {
         setErrorMessage("Por favor, rellene todos los campos");
       }

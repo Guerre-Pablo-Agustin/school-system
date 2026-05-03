@@ -37,6 +37,7 @@ import { User } from "../../../types/Usuario.type";
 
 const formUserSchema = z.object({
   nombre: z.string().min(3, { message: "El nombre es requerido" }),
+  apellido: z.string().min(3, { message: "El apellido es requerido" }),
   email: z
   .string()
   .trim()
@@ -50,7 +51,7 @@ const formUserSchema = z.object({
   }),
   direccion: z.string().min(3, { message: "La direccion es requerida" }),
   password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
-  rol: z.enum(["ADMIN", "DOCENTE", "SUPERADMIN"]),
+  rol: z.enum(["ADMIN", "DOCENTE", "DIRECTIVO"]),
 });
 
 const CreateUserForm = () => {
@@ -67,6 +68,7 @@ const CreateUserForm = () => {
     resolver: zodResolver(formUserSchema),
     defaultValues: {
       nombre: "",
+      apellido: "",
       email: "",
       telefono: "",
       direccion: "",
@@ -81,6 +83,7 @@ const CreateUserForm = () => {
 
   const userData = {
     nombre: values.nombre,
+    apellido: values.apellido,
     email: values.email,
     telefono: values.telefono,
     direccion: values.direccion,
@@ -151,6 +154,23 @@ const CreateUserForm = () => {
               </FormItem>
             )}
           />
+
+          <FormField
+            control={form.control}
+            name="apellido"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Apellido</FormLabel>
+                <FormControl>
+                  <Input placeholder="Apellido" {...field} />
+                </FormControl>
+                <FormDescription>Apellido completo del usuario.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+
           <FormField
             control={form.control}
             name="email"
@@ -200,7 +220,7 @@ const CreateUserForm = () => {
                       <SelectGroup>
                         <SelectLabel>Rol del usuario</SelectLabel>
                         <SelectItem value="DOCENTE">Docente</SelectItem>
-                        <SelectItem value="SUPERADMIN">SuperAdmin</SelectItem>
+                        <SelectItem value="DIRECTIVO">Directivo</SelectItem>
                         <SelectItem value="ADMIN">Admin</SelectItem>
                       </SelectGroup>
                     </SelectContent>

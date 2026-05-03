@@ -63,6 +63,10 @@ export const getColumns = (
     header: "Nombre",
   },
   {
+    accessorKey:"apellido",
+    header: "Apellido",
+  },
+  {
     accessorKey:"email",
     header: "Email",
   },

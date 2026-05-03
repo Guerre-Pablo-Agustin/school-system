@@ -17,9 +17,11 @@ interface LoginRequest {
 }
 
 interface LoginResponse {
+  success?: boolean;
   message: string;
-  user: User;
-  accessToken: string;
+  data?: User[];
+  user?: User;
+  accessToken?: string;
 }
 
 interface getUsersResponse {
@@ -92,14 +94,15 @@ export const baseQueryWithReauth: typeof baseQuery = async (
 export const authApi = createApi({
   reducerPath: "authApi",
   baseQuery: baseQueryWithReauth,
+  tagTypes: ["Usuarios"],
   endpoints: (builder) => ({
 
-    //login
+  //login (auth/login moved to GET /usuarios per Swagger)
     login: builder.mutation<LoginResponse, LoginRequest>({
       query: (credentials) => ({
-        url: "/auth/login",
-        method: "POST",
-        body: credentials,
+        url: "/usuarios",
+        method: "GET",
+        params: credentials,
       }),
     }),
 
@@ -122,9 +125,10 @@ export const authApi = createApi({
     //traer todos los usuarios
     getUsers: builder.query<getUsersResponse, void>({
       query: () => ({
-        url: "/users",
+        url: "/usuarios",
         method: "GET",
       }),
+      providesTags: [{ type: "Usuarios", id: "LIST" }],
     }),
 
     //traer un usuario por su id
@@ -132,10 +136,11 @@ export const authApi = createApi({
       query: (id) => {
         console.log("ID del usuario:", id);
        return {
-        url: `/users/${id}`,
+        url: `/usuarios/${id}`,
         method: "GET"
       }
       },
+      providesTags: (result, error, id) => [{ type: "Usuarios", id }],
     }),
 
     //actualizar un usuario
@@ -143,11 +148,15 @@ export const authApi = createApi({
       query: ({ id, data }) => {
         console.log("🛠️ Enviando usuario desde mutation:", data);
         return {
-          url: `/users/${id}`,
+          url: `/usuarios/${id}`,
           method: "PUT",
           body: data,
         };
       },
+      invalidatesTags: (result, error, { id }) => [
+        { type: "Usuarios", id },
+        { type: "Usuarios", id: "LIST" },
+      ],
     }),
 
     //crear un usuario
@@ -155,7 +164,7 @@ export const authApi = createApi({
       query:(data)=>{
         console.log("🛠️ Enviando usuario desde mutation:",data); // 👈 log
         return {
-          url:"users",
+          url:"usuarios",
           method:"POST",
           body:data,
         }

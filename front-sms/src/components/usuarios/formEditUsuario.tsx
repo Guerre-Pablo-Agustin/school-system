@@ -30,13 +30,14 @@ import { Input } from '../ui/input';
 
 const formUserSchema = z.object({
     nombre: z.string().min(3, { message: "El nombre es requerido" }).optional(),
+    apellido: z.string().min(3, { message: "El apellido es requerido" }).optional(),
     email: z.string().trim().toLowerCase().email({ message: "Correo electrónico inválido" }).optional(),
     telefono: z.string().trim().regex(/^\+?[0-9\s\-()]{7,20}$/, {
         message: "Número de teléfono inválido",
     }).optional(),
     direccion: z.string().min(3, { message: "La direccion es requerida" }).optional(),
     password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres").optional(),
-    rol: z.enum(["ADMIN", "DOCENTE", "SUPERADMIN"]).optional(),
+    rol: z.enum(["ADMIN", "DOCENTE", "DIRECTIVO"]).optional(),
 });
 
 interface Props {
@@ -53,11 +54,12 @@ const FormEditUsuario = ({ dataUser, userPerfil }: Props) => {
     const form = useForm<z.infer<typeof formUserSchema>>({
         resolver: zodResolver(formUserSchema),
         defaultValues: {
-            nombre: "",
-            email: "",
-            telefono: "",
-            direccion: "",
-            rol: "DOCENTE",
+            nombre: dataUser?.nombre || "",
+            apellido: dataUser?.apellido || "",
+            email: dataUser?.email || "",
+            telefono: dataUser?.telefono || "",
+            direccion: dataUser?.direccion || "",
+            rol: dataUser?.rol || "DOCENTE",
             password: "", 
         },
     });
@@ -67,6 +69,7 @@ const FormEditUsuario = ({ dataUser, userPerfil }: Props) => {
         if (dataUser) {
             form.reset({
                 nombre: dataUser.nombre || "",
+                apellido: dataUser.apellido || "",
                 email: dataUser.email || "",
                 telefono: dataUser.telefono || "",
                 direccion: dataUser.direccion || "",
@@ -144,6 +147,20 @@ const FormEditUsuario = ({ dataUser, userPerfil }: Props) => {
                                         <Input placeholder="Nombre" {...field} />
                                     </FormControl>
                                     <FormDescription>Nombre completo del usuario.</FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="apellido"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Apellido</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="Apellido" {...field} />
+                                    </FormControl>
+                                    <FormDescription>Apellido completo del usuario.</FormDescription>
                                     <FormMessage />
                                 </FormItem>
                             )}
@@ -231,7 +248,7 @@ const FormEditUsuario = ({ dataUser, userPerfil }: Props) => {
                                                 <SelectGroup>
                                                     <SelectLabel>Rol del usuario</SelectLabel>
                                                     <SelectItem value="DOCENTE">Docente</SelectItem>
-                                                    <SelectItem value="SUPERADMIN">SuperAdmin</SelectItem>
+                                                    <SelectItem value="DIRECTIVO">Directivo</SelectItem>
                                                     <SelectItem value="ADMIN">Admin</SelectItem>
                                                 </SelectGroup>
                                             </SelectContent>

@@ -2,11 +2,12 @@
 import { Materia } from "./materia.types";
 import { Nota } from "./nota.type";
 
-type UserRole = 'ADMIN' | 'DOCENTE' | 'SUPERADMIN';
+type UserRole = 'ADMIN' | 'DOCENTE' | 'DIRECTIVO';
 
 export interface User {
   id: string;
   nombre: string;
+  apellido: string;
   email: string;
   password: string; // hash
   rol: UserRole;

@@ -5,7 +5,7 @@ import React from 'react'
 const page = () => {
   return (
     <section className="container mx-auto px-10 py-5">
-        <BreadcrumbWithCustomSeparator href="/dashboard/maestros" label="Maestros" page="Listado de maestros" />
+        <BreadcrumbWithCustomSeparator href="/dashboard/usuarios" label="Usuarios" page="Listado de Usuarios" />
             <MainAllUsuarios />
     </section>
   )

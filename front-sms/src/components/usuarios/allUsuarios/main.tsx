@@ -1,6 +1,5 @@
 "use client"
 
-import React from 'react'
 import { Loader2 } from 'lucide-react'
 import { useGetUsersQuery } from '@/redux/services/authApi'
 import { DataTable } from './data-table'
@@ -12,7 +11,6 @@ const MainAllUsuarios = () => {
    const { data, isLoading, isError } = useGetUsersQuery()
 
 
-   
 
    if (isLoading)
     return (
@@ -20,16 +18,16 @@ const MainAllUsuarios = () => {
         <Loader2 className="text-primary mx-auto mb-5 h-48 w-48 animate-spin" />
       </section>
     );
-  if (isError) return <p>Error al cargar los maestros.</p>;
+  if (isError) return <p>Error al cargar los usuarios.</p>;
 
 
-  console.log("data MAESTROS", data?.data)
+  console.log("data usuarios", data?.data)
 
-  const maestros = data?.data
+  const usuarios = data?.data
 
   return (
     <div className="container mx-auto px-5 py-10 w-screen">
-      <DataTable columns={getColumns()} data={maestros!} />
+      <DataTable columns={getColumns()} data={usuarios!} />
     </div>
   )
 }
