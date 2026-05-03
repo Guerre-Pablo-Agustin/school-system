@@ -11,6 +11,7 @@ import {
   Home,
   User,
   Users,
+  CalendarRange,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -104,6 +105,19 @@ const fullNav: NavSection[] = [
         rol: ["ADMIN", "DIRECTIVO"],
       }
       ],
+  },
+  {
+    title: "Ciclos",
+    url: "/dashboard/ciclos",
+    icon: CalendarRange,
+    rol: ["ADMIN", "DIRECTIVO"],
+    items: [{ 
+      title: "Listado de ciclos", 
+      url: "/dashboard/ciclos" },
+    {
+      title: "Nuevo ciclo",
+      url: "/dashboard/ciclos/nuevo",
+    }],
   },
   {
     title: "Usuarios",
