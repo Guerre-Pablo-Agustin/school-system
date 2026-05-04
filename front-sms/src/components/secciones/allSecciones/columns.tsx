@@ -89,7 +89,7 @@ export const getColumns = (
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Acciones</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(seccion.id)}
+              onClick={() => navigator.clipboard.writeText(String(seccion.id))}
             >
               Copiar ID
             </DropdownMenuItem>
