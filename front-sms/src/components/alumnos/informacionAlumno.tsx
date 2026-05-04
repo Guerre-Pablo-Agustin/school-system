@@ -1,112 +1,135 @@
 import React, { useState } from 'react'
-import { Alumno } from '../../../types/alumnos.types'
+import { AlumnoList } from '../../../types/alumnos.types'
 import z from 'zod';
 import { useRouter } from 'next/navigation';
 import { useUpdateAlumnoMutation } from '@/redux/services/alumnosApi';
 import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useGetSeccionesQuery } from '@/redux/services/seccionesApi';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface InformacionAlumnoProps {
-  dataAlumno: Alumno;
+  dataAlumno: AlumnoList;
 }
 
 const formAlumnoSchema = z.object({
   nombre: z.string().min(3, { message: "El nombre es requerido" }),
   apellido: z.string().min(3, { message: "El apellido es requerido" }),
   dni: z.string().min(8, { message: "El dni es requerido" }),
-  grado: z.number().min(1, { message: "El grado es requerido" }),
-  seccion: z.string().min(1, { message: "El seccion es requerido" }).max(2, { message: "El seccion es requerido" }),
+  gradoId: z.number().min(1, { message: "El grado es requerido" }),
   telefono: z
-  .string()
-  .trim()
-  .regex(/^\+?[0-9\s\-()]{7,20}$/, {
-    message: "Número de teléfono inválido",
-  }),
+    .string()
+    .trim()
+    .regex(/^\+?[0-9\s\-()]{7,20}$/, {
+      message: "Número de teléfono inválido",
+    }),
   direccion: z.string().min(3, { message: "La direccion es requerida" }),
+  seccionId: z.number().min(1, { message: "La sección es requerida" }),
+  cicloLectivo: z.string().min(1, { message: "El ciclo lectivo es requerido" }),
+  codigo: z.string().min(1, { message: "El codigo es requerido" }),
 });
 
 const InformacionAlumno = ({ dataAlumno }: InformacionAlumnoProps) => {
 
-     const router = useRouter();
-    const [mensaje, setMensaje] = useState("");
-    const [error, setError] = useState("");
-    const [editarAlumno, { isLoading }] = useUpdateAlumnoMutation();
+  const router = useRouter();
+  const [mensaje, setMensaje] = useState("");
+  const [error, setError] = useState("");
+  const [editarAlumno, { isLoading }] = useUpdateAlumnoMutation();
+  const { data: secciones, isLoading: isLoadingSecciones } = useGetSeccionesQuery();
 
-    const form = useForm<z.infer<typeof formAlumnoSchema>>({
-        resolver: zodResolver(formAlumnoSchema),
-        defaultValues: {
-            nombre: dataAlumno?.nombre || "",
-            apellido: dataAlumno?.apellido || "",
-            dni: dataAlumno?.dni || "",
-            grado: dataAlumno?.grado,
-            seccion: dataAlumno?.seccion || "",
-            telefono: dataAlumno?.telefono || "",
-            direccion: dataAlumno?.direccion || "",
-        },
-    });
+  console.log("dataAlumno", dataAlumno);
 
-    const handlerEdit = async (values: z.infer<typeof formAlumnoSchema>) => {
-        if(!dataAlumno?.id){
-            setError("Alumno no encontrado");
-            return;
+  const form = useForm<z.infer<typeof formAlumnoSchema>>({
+    resolver: zodResolver(formAlumnoSchema),
+    defaultValues: {
+      nombre: dataAlumno?.nombre || "",
+      apellido: dataAlumno?.apellido || "",
+      dni: dataAlumno?.dni || "",
+      gradoId: dataAlumno?.gradoId || 0,
+      seccionId: dataAlumno?.seccionId || 0,
+      telefono: dataAlumno?.telefono || "",
+      direccion: dataAlumno?.direccion || "",
+      cicloLectivo: dataAlumno?.cicloLectivo || "",
+      codigo: dataAlumno?.codigo || "",
+    },
+  });
+
+  const handlerEdit = async (values: z.infer<typeof formAlumnoSchema>) => {
+    if (!dataAlumno?.id) {
+      setError("Alumno no encontrado");
+      return;
+    }
+
+    // Limpiar mensajes previos
+    setError("");
+    setMensaje("");
+
+    try {
+      const response = await editarAlumno({
+        id: dataAlumno.id,
+        data: values
+      }).unwrap();
+
+      if (response) {
+        setMensaje("Alumno actualizado correctamente");
+        router.push("/dashboard/alumnos");
+      } else {
+        setError("Error al actualizar el alumno");
+      }
+    } catch (error: unknown) {
+      console.error("Error al actualizar alumno:", error);
+
+      // Asegurar que siempre sea un string
+      let errorMessage = "Error inesperado al actualizar el alumno.";
+
+      if (typeof error === 'string') {
+        errorMessage = error;
+      } else if (error && typeof error === 'object' && 'data' in error) {
+        const errorData = error.data as { error?: string; message?: string };
+        if (errorData?.error && typeof errorData.error === 'string') {
+          errorMessage = errorData.error;
+        } else if (errorData?.message && typeof errorData.message === 'string') {
+          errorMessage = errorData.message;
         }
-
-        // Limpiar mensajes previos
-        setError("");
-        setMensaje("");
-
-        try {
-            const response = await editarAlumno({
-                id: dataAlumno.id,
-                data: values
-            }).unwrap();
-            
-            if (response) {
-                setMensaje("Alumno actualizado correctamente");
-                router.push("/dashboard/alumnos");
-            } else {
-                setError("Error al actualizar el alumno");
-            }
-        } catch (error: unknown) {
-            console.error("Error al actualizar alumno:", error);
-            
-            // Asegurar que siempre sea un string
-            let errorMessage = "Error inesperado al actualizar el alumno.";
-            
-            if (typeof error === 'string') {
-                errorMessage = error;
-            } else if (error && typeof error === 'object' && 'data' in error) {
-                const errorData = error.data as { error?: string; message?: string };
-                if (errorData?.error && typeof errorData.error === 'string') {
-                    errorMessage = errorData.error;
-                } else if (errorData?.message && typeof errorData.message === 'string') {
-                    errorMessage = errorData.message;
-                }
-            } else if (error && typeof error === 'object' && 'message' in error) {
-                const errorObj = error as { message: string };
-                if (typeof errorObj.message === 'string') {
-                    errorMessage = errorObj.message;
-                }
-            }
-            
-            setError(errorMessage);
+      } else if (error && typeof error === 'object' && 'message' in error) {
+        const errorObj = error as { message: string };
+        if (typeof errorObj.message === 'string') {
+          errorMessage = errorObj.message;
         }
-    };
+      }
 
- 
+      setError(errorMessage);
+    }
+  };
+
+  if (isLoadingSecciones) {
+    return (
+      <section className="container mx-auto py-10">
+        <Loader2 className="animate-spin h-48 w-48 mx-auto" />
+      </section>
+    );
+  }
+
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handlerEdit)} className="space-y-6">
@@ -155,27 +178,42 @@ const InformacionAlumno = ({ dataAlumno }: InformacionAlumnoProps) => {
           />
           <FormField
             control={form.control}
-            name="grado"
+            name="gradoId"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Grado</FormLabel>
                 <FormControl>
-                  <Input placeholder="Grado" {...field} />
+                  <Input placeholder="Grado" {...field} disabled />
                 </FormControl>
                 <FormDescription>Grado del alumno.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
+          {/*seccion*/}
           <FormField
             control={form.control}
-            name="seccion"
+            name="seccionId"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Sección</FormLabel>
-                <FormControl>
-                  <Input placeholder="Sección" {...field} />
-                </FormControl>
+                <Select
+                  onValueChange={(value) => field.onChange(Number(value))}
+                  value={field.value ? String(field.value) : ""}
+                >
+                  <FormControl>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Selecciona una sección" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {secciones?.data?.map((seccion) => (
+                      <SelectItem key={seccion.id} value={String(seccion.id)}>
+                        {seccion.nombre}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <FormDescription>Sección del alumno.</FormDescription>
                 <FormMessage />
               </FormItem>
@@ -207,6 +245,43 @@ const InformacionAlumno = ({ dataAlumno }: InformacionAlumnoProps) => {
                   <Input placeholder="Direccion" {...field} />
                 </FormControl>
                 <FormDescription>Direccion del alumno.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/*año Lectivo*/}
+          <FormField
+            control={form.control}
+            name="cicloLectivo"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Año Lectivo</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    placeholder="Año Lectivo"
+                    {...field}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                  />
+                </FormControl>
+                <FormDescription>Año lectivo del alumno.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/*codigo*/}
+          <FormField
+            control={form.control}
+            name="codigo"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Codigo</FormLabel>
+                <FormControl>
+                  <Input placeholder="Codigo" {...field} disabled />
+                </FormControl>
+                <FormDescription>Codigo del alumno.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}

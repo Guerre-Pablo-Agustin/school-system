@@ -19,6 +19,7 @@ import { useGetClasesQuery } from '@/redux/services/clasesApi';
 import { Loader2 } from 'lucide-react';
 import { useGetAlumnosQuery } from '@/redux/services/alumnosApi';
 import { useGetUsersQuery } from '@/redux/services/authApi';
+import { useGetAsignaturasQuery } from '@/redux/services/asignatura.Api';
 
 const HomeAdmin = () => {
 
@@ -26,9 +27,9 @@ const HomeAdmin = () => {
     const userLogin = useSelector(selectUserLogin);
     const clasesUser = userLogin?.clases;
 
-    //todas las clases
-    const { data : clases, isLoading: isLoadingClases, isError: isErrorClases } = useGetClasesQuery();
-    const clasesData = clases?.data;
+    //todas las asignaturas
+    const { data : dataAsignaturas, isLoading: isLoadingAsignaturas, isError: isErrorasignaturas } = useGetAsignaturasQuery();
+    const asignaturasData = dataAsignaturas?.data;
 
 
     //todos los alumnos
@@ -47,14 +48,14 @@ const HomeAdmin = () => {
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                 <Card>
                     <CardHeader>
-                        <CardTitle>Clases</CardTitle>
+                        <CardTitle>Asignaturas</CardTitle>
                     </CardHeader>
                     <CardContent>
-                       { isLoadingClases ? <Loader2 className='animate-spin text-primary' /> : <p>
-                            {clasesData?.length}
+                       { isLoadingAsignaturas ? <Loader2 className='animate-spin text-primary' /> : <p>
+                            {asignaturasData?.length}
                         </p> } 
 
-                        { isErrorClases && <p className='text-red-500'>Error al cargar las clases</p> }
+                        { isErrorasignaturas && <p className='text-red-500'>Error al cargar las asignaturas</p> }
                     </CardContent>
                 </Card>
                 <Card>

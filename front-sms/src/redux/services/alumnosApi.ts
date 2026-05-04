@@ -53,7 +53,7 @@ export const alumnosApi = createApi({
     }),
 
     // Actualizar alumno
-    updateAlumno: builder.mutation<AlumnoResponse, { id: string; data: Partial<Alumno> }>({
+    updateAlumno: builder.mutation<AlumnoResponse, { id: number; data: Partial<Alumno> }>({
       query: ({ id, data }) => {
         console.log("🛠️ Enviando alumno desde mutation:", data);
         return {
