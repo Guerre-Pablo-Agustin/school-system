@@ -67,6 +67,10 @@ export const getColumns = (
   },
   {
     accessorKey:"cicloEducativoNombre",
+    header: "Ciclo Educativo",
+  },
+  {
+    accessorKey:"cicloLectivo",
     header: "Ciclo Lectivo",
   },
   {
