@@ -1,5 +1,5 @@
 
-import { Materia } from "./materia.types";
+import { Asignatura } from "./materia.types";
 import { Nota } from "./nota.type";
 
 type UserRole = 'ADMIN' | 'DOCENTE' | 'DIRECTIVO';
@@ -32,7 +32,7 @@ export interface Clase {
   nombre: string;
   materiaId: string;
   docenteId: string;
-  materia: Materia;
+  materia: Asignatura;
   docente: User;
   estudiantes: AlumnoClase[];
   anioLectivo: number;
@@ -43,7 +43,7 @@ export interface FilterUser {
   nombre?: string;
   email?: string;
   rol?: UserRole;
-  materias?: Materia[];
+  materias?: Asignatura[];
 }
 
 

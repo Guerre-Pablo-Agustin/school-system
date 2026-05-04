@@ -1,11 +1,11 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithReauth } from "./authApi";
-import { Grado } from "../../../types/grado.type";
+import { Grado, GradoList } from "../../../types/grado.type";
 
 
 interface GradosResponse {
   message: string;
-  data: Grado[];
+  data: GradoList[];
   error?: string;
 }
 

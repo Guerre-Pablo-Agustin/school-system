@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useCreateOrUpdateNotaMutation } from "@/redux/services/notasApi";
-import { useGetMateriasQuery } from "@/redux/services/materiasApi";
+import { useGetAsignaturasQuery } from "@/redux/services/asignatura.Api";
 import { useSelector } from "react-redux";
 import { selectUserLogin } from "@/redux/features/userSlice";
 import { Button } from "../ui/button";
@@ -26,7 +26,7 @@ interface FormAgregarNotaProps {
 
 const FormAgregarNota = ({ alumnoId, onNotaAgregada, onCancelar }: FormAgregarNotaProps) => {
   const [createOrUpdateNota] = useCreateOrUpdateNotaMutation();
-  const { data: materiasData } = useGetMateriasQuery();
+  const { data: asignaturasData } = useGetAsignaturasQuery();
   const userLogin = useSelector(selectUserLogin);
 
   const [materiaId, setMateriaId] = useState("");
@@ -142,7 +142,7 @@ const FormAgregarNota = ({ alumnoId, onNotaAgregada, onCancelar }: FormAgregarNo
                 <SelectValue placeholder="Selecciona una materia" />
               </SelectTrigger>
               <SelectContent>
-                {materiasData?.data?.map((materia) => (
+                {asignaturasData?.data?.map((asignatura) => (
                   <SelectItem key={materia.id} value={materia.id}>
                     {materia.nombre}
                   </SelectItem>

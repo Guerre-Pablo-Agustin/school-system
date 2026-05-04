@@ -4,14 +4,14 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { DataTable } from './data-table'
 import { getColumns } from './columns'
-import { useGetClasesByDocenteQuery } from '@/redux/services/clasesApi'
+import { useGetAsignaturasByDocenteQuery } from '@/redux/services/asignatura.Api'
 import { Loader2 } from 'lucide-react'
 
 const MainMisClases = () => {
 
     const userLogin = useSelector(selectUserLogin)
 
-   const { data, isLoading, isError } = useGetClasesByDocenteQuery(userLogin?.id)
+   const { data, isLoading, isError } = useGetAsignaturasByDocenteQuery(userLogin?.id)
 
 
    

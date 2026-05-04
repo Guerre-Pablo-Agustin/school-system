@@ -1,11 +1,11 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithReauth } from "./authApi";
-import { Seccion } from "../../../types/seccion.type";
+import { Seccion, SeccionList } from "../../../types/seccion.type";
 
 
 interface SeccionesResponse {
   message: string;
-  data: Seccion[];
+  data: SeccionList[];
   error?: string;
 }
 

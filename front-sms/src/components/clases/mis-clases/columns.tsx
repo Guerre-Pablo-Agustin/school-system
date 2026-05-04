@@ -17,11 +17,11 @@ import {
 
 import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
-import { Clase } from "../../../../types/Usuario.type";
+import { AsignaturaByDocente } from "../../../../types/materia.types";
 
 // Función para generar las columnas con las acciones
 export const getColumns = (
-): ColumnDef<Clase>[] => [
+): ColumnDef<AsignaturaByDocente>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -59,24 +59,31 @@ export const getColumns = (
     },
   },
   {
+    id: "docenteNombre",
+    header: "Docente",
+    cell: ({ row }) => (
+      <span>{`${row.original.docenteNombre} ${row.original.docenteApellido}`.trim() || "-"}</span>
+    ),
+  },
+  {
     id: "materiaNombre",
     header: "Materia",
     cell: ({ row }) => (
-      <span>{row.original.materia?.nombre ?? "-"}</span>
+      <span>{row.original.asignaturaNombre || "-"}</span>
     ),
   },
   {
-    id: "materiaCiclo",
-    header: "Ciclo",
+    id: "seccionNombre",
+    header: "Sección",
     cell: ({ row }) => (
-      <span>{row.original.materia?.ciclo ?? "-"}</span>
+      <span>{row.original.seccionNombre || "-"}</span>
     ),
   },
   {
-    id: "materiaCodigo",
-    header: "Código",
+    id: "gradoNombre",
+    header: "Grado",
     cell: ({ row }) => (
-      <span>{row.original.materia?.codigo ?? "-"}</span>
+      <span>{row.original.gradoNombre || "-"}</span>
     ),
   },
   {
@@ -95,7 +102,7 @@ export const getColumns = (
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Acciones</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(clase.id)}
+              onClick={() => navigator.clipboard.writeText(clase.id.toString())}
             >
               Copiar ID
             </DropdownMenuItem>

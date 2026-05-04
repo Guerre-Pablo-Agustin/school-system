@@ -12,9 +12,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
-import { Clase } from "../../../../types/Usuario.type";
+import { AsignaturaEdit } from "../../../../types/materia.types";
 
-export const getColumns = (): ColumnDef<Clase>[] => [
+export const getColumns = (): ColumnDef<AsignaturaEdit>[] => [
   {
     id: "select",
     header: ({ table }) => (

@@ -17,11 +17,10 @@ import {
 
 import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
-import { Materia } from "../../../../types/materia.types";
+import { Asignatura } from "../../../../types/materia.types";
 
-// Función para generar las columnas con las acciones
 export const getColumns = (
-): ColumnDef<Materia>[] => [
+): ColumnDef<Asignatura>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -66,14 +65,10 @@ export const getColumns = (
   accessorKey:"codigo",
   header: "Código",
 },
-{
-  accessorKey:"ciclo",
-  header: "Ciclo",
-},  
   {
     id: "actions",
     cell: ({ row }) => {
-      const clase = row.original;
+      const asignatura = row.original;
 
       return (
         <DropdownMenu>
@@ -86,12 +81,12 @@ export const getColumns = (
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Acciones</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(clase.id)}
+              onClick={() => navigator.clipboard.writeText(asignatura.id)}
             >
               Copiar ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <Link href={`/dashboard/materias/${clase.id}/edit`}>
+            <Link href={`/dashboard/materias/${asignatura.id}/edit`}>
             <DropdownMenuItem>
               Editar <List className="ml-1 h-4 w-4" />
             </DropdownMenuItem>

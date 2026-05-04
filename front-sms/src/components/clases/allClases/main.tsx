@@ -3,13 +3,13 @@
 import React from 'react'
 import { DataTable } from './data-table'
 import { getColumns } from './columns'
-import { useGetClasesQuery } from '@/redux/services/clasesApi'
 import { Loader2 } from 'lucide-react'
+import { useGetAsignaturasQuery } from '@/redux/services/asignatura.Api'
 
 const MainAllClases = () => {
 
 
-   const { data, isLoading, isError } = useGetClasesQuery()
+   const { data, isLoading, isError } = useGetAsignaturasQuery()
 
 
    

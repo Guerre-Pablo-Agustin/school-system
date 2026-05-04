@@ -3,21 +3,20 @@ import { BreadcrumbWithCustomSeparator } from '@/components/ui/breadcrumbSeparat
 import { useParams } from 'next/navigation'
 import React from 'react'
 import NotFound from './not-found'
-import { useGetMateriaByIdQuery } from '@/redux/services/materiasApi'
+import { useGetAsignaturaByIdQuery } from '@/redux/services/asignatura.Api'
 import { Loader2 } from 'lucide-react'
-import FormEditarMateria from '@/components/materias/formEditarMateria'
+import FormEditarAsignatura from '@/components/materias/formEditarMateria'
 
 const Page = () => {
-
 
     const params = useParams()
     const id = params.id as string
 
  if(!id){
-    NotFound()
+     NotFound()
  } 
 
- const {data , isLoading, isError} = useGetMateriaByIdQuery(id)
+ const {data , isLoading, isError} = useGetAsignaturaByIdQuery(id)
 
  if (isLoading)
     return (
@@ -26,14 +25,12 @@ const Page = () => {
       </section>
     );
   
-  if (isError) return <div>Usuario no encontrado</div>;
+  if (isError) return <div>Asignatura no encontrada</div>;
 
 
-  const dataMateria = data?.data
+  const dataAsignatura = data?.data
 
-  console.log("dataMateria", dataMateria) 
-
-  if (!dataMateria || !dataMateria?.id) {
+  if (!dataAsignatura || !dataAsignatura?.id) {
     return (
       <section className="container mx-auto py-10">
         <Loader2 className="mx-auto h-48 w-48 animate-spin" />
@@ -44,9 +41,9 @@ const Page = () => {
 
   return (
     <div className="container mx-auto py-10 px-5">
-        <BreadcrumbWithCustomSeparator href="/dashboard/materias" label="materias" page="Editar materias" />
+        <BreadcrumbWithCustomSeparator href="/dashboard/materias" label="asignaturas" page="Editar asignatura" />
         <div className="container mx-auto py-10 px-5">
-            <FormEditarMateria dataMateria={dataMateria} />
+            <FormEditarAsignatura dataAsignatura={dataAsignatura} />
         </div>
     </div>
   )

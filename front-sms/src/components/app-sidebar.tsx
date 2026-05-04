@@ -85,22 +85,22 @@ const fullNav: NavSection[] = [
     ],
   },
   {
-    title: "Materias",
+    title: "Asignaturas",
     url: "/dashboard/materias",
     icon: ClipboardList,
     rol: ["ADMIN", "DIRECTIVO", "DOCENTE"],
     items: [
-      { title: "Listado de materias", 
+      { title: "Listado de asignaturas", 
         url: "/dashboard/materias",
         rol: ["ADMIN", "DIRECTIVO"],
       },
       {
-        title: "Mis materias",
+        title: "Mis asignaturas",
         url: "/dashboard/materias/mis-materias",
         rol: ["ADMIN", "DIRECTIVO", "DOCENTE"],
       },
       {
-        title: "Nueva materia",
+        title: "Nueva asignatura",
         url: "/dashboard/materias/nueva",
         rol: ["ADMIN", "DIRECTIVO"],
       }

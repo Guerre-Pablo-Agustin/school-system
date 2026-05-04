@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from "zod";
-import { useCreateMateriaMutation } from '@/redux/services/materiasApi';
+import { useCreateAsignaturaMutation } from '@/redux/services/asignatura.Api';
 import {
     Form,
     FormControl,
@@ -15,57 +15,65 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from "../ui/select";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
+import { useGetGradosQuery } from '@/redux/services/gradosApi';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-const formMateriaSchema = z.object({
+const formAsignaturaSchema = z.object({
     nombre: z.string().min(3, { message: "El nombre es requerido" }),
     codigo: z.string().min(3, { message: "El codigo es requerido" }),
-    ciclo: z.enum(["PRIMARIA", "SECUNDARIA"]),
+    gradoId: z.number().min(1, { message: "El grado es requerido" }),
 });
 
-const FormnuevaMateria = () => {
+const FormNuevaAsignatura = () => {
     const router = useRouter();
     const [mensaje, setMensaje] = useState("");
     const [error, setError] = useState("");
-    const [createMateria, { isLoading }] = useCreateMateriaMutation();
+    const [createAsignatura, { isLoading }] = useCreateAsignaturaMutation();
+    const { data: grados, isLoading: isLoadingGrados } = useGetGradosQuery();
 
-    const form = useForm<z.infer<typeof formMateriaSchema>>({
-        resolver: zodResolver(formMateriaSchema),
+    const form = useForm<z.infer<typeof formAsignaturaSchema>>({
+        resolver: zodResolver(formAsignaturaSchema),
         defaultValues: {
             nombre: "",
             codigo: "",
-            ciclo: "PRIMARIA",
+            gradoId: 0,
         },
     });
 
-    const handleSubmit = async (data: z.infer<typeof formMateriaSchema>) => {
+    const handleSubmit = async (data: z.infer<typeof formAsignaturaSchema>) => {
         try {
-            const response = await createMateria(data).unwrap();
+            const response = await createAsignatura(data).unwrap();
             if (response) {
-                setMensaje("Materia creada correctamente");
+                setMensaje("Asignatura creada correctamente");
                 router.push("/dashboard/materias");
             } else {
-                setMensaje("Error al crear la materia");
+                setMensaje("Error al crear la asignatura");
             }
         } catch (error) {
-            console.error("Error al crear materia:", error);
+            console.error("Error al crear asignatura:", error);
             const errorMessage =
                 (error as { data?: { error?: string } })?.data?.error ||
-                "Error inesperado al crear la materia.";
+                "Error inesperado al crear la asignatura.";
             setError(errorMessage);
         }
     };
+
+    if (isLoadingGrados) {
+        return (
+            <section className="container mx-auto py-10">
+                <Loader2 className="animate-spin h-48 w-48 mx-auto" />
+            </section>
+        );
+    }
 
 
     return (
@@ -81,7 +89,7 @@ const FormnuevaMateria = () => {
                                 <FormControl>
                                     <Input placeholder="Nombre" {...field} />
                                 </FormControl>
-                                <FormDescription>Nombre de la materia.</FormDescription>
+                                <FormDescription>Nombre de la asignatura.</FormDescription>
                                 <FormMessage />
                             </FormItem>
                         )}
@@ -95,36 +103,43 @@ const FormnuevaMateria = () => {
                                 <FormControl>
                                     <Input placeholder="Código" {...field} />
                                 </FormControl>
-                                <FormDescription>Código de la materia.</FormDescription>
+                                <FormDescription>Código de la asignatura.</FormDescription>
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
                     <FormField
                         control={form.control}
-                        name="ciclo"
+                        name="gradoId"
                         render={({ field }) => (
                             <FormItem>
-                                <Select onValueChange={field.onChange} value={field.value}>
-                                    <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Seleccione el ciclo" />
-                                    </SelectTrigger>
+                                <FormLabel>Grado</FormLabel>
+                                <Select
+                                    onValueChange={(value) => field.onChange(Number(value))}
+                                    value={String(field.value)}
+                                >
+                                    <FormControl>
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Selecciona un grado" />
+                                        </SelectTrigger>
+                                    </FormControl>
                                     <SelectContent>
-                                        <SelectGroup>
-                                            <SelectLabel></SelectLabel>
-                                            <SelectItem value="PRIMARIA">PRIMARIA</SelectItem>
-                                            <SelectItem value="SECUNDARIA">SECUNDARIA</SelectItem>
-
-                                        </SelectGroup>
+                                        {grados?.data?.map((grado) => (
+                                            <SelectItem key={grado.id} value={String(grado.id)}>
+                                                {grado.nombre}
+                                            </SelectItem>
+                                        ))}
                                     </SelectContent>
                                 </Select>
+                                <FormDescription>Grado al que pertenece la asignatura.</FormDescription>
+                                <FormMessage />
                             </FormItem>
                         )}
                     />
                 </div>
                 <div className="flex gap-4">
                     <Button type="submit" disabled={isLoading} className="cursor-pointer">
-                        {isLoading ? "Guardando..." : "Crear Materia"}
+                        {isLoading ? "Guardando..." : "Crear Asignatura"}
                     </Button>
                     <Button
                         variant="outline"
@@ -136,7 +151,6 @@ const FormnuevaMateria = () => {
                 </div>
             </form>
 
-            {/* Alertas de estado */}
             <div className="mt-5 space-y-3">
                 {error && (
                     <Alert variant="destructive">
@@ -159,4 +173,4 @@ const FormnuevaMateria = () => {
     );
 };
 
-export default FormnuevaMateria;
+export default FormNuevaAsignatura;

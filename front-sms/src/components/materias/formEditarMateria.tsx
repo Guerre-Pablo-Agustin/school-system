@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import { Materia } from '../../../types/materia.types';
+import { AsignaturaEdit } from '../../../types/materia.types';
 import { useRouter } from 'next/navigation';
-import { useUpdateMateriaMutation } from '@/redux/services/materiasApi';
+import { useUpdateAsignaturaMutation } from '@/redux/services/asignatura.Api';
 import z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -14,74 +14,63 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from "../ui/select";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 import { useForm } from 'react-hook-form';
 
-interface FormEditarMateriaProps {
-  dataMateria: Materia;
+interface FormEditarAsignaturaProps {
+  dataAsignatura: AsignaturaEdit;
 }
 
 
-const formMateriaSchema = z.object({
+const formAsignaturaSchema = z.object({
     nombre: z.string().min(3, { message: "El nombre es requerido" }),
     codigo: z.string().min(3, { message: "El codigo es requerido" }),
-    ciclo: z.enum(["PRIMARIA", "SECUNDARIA"]),
+    gradoId: z.number().min(1, { message: "El grado es requerido" }),
 });
 
-const FormEditarMateria = ({ dataMateria }: FormEditarMateriaProps) => {
-
-      const router = useRouter();
-    const [updateProductApi, { isLoading }] = useUpdateMateriaMutation();
+const FormEditarAsignatura = ({ dataAsignatura }: FormEditarAsignaturaProps) => {
+    console.log("dataAsignatura", dataAsignatura);
+    const router = useRouter();
+    const [updateAsignaturaApi, { isLoading }] = useUpdateAsignaturaMutation();
     const [mensaje, setMensaje] = useState("");
     const [error, setError] = useState("");
 
-       const form = useForm<z.infer<typeof formMateriaSchema>>({
-        resolver: zodResolver(formMateriaSchema),
+       const form = useForm<z.infer<typeof formAsignaturaSchema>>({
+        resolver: zodResolver(formAsignaturaSchema),
         defaultValues: {
-            nombre: dataMateria?.nombre || "",
-            codigo: dataMateria?.codigo || "",
-            ciclo: dataMateria?.ciclo || "PRIMARIA",
+            nombre: dataAsignatura?.nombre || "",
+            codigo: dataAsignatura?.codigo || "",
+            gradoId: dataAsignatura?.gradoId || 0,
         },
     });
 
-    const handlerEdit = async (values: z.infer<typeof formMateriaSchema>) => {
-        if(!dataMateria?.id){
-            setError("Materia no encontrada");
+    const handlerEdit = async (values: z.infer<typeof formAsignaturaSchema>) => {
+        if(!dataAsignatura?.id){
+            setError("Asignatura no encontrada");
             return;
         }
 
-        // Limpiar mensajes previos
         setError("");
         setMensaje("");
 
         try {
-            const response = await updateProductApi({
-                id: dataMateria.id,
+            const response = await updateAsignaturaApi({
+                id: dataAsignatura.id,
                 data: values
             }).unwrap();
             
             if (response) {
-                setMensaje("Materia actualizada correctamente");
+                setMensaje("Asignatura actualizada correctamente");
                 router.push("/dashboard/materias");
             } else {
-                setError("Error al actualizar la materia");
+                setError("Error al actualizar la asignatura");
             }
         } catch (error: unknown) {
-            console.error("Error al actualizar materia:", error);
+            console.error("Error al actualizar asignatura:", error);
             
-            // Asegurar que siempre sea un string
-            let errorMessage = "Error inesperado al actualizar la materia.";
+            let errorMessage = "Error inesperado al actualizar la asignatura.";
             
             if (typeof error === 'string') {
                 errorMessage = error;
@@ -116,7 +105,7 @@ const FormEditarMateria = ({ dataMateria }: FormEditarMateriaProps) => {
                 <FormControl>
                   <Input placeholder="Nombre" {...field} />
                 </FormControl>
-                <FormDescription>Nombre de la materia.</FormDescription>
+                <FormDescription>Nombre de la asignatura.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -130,33 +119,7 @@ const FormEditarMateria = ({ dataMateria }: FormEditarMateriaProps) => {
                 <FormControl>
                   <Input placeholder="Código" {...field} />
                 </FormControl>
-                <FormDescription>Código de la materia.</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="ciclo"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Ciclo</FormLabel>
-                <FormControl>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Selecciona el ciclo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel></SelectLabel>
-                        <SelectItem value="PRIMARIA">PRIMARIA</SelectItem>
-                        <SelectItem value="SECUNDARIA">SECUNDARIA</SelectItem>
-
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormDescription>Ciclo de la materia.</FormDescription>
+                <FormDescription>Código de la asignatura.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -164,7 +127,7 @@ const FormEditarMateria = ({ dataMateria }: FormEditarMateriaProps) => {
         </div>
         <div className="flex gap-4">
           <Button type="submit" disabled={isLoading} className="cursor-pointer">
-            {isLoading ? "Guardando..." : "Actualizar Materia"}
+            {isLoading ? "Guardando..." : "Actualizar Asignatura"}
           </Button>
           <Button
             variant="outline"
@@ -176,7 +139,6 @@ const FormEditarMateria = ({ dataMateria }: FormEditarMateriaProps) => {
         </div>
       </form>
 
-      {/* Alertas de estado */}      
       <div className="mt-5 space-y-3">
         {error && typeof error === 'string' && (
           <Alert variant="destructive">
@@ -198,4 +160,4 @@ const FormEditarMateria = ({ dataMateria }: FormEditarMateriaProps) => {
   );
 }
 
-export default FormEditarMateria
+export default FormEditarAsignatura

@@ -1,7 +1,6 @@
 "use client";
 import { useGetUserByIdQuery } from '@/redux/services/authApi';
-import { useCreateClaseMutation } from '@/redux/services/clasesApi';
-import { useGetMateriasByCodigoQuery } from '@/redux/services/materiasApi';
+import { useAsignarDocenteMutation, useGetAsignaturaByIdQuery } from '@/redux/services/asignatura.Api';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react'
@@ -19,31 +18,46 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { AlertCircle, CheckCircle2, Search } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Loader2, Search } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Skeleton } from '../ui/skeleton';
+import { useGetSeccionesQuery } from '@/redux/services/seccionesApi';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { SeccionList } from '../../../types/seccion.type';
 
 const formClaseSchema = z.object({
-    docenteId: z.string().min(1, "Docente es requerido"),
-    materiaId: z.string().min(1, "Materia es requerida"),
-    anioLectivo: z.number().min(2000, "Año lectivo debe ser mayor a 2000").max(2100, "Año lectivo no válido"),
+    docenteId: z.number().min(1, "Docente es requerido"),
+    asignaturaId: z.number().min(1, "Asignatura es requerida"),
+    seccionId: z.number().min(1, "Seccion es requerida"),
 })
 
 const FormNuevaClase = () => {
     const router = useRouter()
-    const [createClase, { isLoading }] = useCreateClaseMutation()
-    const [codigoMateriaBusqueda, setCodigoMateriaBusqueda] = useState("")
+    const [asignarDocente, { isLoading }] = useAsignarDocenteMutation()
+    const [codigoAsignaturaBusqueda, setCodigoAsignaturaBusqueda] = useState("")
     const [docenteIdBusqueda, setDocenteIdBusqueda] = useState("")
+
+    const { data: seccionData, isLoading: isLoadingSeccion } = useGetSeccionesQuery();
+    console.log("seccionData", seccionData)
+
+
     const [mensaje, setMensaje] = useState({
         error: "",
         success: "",
-        materia: "",
+        asignatura: "",
         docente: "",
+        seccion: "",
     })
 
     // hook para obtener datos de la materia
-    const { data: MateriaData, isLoading: isLoadingMateria, isError: isErrorMateria, refetch: refetchMateria } = useGetMateriasByCodigoQuery(codigoMateriaBusqueda, {
-        skip: !codigoMateriaBusqueda,
+    const { data: asignaturaData, isLoading: isLoadingAsignatura, isError: isErrorAsignatura, refetch: refetchAsignatura } = useGetAsignaturaByIdQuery(codigoAsignaturaBusqueda, {
+        skip: !codigoAsignaturaBusqueda,
     })
 
     // hook para obtener datos del docente
@@ -54,27 +68,27 @@ const FormNuevaClase = () => {
     const form = useForm<z.infer<typeof formClaseSchema>>({
         resolver: zodResolver(formClaseSchema),
         defaultValues: {
-            docenteId: "",
-            materiaId: "",
-            anioLectivo: new Date().getFullYear(),
+            docenteId: 0,
+            asignaturaId: 0,
+            seccionId: 0,
         },
     });
 
-    // Efecto para autocompletar materia cuando se encuentra
+    // Efecto para autocompletar asignatura cuando se encuentra
     useEffect(() => {
-        if (MateriaData) {
-            form.setValue('materiaId', MateriaData.data.id);
+        if (asignaturaData) {
+            form.setValue('asignaturaId', Number(asignaturaData.data.id));
             setMensaje(prev => ({
                 ...prev,
-                materia: `Materia encontrada: ${MateriaData.data.nombre} (${MateriaData.data.codigo})`
+                asignatura: `Asignatura encontrada: ${asignaturaData.data.nombre} (${asignaturaData.data.codigo})`
             }));
         }
-    }, [MateriaData, form]);
+    }, [asignaturaData, form]);
 
     // Efecto para autocompletar docente cuando se encuentra
     useEffect(() => {
         if (docenteData && docenteData.data.rol === 'DOCENTE') {
-            form.setValue('docenteId', docenteData.data.id);
+            form.setValue('docenteId', Number(docenteData.data.id));
             setMensaje(prev => ({
                 ...prev,
                 docente: `Docente encontrado: ${docenteData.data.nombre} (${docenteData.data.email})`
@@ -89,13 +103,13 @@ const FormNuevaClase = () => {
 
     // Efecto para manejar errores de búsqueda
     useEffect(() => {
-        if (isErrorMateria && codigoMateriaBusqueda) {
+        if (isErrorAsignatura && codigoAsignaturaBusqueda) {
             setMensaje(prev => ({
                 ...prev,
-                materia: "Materia no encontrada. Verifica el código."
+                asignatura: "Asignatura no encontrada. Verifica el código."
             }));
         }
-    }, [isErrorMateria, codigoMateriaBusqueda]);
+    }, [isErrorAsignatura, codigoAsignaturaBusqueda]);
 
     useEffect(() => {
         if (isErrorDocente && docenteIdBusqueda) {
@@ -108,13 +122,14 @@ const FormNuevaClase = () => {
 
     const handleSubmit = async (data: z.infer<typeof formClaseSchema>) => {
         try {
-            const response = await createClase(data).unwrap();
+            const response = await asignarDocente(data).unwrap();
             if (response) {
                 setMensaje({
                     error: "",
                     success: "Clase creada correctamente",
-                    materia: "",
-                    docente: ""
+                    asignatura: "",
+                    docente: "",
+                    seccion: "",
                 });
                 setTimeout(() => router.push("/dashboard/clases"), 1500);
             }
@@ -126,16 +141,17 @@ const FormNuevaClase = () => {
             setMensaje({
                 error: errorMessage,
                 success: "",
-                materia: "",
+                asignatura: "",
                 docente: "",
+                seccion: "",
             });
         }
     };
 
-    const handleBuscarMateria = () => {
-        if (codigoMateriaBusqueda.trim()) {
-            refetchMateria();
-            setMensaje(prev => ({ ...prev, materia: "Buscando materia..." }));
+    const handleBuscarAsignatura = () => {
+        if (codigoAsignaturaBusqueda.trim()) {
+            refetchAsignatura();
+            setMensaje(prev => ({ ...prev, asignatura: "Buscando asignatura..." }));
         }
     };
 
@@ -146,56 +162,62 @@ const FormNuevaClase = () => {
         }
     };
 
+    if (isLoadingSeccion) {
+        return (
+            <section className="container mx-auto py-10">
+                <Loader2 className="animate-spin h-48 w-48 mx-auto" />
+            </section>
+        );
+    }
+
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
                 <div className="grid gap-6 md:grid-cols-2">
-                    {/* Card para buscar materia */}
+                    {/* Card para buscar asignatura */}
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <Search className="h-5 w-5" />
-                                Buscar Materia por Código
+                                Buscar Asignatura por Código
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className='flex gap-2'>
                                 <Input
-                                    placeholder="Ingresa el código de la materia (ej: MAT-5P)"
-                                    value={codigoMateriaBusqueda}
-                                    onChange={(e) => setCodigoMateriaBusqueda(e.target.value)}
-                                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleBuscarMateria())}
+                                    placeholder="Ingresa el código de la asignatura (ej: MAT-5P)"
+                                    value={codigoAsignaturaBusqueda}
+                                    onChange={(e) => setCodigoAsignaturaBusqueda(e.target.value)}
+                                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleBuscarAsignatura())}
                                 />
                                 <Button
                                     type="button"
-                                    onClick={handleBuscarMateria}
-                                    disabled={isLoadingMateria || !codigoMateriaBusqueda.trim()}
+                                    onClick={handleBuscarAsignatura}
+                                    disabled={isLoadingAsignatura || !codigoAsignaturaBusqueda.trim()}
                                 >
-                                    {isLoadingMateria ? "Buscando..." : "Buscar"}
+                                    {isLoadingAsignatura ? "Buscando..." : "Buscar"}
                                 </Button>
                             </div>
 
-                            {isLoadingMateria && (
+                            {isLoadingAsignatura && (
                                 <div className="space-y-2">
                                     <Skeleton className="h-4 w-full" />
                                     <Skeleton className="h-4 w-3/4" />
                                 </div>
                             )}
 
-                            {mensaje.materia && (
-                                <Alert variant={isErrorMateria ? "destructive" : "default"} className="mt-2">
+                            {mensaje.asignatura && (
+                                <Alert variant={isErrorAsignatura ? "destructive" : "default"} className="mt-2">
                                     <AlertCircle className="h-4 w-4" />
-                                    <AlertDescription>{mensaje.materia}</AlertDescription>
+                                    <AlertDescription>{mensaje.asignatura}</AlertDescription>
                                 </Alert>
                             )}
 
-                            {MateriaData && (
+                            {asignaturaData && (
                                 <div className="p-3 border rounded-lg bg-muted/50">
-                                    <h4 className="font-semibold">Información de la Materia:</h4>
-                                    <p><strong>Nombre:</strong> {MateriaData.data.nombre}</p>
-                                    <p><strong>Código:</strong> {MateriaData.data.codigo}</p>
-                                    <p><strong>Ciclo:</strong> {MateriaData.data.ciclo}</p>
-                                    <p><strong>Grado:</strong> {MateriaData.data.grado}</p>
+                                    <h4 className="font-semibold">Información de la Asignatura:</h4>
+                                    <p><strong>Nombre:</strong> {asignaturaData.data.nombre}</p>
+                                    <p><strong>Código:</strong> {asignaturaData.data.codigo}</p>
                                 </div>
                             )}
                         </CardContent>
@@ -257,7 +279,7 @@ const FormNuevaClase = () => {
                 <div className="hidden">
                     <FormField
                         control={form.control}
-                        name="materiaId"
+                        name="asignaturaId"
                         render={({ field }) => (
                             <FormItem>
                                 <FormControl>
@@ -281,24 +303,33 @@ const FormNuevaClase = () => {
                     />
                 </div>
 
-                {/* Campo de año lectivo */}
+                {/* Campo de sección */}
                 <FormField
                     control={form.control}
-                    name="anioLectivo"
+                    name="seccionId"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Año Lectivo</FormLabel>
+                            <FormLabel>Sección a la que pertenece la clase</FormLabel>
                             <FormControl>
-                                <Input
-                                    type="number"
-                                    placeholder="2024"
-                                    {...field}
-                                    onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                                />
+                                <Select
+                                    onValueChange={(value) => field.onChange(Number(value))}
+                                    value={String(field.value)}
+                                >
+                                    <FormControl>
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Selecciona una sección" />
+                                        </SelectTrigger>
+                                    </FormControl>
+
+                                    <SelectContent>
+                                        {seccionData?.data?.map((seccion: SeccionList) => (
+                                            <SelectItem key={seccion.id} value={String(seccion.id)}>
+                                                {seccion.nombre}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </FormControl>
-                            <FormDescription>
-                                Año académico de la clase
-                            </FormDescription>
                             <FormMessage />
                         </FormItem>
                     )}
@@ -307,7 +338,7 @@ const FormNuevaClase = () => {
                 <div className="flex gap-4">
                     <Button
                         type="submit"
-                        disabled={isLoading || !form.watch('materiaId') || !form.watch('docenteId')}
+                        disabled={isLoading || !form.watch('asignaturaId') || !form.watch('docenteId')}
                         className="cursor-pointer"
                     >
                         {isLoading ? "Creando..." : "Crear Clase"}

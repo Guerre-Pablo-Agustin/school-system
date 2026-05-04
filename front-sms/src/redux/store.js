@@ -7,7 +7,7 @@ import userReducer from "./features/userSlice";
 //services
 import { authApi } from "./services/authApi";
 import { clasesApi } from "./services/clasesApi";
-import { materiasApi } from "./services/materiasApi";
+import { materiasApi } from "./services/asignatura.Api";
 import { alumnosApi } from "./services/alumnosApi";
 import { notasApi } from "./services/notasApi";
 import { ciclosApi } from "./services/ciclosApi";

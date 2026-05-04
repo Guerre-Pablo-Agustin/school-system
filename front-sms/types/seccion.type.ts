@@ -1,5 +1,5 @@
 export interface Seccion {
-  id: string;
+  id: string | number;
   nombre: string;
   gradoId: number;
   cicloLectivo: string;
@@ -12,6 +12,6 @@ export interface SeccionList {
   cicloLectivo: string;
   gradoId: number;
   gradoNombre: string;
-  id: number;
+  id: string | number;
   nombre: string;
 }
