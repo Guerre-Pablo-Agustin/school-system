@@ -120,6 +120,32 @@ const fullNav: NavSection[] = [
     }],
   },
   {
+    title: "Grados",
+    url: "/dashboard/grados",
+    icon: GraduationCap,
+    rol: ["ADMIN", "DIRECTIVO"],
+    items: [{ 
+      title: "Listado de grados", 
+      url: "/dashboard/grados" },
+    {
+      title: "Nuevo grado",
+      url: "/dashboard/grados/nuevo",
+    }],
+  },
+  {
+    title: "Secciones",
+    url: "/dashboard/secciones",
+    icon: ClipboardList,
+    rol: ["ADMIN", "DIRECTIVO"],
+    items: [{ 
+      title: "Listado de secciones", 
+      url: "/dashboard/secciones" },
+    {
+      title: "Nueva seccion",
+      url: "/dashboard/secciones/nuevo",
+    }],
+  },
+  {
     title: "Usuarios",
     url: "/dashboard/usuarios",
     icon: Users,

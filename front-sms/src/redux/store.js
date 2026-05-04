@@ -11,6 +11,8 @@ import { materiasApi } from "./services/materiasApi";
 import { alumnosApi } from "./services/alumnosApi";
 import { notasApi } from "./services/notasApi";
 import { ciclosApi } from "./services/ciclosApi";
+import { gradosApi } from "./services/gradosApi";
+import { seccionesApi } from "./services/seccionesApi";
 
 
 
@@ -23,9 +25,11 @@ export const store = configureStore({
     [alumnosApi.reducerPath]: alumnosApi.reducer,
     [notasApi.reducerPath]: notasApi.reducer,
     [ciclosApi.reducerPath]: ciclosApi.reducer,
+    [gradosApi.reducerPath]: gradosApi.reducer,
+    [seccionesApi.reducerPath]: seccionesApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat([authApi.middleware, clasesApi.middleware, materiasApi.middleware, alumnosApi.middleware, notasApi.middleware, ciclosApi.middleware]),
+    getDefaultMiddleware().concat([authApi.middleware, clasesApi.middleware, materiasApi.middleware, alumnosApi.middleware, notasApi.middleware, ciclosApi.middleware, gradosApi.middleware, seccionesApi.middleware]),
 });
 
 setupListeners(store.dispatch);
