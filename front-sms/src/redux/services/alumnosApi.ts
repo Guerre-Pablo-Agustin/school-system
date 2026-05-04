@@ -24,17 +24,20 @@ interface AlumnoResponse {
 
 export const alumnosApi = createApi({
   reducerPath: "alumnosApi = createApi({",
+  tagTypes: ['Alumnos'],
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
 
     // Traer todas las materias
     getAlumnos: builder.query<alumnosResponse, void>({
       query: () => "/alumnos",
+      providesTags: [{ type: 'Alumnos', id: 'LIST' }],
     }),
 
     //traer alumno por id
     getAlumnobyId: builder.query<AlumnoResponse, string>({
       query: (id) => `/alumnos/${id}`,
+      providesTags: ['Alumnos'],
     }),
 
     //crear alumno
@@ -59,6 +62,7 @@ export const alumnosApi = createApi({
           body: data,
         };
       },
+      invalidatesTags: ['Alumnos'],
     }),
 
     //traer notas por año
@@ -71,6 +75,38 @@ export const alumnosApi = createApi({
       };
     }, { id: string; anio: number }>({
       query: ({ id, anio }) => `/alumnos/${id}/notas/${anio}`,
+      providesTags: ['Alumnos'],
+    }),
+
+    // Eliminar alumno
+    deleteAlumno: builder.mutation<{
+      message: string;
+      data: Alumno;
+      success: boolean;
+    }, string>({
+      query: (id) => ({
+        url: `/alumnos/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ['Alumnos'],
+    }),
+
+    //alumno por seccion
+    getAlumnosPorSeccion: builder.query<alumnosResponse, string>({
+      query: (seccionId) => `/alumnos/${seccionId}`,
+      providesTags: ['Alumnos'],
+    }),
+
+    //alumno por grado y ciclo lectivo
+    getAlumnosPorGradoYCiclo: builder.query<alumnosResponse, { gradoId: string; cicloLectivo: string }>({
+      query: ({ gradoId, cicloLectivo }) => `/alumnos/grado/${gradoId}/ciclo/${cicloLectivo}`,
+      providesTags: ['Alumnos'],
+    }),
+
+    //alumno por codigo
+    getAlumnosPorCodigo: builder.query<alumnosResponse, string>({
+      query: (codigo) => `/alumnos/codigo/${codigo}`,
+      providesTags: ['Alumnos'],
     }),
   }),
 });
@@ -82,6 +118,10 @@ export const {
   useUpdateAlumnoMutation,
   useGetAlumnobyIdQuery,
   useGetNotasPorAnioQuery,
+  useDeleteAlumnoMutation,
+  useGetAlumnosPorSeccionQuery,
+  useGetAlumnosPorGradoYCicloQuery,
+  useGetAlumnosPorCodigoQuery,
 } = alumnosApi
 
 

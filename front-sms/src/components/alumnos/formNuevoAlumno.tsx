@@ -6,33 +6,43 @@ import React, { useState } from 'react'
 import { useForm } from 'react-hook-form';
 import z from 'zod';
 import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { AlertCircle, CheckCircle2, BookOpen } from "lucide-react";
+import { AlertCircle, CheckCircle2, BookOpen, Loader2 } from "lucide-react";
+import { useGetSeccionesQuery } from '@/redux/services/seccionesApi';
 
 const formAlumnoSchema = z.object({
   nombre: z.string().min(3, { message: "El nombre es requerido" }),
   apellido: z.string().min(3, { message: "El apellido es requerido" }),
   dni: z.string().min(8, { message: "El dni es requerido" }),
   grado: z.number().min(1, { message: "El grado es requerido" }).max(6, { message: "El grado máximo es 6" }),
-  seccion: z.string().min(1, { message: "La sección es requerida" }).max(2, { message: "La sección debe tener máximo 2 caracteres" }),
+  seccionId: z.number().min(1, { message: "La sección es requerida" }),
   telefono: z
-  .string()
-  .trim()
-  .regex(/^\+?[0-9\s\-()]{7,20}$/, {
-    message: "Número de teléfono inválido",
-  }),
+    .string()
+    .trim()
+    .regex(/^\+?[0-9\s\-()]{7,20}$/, {
+      message: "Número de teléfono inválido",
+    }),
   direccion: z.string().min(3, { message: "La dirección es requerida" }),
   anioLectivo: z.number().min(2000, { message: "El año lectivo debe ser mayor a 2000" }).max(2100, { message: "Año lectivo no válido" }),
+  codigo: z.string().min(1, { message: "El codigo es requerido" }),
 });
 
 interface EnrollmentInfo {
@@ -41,63 +51,74 @@ interface EnrollmentInfo {
 }
 
 const FormNuevoAlumno = () => {
-    const router = useRouter();
-    const [mensaje, setMensaje] = useState("");
-    const [error, setError] = useState("");
-    const [enrollmentInfo, setEnrollmentInfo] = useState<EnrollmentInfo | null>(null);
-    const [createAlumno, { isLoading }] = useCreateAlumnoMutation();
+  const router = useRouter();
+  const [mensaje, setMensaje] = useState("");
+  const [error, setError] = useState("");
+  const [enrollmentInfo, setEnrollmentInfo] = useState<EnrollmentInfo | null>(null);
+  const [createAlumno, { isLoading }] = useCreateAlumnoMutation();
+  const { data: secciones, isLoading: isLoadingSecciones } = useGetSeccionesQuery();
 
-    const form = useForm<z.infer<typeof formAlumnoSchema>>({
-        resolver: zodResolver(formAlumnoSchema),
-        defaultValues: {
-            nombre: "",
-            apellido: "",
-            dni: "",
-            grado: 0,
-            seccion: "",
-            telefono: "",
-            direccion: "",
-            anioLectivo: new Date().getFullYear(),
-        },
-    });
+  const form = useForm<z.infer<typeof formAlumnoSchema>>({
+    resolver: zodResolver(formAlumnoSchema),
+    defaultValues: {
+      nombre: "",
+      apellido: "",
+      dni: "",
+      grado: 0,
+      seccionId: 0,
+      telefono: "",
+      direccion: "",
+      anioLectivo: new Date().getFullYear(),
+      codigo: ""
+    },
+  });
 
-    const handleSubmit = async (data: z.infer<typeof formAlumnoSchema>) => {
-        // Limpiar mensajes previos
-        setError("");
-        setMensaje("");
-        setEnrollmentInfo(null);
+  const handleSubmit = async (data: z.infer<typeof formAlumnoSchema>) => {
+    // Limpiar mensajes previos
+    setError("");
+    setMensaje("");
+    setEnrollmentInfo(null);
 
-        try {
-            const response = await createAlumno(data).unwrap();
-            
-            if (response.success) {
-                setMensaje(response.message || "Alumno creado correctamente");
-                
-                // Mostrar información de las inscripciones automáticas
-                if (response.enrollment) {
-                    setEnrollmentInfo(response.enrollment);
-                }
-                
-                // Redirigir después de 3 segundos para que el usuario vea el mensaje
-                setTimeout(() => {
-                    router.push("/dashboard/alumnos");
-                }, 9000);
-            } else {
-                setError(response.message || "Error al crear el alumno");
-            }
-        } catch (error) {
-            console.error("Error al crear alumno:", error);
-            const errorMessage =
-                (error as { data?: { error?: string } })?.data?.error ||
-                "Error inesperado al crear el alumno.";
-            setError(errorMessage);
+    try {
+      const response = await createAlumno(data).unwrap();
+
+      if (response.success) {
+        setMensaje(response.message || "Alumno creado correctamente");
+
+        // Mostrar información de las inscripciones automáticas
+        if (response.enrollment) {
+          setEnrollmentInfo(response.enrollment);
         }
-    };
+
+        // Redirigir después de 3 segundos para que el usuario vea el mensaje
+        setTimeout(() => {
+          router.push("/dashboard/alumnos");
+        }, 9000);
+      } else {
+        setError(response.message || "Error al crear el alumno");
+      }
+    } catch (error) {
+      console.error("Error al crear alumno:", error);
+      const errorMessage =
+        (error as { data?: { error?: string } })?.data?.error ||
+        "Error inesperado al crear el alumno.";
+      setError(errorMessage);
+    }
+  };
+
+  if (isLoadingSecciones) {
+    return (
+      <section className="container mx-auto py-10">
+        <Loader2 className="animate-spin h-48 w-48 mx-auto" />
+      </section>
+    );
+  }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          {/*nombre*/}
           <FormField
             control={form.control}
             name="nombre"
@@ -112,6 +133,8 @@ const FormNuevoAlumno = () => {
               </FormItem>
             )}
           />
+
+          {/*apellido*/}
           <FormField
             control={form.control}
             name="apellido"
@@ -126,6 +149,8 @@ const FormNuevoAlumno = () => {
               </FormItem>
             )}
           />
+
+          {/*dni*/}
           <FormField
             control={form.control}
             name="dni"
@@ -140,6 +165,8 @@ const FormNuevoAlumno = () => {
               </FormItem>
             )}
           />
+
+          {/*grado*/}
           <FormField
             control={form.control}
             name="grado"
@@ -147,10 +174,10 @@ const FormNuevoAlumno = () => {
               <FormItem>
                 <FormLabel>Grado</FormLabel>
                 <FormControl>
-                  <Input 
-                    type="number" 
-                    placeholder="Grado (1-6)" 
-                    {...field} 
+                  <Input
+                    type="number"
+                    placeholder="Grado (1-6)"
+                    {...field}
                     onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                   />
                 </FormControl>
@@ -159,15 +186,30 @@ const FormNuevoAlumno = () => {
               </FormItem>
             )}
           />
+          {/*seccion*/}
           <FormField
             control={form.control}
-            name="seccion"
+            name="seccionId"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Sección</FormLabel>
-                <FormControl>
-                  <Input placeholder="Sección (ej: A, B)" {...field} />
-                </FormControl>
+                <Select
+                  onValueChange={(value) => field.onChange(Number(value))}
+                  value={field.value ? String(field.value) : ""}
+                >
+                  <FormControl>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Selecciona una sección" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {secciones?.data?.map((seccion) => (
+                      <SelectItem key={seccion.id} value={String(seccion.id)}>
+                        {seccion.nombre}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <FormDescription>Sección del alumno.</FormDescription>
                 <FormMessage />
               </FormItem>
@@ -204,6 +246,22 @@ const FormNuevoAlumno = () => {
             )}
           />
 
+           {/*codigo e alumno*/}
+           <FormField
+            control={form.control}
+            name="codigo"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Código</FormLabel>
+                <FormControl>
+                  <Input placeholder="Código" {...field} />
+                </FormControl>
+                <FormDescription>Código del alumno.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <FormField
             control={form.control}
             name="anioLectivo"
@@ -211,10 +269,10 @@ const FormNuevoAlumno = () => {
               <FormItem>
                 <FormLabel>Año lectivo</FormLabel>
                 <FormControl>
-                  <Input 
+                  <Input
                     type="number"
-                    placeholder="Año lectivo" 
-                    {...field} 
+                    placeholder="Año lectivo"
+                    {...field}
                     onChange={(e) => field.onChange(parseInt(e.target.value) || new Date().getFullYear())}
                   />
                 </FormControl>
@@ -278,7 +336,7 @@ const FormNuevoAlumno = () => {
           </Alert>
         )}
       </div>
-    </Form> 
+    </Form>
   )
 }
 

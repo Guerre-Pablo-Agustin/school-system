@@ -17,11 +17,11 @@ import {
 
 import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
-import { Alumno } from "../../../../types/alumnos.types";
+import { AlumnoList } from "../../../../types/alumnos.types";
 
 // Función para generar las columnas con las acciones
 export const getColumns = (
-): ColumnDef<Alumno>[] => [
+): ColumnDef<AlumnoList>[] => [
     {
       id: "select",
       header: ({ table }) => (
@@ -58,6 +58,11 @@ export const getColumns = (
         );
       },
     },
+
+    {
+      accessorKey: "codigo",
+      header: "Código",
+    },
     {
       accessorKey: "nombre",
       header: "Nombre",
@@ -76,7 +81,7 @@ export const getColumns = (
       cell: ({ row }) => {
         return (
           <span>
-            {row.original.grado ?? "-"} / {row.original.seccion ?? "-"}
+            {row.original.gradoNombre ?? "-"} / {row.original.seccionNombre ?? "-"}
           </span>
         );
       },
@@ -84,7 +89,7 @@ export const getColumns = (
     {
       id: "actions",
       cell: ({ row }) => {
-        const clase = row.original;
+        const alumno = row.original;
 
         return (
           <DropdownMenu>
@@ -97,12 +102,12 @@ export const getColumns = (
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Acciones</DropdownMenuLabel>
               <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(clase.id)}
+                onClick={() => navigator.clipboard.writeText(String(alumno.id))}
               >
                 Copiar ID
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <Link href={`/dashboard/alumnos/${clase.id}/informacion`}>
+              <Link href={`/dashboard/alumnos/${alumno.id}/informacion`}>
                 <DropdownMenuItem>
                   informacion <List className="ml-1 h-4 w-4" />
                 </DropdownMenuItem>
