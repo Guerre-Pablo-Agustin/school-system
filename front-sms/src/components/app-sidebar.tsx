@@ -10,6 +10,7 @@ import {
   FileText,
   GraduationCap,
   Home,
+  Percent,
   User,
   Users,
   CalendarRange,
@@ -174,6 +175,19 @@ const fullNav: NavSection[] = [
     {
       title: "Asistencia docente",
       url: "/dashboard/asistencias/docente-nuevo",
+    }],
+  },
+  {
+    title: "Ponderaciones",
+    url: "/dashboard/ponderaciones",
+    icon: Percent,
+    rol: ["ADMIN", "DIRECTIVO"],
+    items: [{ 
+      title: "Listado de ponderaciones", 
+      url: "/dashboard/ponderaciones" },
+    {
+      title: "Nueva ponderacion",
+      url: "/dashboard/ponderaciones/nuevo",
     }],
   },
   {

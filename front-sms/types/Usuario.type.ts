@@ -5,7 +5,7 @@ import { Nota } from "./nota.type";
 export type UserRole = 'ADMIN' | 'DOCENTE' | 'DIRECTIVO';
 
 export interface User {
-  id: string;
+  id: number;
   nombre: string;
   apellido: string;
   email: string;
@@ -17,7 +17,7 @@ export interface User {
 }
 
 interface AlumnoClase {
-    id: string,
+    id: number,
     nombre: string,
     apellido: string,
     grado: string,
@@ -28,10 +28,10 @@ interface AlumnoClase {
 
 
 export interface Clase {
-  id: string;
+  id: number;
   nombre: string;
-  materiaId: string;
-  docenteId: string;
+  materiaId: number;
+  docenteId: number;
   materia: Asignatura;
   docente: User;
   estudiantes: AlumnoClase[];

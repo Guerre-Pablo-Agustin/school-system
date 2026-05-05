@@ -28,6 +28,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { EstadoAsistencia } from "../../../types/asistencia.type";
+import { User } from "../../../types/Usuario.type";
 
 const formAsistenciaDocenteSchema = z.object({
   fecha: z.string().min(1, { message: "La fecha es requerida" }),
@@ -71,8 +72,7 @@ const FormAsistenciaDocente = () => {
           map[a.docenteId] = a.estado;
         });
       }
-
-      docentesData.data.forEach((docente) => {
+      docentesData.data.forEach((docente: User) => {
         if (!map[docente.id]) {
           map[docente.id] = "PRESENTE";
         }
