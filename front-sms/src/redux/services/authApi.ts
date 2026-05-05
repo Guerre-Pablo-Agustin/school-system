@@ -4,7 +4,7 @@ import {
   FetchBaseQueryError,
 } from "@reduxjs/toolkit/query/react";
 import { logoutUser, setUserToken } from "../features/userSlice";
-import { User } from "../../../types/Usuario.type";
+import { User, UserRole } from "../../../types/Usuario.type";
 
 interface RootState {
   user: {
@@ -194,6 +194,12 @@ export const authApi = createApi({
       },
       invalidatesTags: [{ type: "Usuarios", id: "LIST" }],
     }),
+
+    //usuario por rol
+    getUsuariosByRol: builder.query<getUsersResponse, UserRole>({
+      query: (rol) => `/usuarios/rol/${rol}`,
+      providesTags: [{ type: "Usuarios", id: "LIST" }],
+    }),
   }),
 });
 
@@ -204,5 +210,6 @@ export const {
   useGetUserByIdQuery,
   useUpdateUserMutation,
   useCreateUserMutation,
-  useGetUsersQuery
+  useGetUsersQuery,
+  useGetUsuariosByRolQuery
 } = authApi;

@@ -2,7 +2,7 @@
 import { Asignatura } from "./materia.types";
 import { Nota } from "./nota.type";
 
-type UserRole = 'ADMIN' | 'DOCENTE' | 'DIRECTIVO';
+export type UserRole = 'ADMIN' | 'DOCENTE' | 'DIRECTIVO';
 
 export interface User {
   id: string;

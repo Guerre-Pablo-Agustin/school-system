@@ -93,9 +93,9 @@ export const alumnosApi = createApi({
 
     //alumno por seccion
     getAlumnosPorSeccion: builder.query<alumnosResponse, string>({
-      query: (seccionId) => `/alumnos/${seccionId}`,
-      providesTags: ['Alumnos'],
-    }),
+  query: (seccionId) => `/alumnos/seccion/${seccionId}`,
+  providesTags: ['Alumnos'],
+}),
 
     //alumno por grado y ciclo lectivo
     getAlumnosPorGradoYCiclo: builder.query<alumnosResponse, { gradoId: string; cicloLectivo: string }>({
