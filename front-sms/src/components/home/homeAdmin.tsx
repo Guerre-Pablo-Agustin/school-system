@@ -103,7 +103,7 @@ const HomeAdmin = () => {
                                         <TableRow key={clase.id}>
                                             <TableCell>{clase.materia?.nombre}</TableCell>
                                             <TableCell>{clase.materia?.codigo}</TableCell>
-                                            <TableCell>{clase.materia?.ciclo}</TableCell>
+                                            <TableCell>{clase.materia?.cicloLectivo}</TableCell>
                                             <TableCell>
                                                 <Link href={`/dashboard/clases/${clase.id}/informacion`}>
                                                     <Button>Ver Clase</Button>

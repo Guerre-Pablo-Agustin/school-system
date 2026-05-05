@@ -30,7 +30,7 @@ import {
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { AlertCircle, CheckCircle2, Loader2, MailCheck, MailWarning } from "lucide-react";
-import { selectUserToken } from "@/redux/features/userSlice";
+import { selectUserLogin, selectUserToken } from "@/redux/features/userSlice";
 
 import { useSelector } from "react-redux";
 import { User } from "../../../types/Usuario.type";
@@ -55,6 +55,10 @@ const formUserSchema = z.object({
 });
 
 const CreateUserForm = () => {
+
+  const userLogin = useSelector(selectUserLogin);
+  const idUserLogin = userLogin?.id
+
   const token = useSelector(selectUserToken);
   const router = useRouter();
   const [mensaje, setMessage] = useState("");
@@ -91,9 +95,9 @@ const CreateUserForm = () => {
     rol: values.rol
   }
     
-   console.log("🚀 Creando usuario...", userData);
+   console.log("🚀 Creando usuario...", userData,idUserLogin);
     try {
-      const response = await createUser(userData).unwrap();
+       const response = await createUser({data:userData, userLoginId:idUserLogin}).unwrap();
       if (response) {
         setMessage("Usuario creado correctamente");
 
@@ -126,11 +130,15 @@ const CreateUserForm = () => {
       return;
     }
 
-    const user = data?.data.find((user: User) => user.email === email);
+    console.log("🚀 Enviando usuario desde mutation:", data);
+
+    const user = data?.data?.find((user: User) => user.email === email);
     if (user) {
+      console.log("🚀 Usuario encontrado:", user);
       setErrorMailMessage("El mail ya está registrado");
       setVerifyMail(true);
     } else {
+      console.log("🚀 Email disponible");
       setErrorMailMessage("Email disponible");
       setVerifyMail(false);
     }

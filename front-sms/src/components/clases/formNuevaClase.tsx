@@ -1,6 +1,6 @@
 "use client";
 import { useGetUserByIdQuery } from '@/redux/services/authApi';
-import { useAsignarDocenteMutation, useGetAsignaturaByIdQuery } from '@/redux/services/asignatura.Api';
+import { useAsignarDocenteMutation, useGetAsignaturasByCodigoQuery } from '@/redux/services/asignatura.Api';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react'
@@ -9,7 +9,6 @@ import z from 'zod'
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -56,7 +55,7 @@ const FormNuevaClase = () => {
     })
 
     // hook para obtener datos de la materia
-    const { data: asignaturaData, isLoading: isLoadingAsignatura, isError: isErrorAsignatura, refetch: refetchAsignatura } = useGetAsignaturaByIdQuery(codigoAsignaturaBusqueda, {
+    const { data: asignaturaData, isLoading: isLoadingAsignatura, isError: isErrorAsignatura, refetch: refetchAsignatura } = useGetAsignaturasByCodigoQuery(codigoAsignaturaBusqueda, {
         skip: !codigoAsignaturaBusqueda,
     })
 

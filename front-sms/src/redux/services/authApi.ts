@@ -4,10 +4,15 @@ import {
   FetchBaseQueryError,
 } from "@reduxjs/toolkit/query/react";
 import { logoutUser, setUserToken } from "../features/userSlice";
-import { store } from "../store";
 import { User } from "../../../types/Usuario.type";
 
-type RootState = ReturnType<typeof store.getState>;
+interface RootState {
+  user: {
+    userLogin: User | null;
+    usertoken: string | null;
+  };
+}
+
 
 const backendUrl = process.env.NEXT_PUBLIC_API_ROUTElOCAL;
 
@@ -17,17 +22,16 @@ interface LoginRequest {
 }
 
 interface LoginResponse {
-  success?: boolean;
+  success: boolean;
   message: string;
-  data?: User[];
-  user?: User;
+  data: User;
   accessToken?: string;
 }
 
 interface getUsersResponse {
-  message: string;
-  data: User[];
-
+    success: boolean;
+    message: string;
+    data: User[];
 }
 
 interface UserResponse {
@@ -36,12 +40,27 @@ interface UserResponse {
   error?: string;
 }
 
+interface CreateUserRequest {
+  data: Partial<User>;
+  userLoginId: number;
+}
+
+interface CreateUserResponse {
+  data: {
+    success: boolean;
+    message: string;
+    data: User;
+  };
+}
+
 const baseQuery = fetchBaseQuery({
   baseUrl: backendUrl,
   credentials: "include",
   prepareHeaders: (headers, { getState }) => {
-    const token = (getState() as RootState).user.usertoken;
+    const state = getState() as RootState;
+    const token = state.user?.usertoken;
     if (token) {
+
       headers.set("authorization", `Bearer ${token}`);
     }
     return headers;
@@ -55,7 +74,9 @@ export const baseQueryWithReauth: typeof baseQuery = async (
 ) => {
   let result = await baseQuery(args, api, extraOptions);
 
-  const status = (result.error as FetchBaseQueryError)?.status;
+  const error = result.error as FetchBaseQueryError | undefined;
+  const status = error?.status;
+
 
   console.log("Resultado de la query original:", result);
 
@@ -97,12 +118,12 @@ export const authApi = createApi({
   tagTypes: ["Usuarios"],
   endpoints: (builder) => ({
 
-  //login (auth/login moved to GET /usuarios per Swagger)
+    //login (auth/login moved to GET /usuarios per Swagger)
     login: builder.mutation<LoginResponse, LoginRequest>({
       query: (credentials) => ({
-        url: "/usuarios",
-        method: "GET",
-        params: credentials,
+        url: "/auth/login",
+        method: "POST",
+        body: credentials,
       }),
     }),
 
@@ -135,10 +156,10 @@ export const authApi = createApi({
     getUserById: builder.query<UserResponse, string>({
       query: (id) => {
         console.log("ID del usuario:", id);
-       return {
-        url: `/usuarios/${id}`,
-        method: "GET"
-      }
+        return {
+          url: `/usuarios/${id}`,
+          method: "GET"
+        }
       },
       providesTags: (result, error, id) => [{ type: "Usuarios", id }],
     }),
@@ -160,25 +181,28 @@ export const authApi = createApi({
     }),
 
     //crear un usuario
-    createUser: builder.mutation<UserResponse, Partial<User>>({
-      query:(data)=>{
-        console.log("🛠️ Enviando usuario desde mutation:",data); // 👈 log
+    createUser: builder.mutation<CreateUserResponse, CreateUserRequest>({
+      query: ({ data, userLoginId }) => {
         return {
-          url:"usuarios",
-          method:"POST",
-          body:data,
-        }
+          headers: {
+            "X-Creador-Id": String(userLoginId), // ✅ HTTP headers son siempre strings
+          },
+          url: "usuarios",
+          method: "POST",
+          body: data,
+        };
       },
+      invalidatesTags: [{ type: "Usuarios", id: "LIST" }],
     }),
   }),
 });
 
-export const { 
-  useLoginMutation, 
-  useLogoutMutation, 
-  useRefreshTokenMutation, 
-  useGetUserByIdQuery, 
-  useUpdateUserMutation, 
-  useCreateUserMutation, 
-  useGetUsersQuery 
+export const {
+  useLoginMutation,
+  useLogoutMutation,
+  useRefreshTokenMutation,
+  useGetUserByIdQuery,
+  useUpdateUserMutation,
+  useCreateUserMutation,
+  useGetUsersQuery
 } = authApi;

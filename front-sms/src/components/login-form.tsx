@@ -35,10 +35,11 @@ export function LoginForm({
     try {
       if (email && password) {
         const response = await login({ email, password }).unwrap(); // <-- importante
+        console.log("Response login:", response);
+        const user = response.data;
+        const accessToken = response.accessToken;
 
-        // La API devuelve: { data: { success, message, data: [users] } }
-        const user = response?.data?.[0] || response?.user;
-        const accessToken = response?.accessToken;
+     
         
         if (user) {
           dispatch(loginSlice({ userLogin: user, accessToken }));
