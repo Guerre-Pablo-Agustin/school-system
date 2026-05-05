@@ -4,6 +4,7 @@ import * as React from "react"
 import {
   AlertCircle,
   BookOpen,
+  CalendarCheck,
   ClipboardList,
   Command,
   FileText,
@@ -143,6 +144,36 @@ const fullNav: NavSection[] = [
     {
       title: "Nueva seccion",
       url: "/dashboard/secciones/nuevo",
+    }],
+  },
+  {
+    title: "Horarios",
+    url: "/dashboard/horarios",
+    icon: CalendarRange,
+    rol: ["ADMIN", "DIRECTIVO"],
+    items: [{ 
+      title: "Listado de horarios", 
+      url: "/dashboard/horarios" },
+    {
+      title: "Nuevo horario",
+      url: "/dashboard/horarios/nuevo",
+    }],
+  },
+  {
+    title: "Asistencias",
+    url: "/dashboard/asistencias",
+    icon: CalendarCheck,
+    rol: ["ADMIN", "DIRECTIVO", "DOCENTE"],
+    items: [{ 
+      title: "Listado de asistencias", 
+      url: "/dashboard/asistencias" },
+    {
+      title: "Asistencia alumnos",
+      url: "/dashboard/asistencias/alumno-nuevo",
+    },
+    {
+      title: "Asistencia docente",
+      url: "/dashboard/asistencias/docente-nuevo",
     }],
   },
   {
