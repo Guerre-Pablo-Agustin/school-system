@@ -17,9 +17,9 @@ export interface Alumno {
 export interface AlumnoList {
 activo: boolean
 apellido: string
-cicloEducativoId: number
-cicloEducativoNombre: string
-cicloLectivo: string
+cicloEducativoId?: number
+cicloEducativoNombre?: string
+cicloLectivo?: string
 codigo: string
 gradoId: number
 gradoNombre: string
@@ -27,4 +27,7 @@ id: number
 nombre: string
 seccionId: number
 seccionNombre: string
+documento: string
+telefono: string
+direccion: string
 }

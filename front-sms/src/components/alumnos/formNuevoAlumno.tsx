@@ -29,11 +29,9 @@ import { AlertCircle, CheckCircle2, BookOpen, Loader2 } from "lucide-react";
 import { useGetSeccionesQuery } from '@/redux/services/seccionesApi';
 
 const formAlumnoSchema = z.object({
+  codigo: z.string().min(1, { message: "El codigo es requerido" }),
   nombre: z.string().min(3, { message: "El nombre es requerido" }),
   apellido: z.string().min(3, { message: "El apellido es requerido" }),
-  dni: z.string().min(8, { message: "El dni es requerido" }),
-  grado: z.number().min(1, { message: "El grado es requerido" }).max(6, { message: "El grado máximo es 6" }),
-  seccionId: z.number().min(1, { message: "La sección es requerida" }),
   telefono: z
     .string()
     .trim()
@@ -41,8 +39,8 @@ const formAlumnoSchema = z.object({
       message: "Número de teléfono inválido",
     }),
   direccion: z.string().min(3, { message: "La dirección es requerida" }),
-  anioLectivo: z.number().min(2000, { message: "El año lectivo debe ser mayor a 2000" }).max(2100, { message: "Año lectivo no válido" }),
-  codigo: z.string().min(1, { message: "El codigo es requerido" }),
+  documento: z.string().min(8, { message: "El dni es requerido" }),
+  seccionId: z.number().min(1, { message: "La sección es requerida" }),
 });
 
 interface EnrollmentInfo {
@@ -63,12 +61,10 @@ const FormNuevoAlumno = () => {
     defaultValues: {
       nombre: "",
       apellido: "",
-      dni: "",
-      grado: 0,
+      documento: "",
       seccionId: 0,
       telefono: "",
       direccion: "",
-      anioLectivo: new Date().getFullYear(),
       codigo: ""
     },
   });
@@ -153,7 +149,7 @@ const FormNuevoAlumno = () => {
           {/*dni*/}
           <FormField
             control={form.control}
-            name="dni"
+            name="documento"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>DNI</FormLabel>
@@ -161,27 +157,6 @@ const FormNuevoAlumno = () => {
                   <Input placeholder="DNI" {...field} />
                 </FormControl>
                 <FormDescription>DNI del alumno.</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/*grado*/}
-          <FormField
-            control={form.control}
-            name="grado"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Grado</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="Grado (1-6)"
-                    {...field}
-                    onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                  />
-                </FormControl>
-                <FormDescription>Grado del alumno (se asociará automáticamente a las materias de este grado).</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -262,25 +237,6 @@ const FormNuevoAlumno = () => {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="anioLectivo"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Año lectivo</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="Año lectivo"
-                    {...field}
-                    onChange={(e) => field.onChange(parseInt(e.target.value) || new Date().getFullYear())}
-                  />
-                </FormControl>
-                <FormDescription>Año lectivo para las asignaciones automáticas.</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
         </div>
 
         <div className="flex gap-4">
@@ -319,11 +275,11 @@ const FormNuevoAlumno = () => {
                       <span className="font-medium">Inscripciones Automáticas:</span>
                     </div>
                     <p className="text-sm text-green-700 mt-1">
-                      El alumno fue inscrito automáticamente en {enrollmentInfo.inscripcionesCreadas} de {enrollmentInfo.totalClases} materias del {form.watch('grado')}° grado.
+                      El alumno fue inscrito automáticamente en {enrollmentInfo.inscripcionesCreadas} de {enrollmentInfo.totalClases} materias.
                     </p>
                     {enrollmentInfo.inscripcionesCreadas < enrollmentInfo.totalClases && (
                       <p className="text-xs text-amber-700 mt-1">
-                        ⚠️ Algunas materias no tienen clases creadas para el año lectivo {form.watch('anioLectivo')}.
+                        ⚠️ Algunas materias no tienen clases creadas.
                       </p>
                     )}
                   </div>

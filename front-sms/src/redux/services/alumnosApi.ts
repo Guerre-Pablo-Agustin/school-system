@@ -1,19 +1,19 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithReauth } from "./authApi";
-import { Alumno } from "../../../types/alumnos.types";
+import { Alumno, AlumnoList } from "../../../types/alumnos.types";
 import { Clase } from "../../../types/Usuario.type";
 
 
 
 interface alumnosResponse {
   message: string;
-  data: Alumno[];
+  data: AlumnoList[];
   error?: string;
 }
 
 interface AlumnoResponse {
   message: string;
-  data: Alumno;
+  data: AlumnoList;
   error?: string;
   success?: boolean;
   enrollment?: {

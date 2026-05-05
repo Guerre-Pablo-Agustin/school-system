@@ -72,7 +72,7 @@ export const getColumns = (
       header: "Apellido",
     },
     {
-      accessorKey: "dni",
+      accessorKey: "documento",
       header: "DNI",
     },
     {

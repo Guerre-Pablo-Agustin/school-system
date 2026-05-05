@@ -32,20 +32,19 @@ interface InformacionAlumnoProps {
 }
 
 const formAlumnoSchema = z.object({
+  codigo: z.string().min(1, { message: "El codigo es requerido" }),
   nombre: z.string().min(3, { message: "El nombre es requerido" }),
   apellido: z.string().min(3, { message: "El apellido es requerido" }),
-  dni: z.string().min(8, { message: "El dni es requerido" }),
-  gradoId: z.number().min(1, { message: "El grado es requerido" }),
   telefono: z
     .string()
     .trim()
     .regex(/^\+?[0-9\s\-()]{7,20}$/, {
       message: "Número de teléfono inválido",
     }),
-  direccion: z.string().min(3, { message: "La direccion es requerida" }),
+    direccion: z.string().min(3, { message: "La direccion es requerida" }),
+  documento: z.string().min(8, { message: "El dni es requerido" }),
   seccionId: z.number().min(1, { message: "La sección es requerida" }),
-  cicloLectivo: z.string().min(1, { message: "El ciclo lectivo es requerido" }),
-  codigo: z.string().min(1, { message: "El codigo es requerido" }),
+ 
 });
 
 const InformacionAlumno = ({ dataAlumno }: InformacionAlumnoProps) => {
@@ -63,12 +62,10 @@ const InformacionAlumno = ({ dataAlumno }: InformacionAlumnoProps) => {
     defaultValues: {
       nombre: dataAlumno?.nombre || "",
       apellido: dataAlumno?.apellido || "",
-      dni: dataAlumno?.dni || "",
-      gradoId: dataAlumno?.gradoId || 0,
+      documento: dataAlumno?.documento || "",
       seccionId: dataAlumno?.seccionId || 0,
       telefono: dataAlumno?.telefono || "",
       direccion: dataAlumno?.direccion || "",
-      cicloLectivo: dataAlumno?.cicloLectivo || "",
       codigo: dataAlumno?.codigo || "",
     },
   });
@@ -164,7 +161,7 @@ const InformacionAlumno = ({ dataAlumno }: InformacionAlumnoProps) => {
           />
           <FormField
             control={form.control}
-            name="dni"
+            name="documento"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>DNI</FormLabel>
@@ -172,20 +169,6 @@ const InformacionAlumno = ({ dataAlumno }: InformacionAlumnoProps) => {
                   <Input placeholder="DNI" {...field} />
                 </FormControl>
                 <FormDescription>DNI del alumno.</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="gradoId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Grado</FormLabel>
-                <FormControl>
-                  <Input placeholder="Grado" {...field} disabled />
-                </FormControl>
-                <FormDescription>Grado del alumno.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -245,27 +228,6 @@ const InformacionAlumno = ({ dataAlumno }: InformacionAlumnoProps) => {
                   <Input placeholder="Direccion" {...field} />
                 </FormControl>
                 <FormDescription>Direccion del alumno.</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/*año Lectivo*/}
-          <FormField
-            control={form.control}
-            name="cicloLectivo"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Año Lectivo</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="Año Lectivo"
-                    {...field}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                  />
-                </FormControl>
-                <FormDescription>Año lectivo del alumno.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
